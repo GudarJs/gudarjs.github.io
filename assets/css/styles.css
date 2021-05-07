@@ -288,6 +288,7 @@ p {
 }
 .summary > .first-paragraph > img {
   display: inline-block;
+  vertical-align: bottom;
   width: 4rem;
   margin-right: 1rem;
 }
