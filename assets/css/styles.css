@@ -282,12 +282,12 @@ p {
 .footer .fa-heart {
   color: #fb866a;
 }
-.summary > img {
+.summary > .first-paragraph > img {
   display: inline-block;
   width: 4rem;
   margin-right: 1rem;
 }
-.summary > p {
+.summary > .first-paragraph > p {
   display: inline;  
 }
 .email {
