@@ -282,13 +282,20 @@ p {
 .footer .fa-heart {
   color: #fb866a;
 }
+.summary > .first-paragraph {
+  margin-bottom: 1rem;
+  text-align: justify;
+}
 .summary > .first-paragraph > img {
   display: inline-block;
   width: 4rem;
   margin-right: 1rem;
 }
 .summary > .first-paragraph > p {
-  display: inline;  
+  display: inline;
+}
+.sumary p {
+  text-align: justify;
 }
 .email {
   display: block;
