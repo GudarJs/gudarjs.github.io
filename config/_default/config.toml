@@ -1,0 +1,4 @@
+baseURL = 'http://example.org/'
+languageCode = 'es-us'
+title = 'Guzmán D. Darío'
+defaultContentLanguage = 'en'

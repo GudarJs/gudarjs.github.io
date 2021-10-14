@@ -1,0 +1,38 @@
+<ul class="social-list list-inline mb-0">
+  {{ with .Param "github" }}
+  <li class="list-inline-item">
+    <a href="{{ . }}" target="_blank" class="text-white" title="Github link" rel="noopener" aria-label="follow on Github——Opens in a new window">
+      <i class="fab fa-github-alt fa-fw"></i>
+    </a>
+  </li>
+  {{ end }}
+  {{ $icon_size := "32px" }}
+  {{ with .Param "linkedin" }}
+  <li class="list-inline-item">
+    <a href="{{ . }}" target="_blank" class="text-white" title="LinkedIn link" rel="noopener" aria-label="follow on LinkedIn——Opens in a new window">
+      <i class="fab fa-linkedin-in fa-fw"></i>
+    </a>
+  </li>
+  {{ end }}
+  {{ with .Param "stackoverflow" }}
+  <li class="list-inline-item">
+    <a href="{{ . }}" target="_blank" class="text-white" title="Stack Overflow link" rel="noopener" aria-label="follow on Stack Overflow——Opens in a new window">
+      <i class="fab fa-stack-overflow fa-fw"></i>
+    </a>
+  </li>
+  {{ end }}
+  {{ with .Param "twitter" }}
+  <li class="list-inline-item">
+    <a href="{{ . }}" target="_blank" class="text-white" title="Twitter link" rel="noopener" aria-label="follow on Twitter——Opens in a new window">
+      <i class="fab fa-twitter fa-fw"></i>
+    </a>
+  </li>
+  {{ end }}
+  {{ with .Param "rss" }}
+  <li class="list-inline-item">
+    <a href="{{ . }}" target="_blank" class="text-white" title="RSS link" rel="noopener" aria-label="follow on RSS——Opens in a new window">
+      <i class="fab fa-rss fa-fw"></i>
+    </a>
+  </li>
+  {{ end }}
+</ul><!--//social-list-->

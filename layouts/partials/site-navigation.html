@@ -1,0 +1,22 @@
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+  <span class="navbar-toggler-icon"></span>
+</button>
+  
+<div class="collapse navbar-collapse text-uppercase" id="navigation">
+  {{- $currentPage := . -}}
+  {{ if .Site.Menus.main }}
+    <ul class="navbar-nav ml-lg-auto">
+      {{ range .Site.Menus.main }}
+        <li class="nav-item {{ if $currentPage.IsMenuCurrent "main" . }}active{{ end }} mr-lg-3">
+          <a class="nav-link" href="{{ .URL }}" title="{{ i18n "pageTitle" . }}">
+            {{ .Name }}{{ if $currentPage.IsMenuCurrent "main" . }} <span class="sr-only">(current)</span>{{ end }}
+          </a>
+        </li>
+      {{ end }}
+
+      {{ partial "i18nlist.html" . }}
+    </ul>
+  {{ end }}
+  </ul>
+  <span id="slide-line"></span>
+</div>

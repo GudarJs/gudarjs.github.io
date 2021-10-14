@@ -1,0 +1,30 @@
+[[main]]
+  identifier = 'home'
+  name = 'HOME'
+  url = '/'
+  weight = 100
+[[main]]
+  identifier = 'projects'
+  name = 'PROJECTS'
+  url = '/projects/'
+  weight = 101
+[[main]]
+  identifier = 'talks'
+  name = 'TALKS'
+  url = '/talks/'
+  weight = 102
+[[main]]
+  identifier = 'blog'
+  name = 'BLOG'
+  url = '/blog/'
+  weight = 103
+[[main]]
+  identifier = 'resume'
+  name = 'RESUME'
+  url = '/resume/'
+  weight = 104
+[[main]]
+  identifier = 'contact'
+  name = 'CONTACT'
+  url = '/contact/'
+  weight = 105

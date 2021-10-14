@@ -1,0 +1,19 @@
+sections:
+  backend:
+    name: Backend
+    icon: images/backend-icon.svg
+    skills:
+      - Django
+      - Python
+
+  frontend:
+    name: Frontend
+    icon: images/frontend-icon.svg
+    skills:
+      - React
+
+  others:
+    name: Others
+    icon: images/other-skills-icon.svg
+    skills:
+      - Devops

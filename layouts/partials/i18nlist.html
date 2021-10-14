@@ -1,0 +1,12 @@
+{{ if .IsTranslated }}
+<li class="nav-item dropdown mr-0">
+    <a class="nav-link dropdown-toggle" href="#" id="navigationLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{ .Lang }}
+    </a>
+    <div class="dropdown-menu dropdown-menu-right text-capitalize shadow-lg" aria-labelledby="navigationLink">
+        {{ range .Translations }}
+            <a class="dropdown-item" href="{{ .RelPermalink }}">{{ .Lang }}</a>
+        {{ end}}
+    </div>
+</li>
+{{ end }}
