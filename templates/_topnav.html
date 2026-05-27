@@ -1,0 +1,23 @@
+<header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="{{ '/'|url }}">
+            <img src="{{ '/static/profile.png'|url }}" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="{{ '/'|url }}" class="topnav-link {% if this._path == '/' %}is-current{% endif %} inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">{{ t.nav_home }}</a></li>
+                <li><a href="{{ '/cv'|url }}" class="topnav-link {% if this._path.startswith('/cv') %}is-current{% endif %} inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">{{ t.nav_cv }}</a></li>
+                <li><a href="{{ '/talleres'|url }}" class="topnav-link {% if this._path.startswith('/talleres') %}is-current{% endif %} inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">{{ t.nav_workshops }}</a></li>
+                <li><a href="{{ '/blog'|url }}" class="topnav-link {% if this._path.startswith('/blog') %}is-current{% endif %} inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">{{ t.nav_blog }}</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="{{ this._path|url(alt=t.lang_switch_alt) }}">
+            <i class="fa fa-globe"></i> {{ t.lang_switch_label }}
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> {{ t.nav_hire }}</a>
+    </div>
+</header>
