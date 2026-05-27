@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="bg-gradient-to-b from-white to-[#f8f9fa] pt-16 pb-14 border-b border-[#e9ecef] rounded-b-3xl">
+    <div class="max-w-[1140px] mx-auto px-8">
+        <p class="font-mono text-xs uppercase tracking-[0.14em] text-azure mb-3">{{ this.eyebrow }}</p>
+        <h1 class="text-[40px] font-black text-slate-900 tracking-[-0.01em] leading-[1.1] mb-4">{{ this.title }}</h1>
+        <p class="text-[17px] text-slate-600 max-w-[38em] leading-[1.55] m-0">{{ this.deck }}</p>
+    </div>
+</section>
+
+<section class="py-20 bg-[#f8f9fa]">
+    <div class="max-w-[1140px] mx-auto px-8">
+        {% set theme_icons = {'green': 'fa-code', 'blue': 'fa-globe', 'red': 'fa-bolt', 'coral': 'fa-users'} %}
+        <div class="flex flex-col">
+            {% for post in this.children %}
+            <a class="grid grid-cols-[280px_1fr] gap-7 py-7 border-b border-[#e9ecef] no-underline last:border-b-0 hover:no-underline max-[900px]:grid-cols-1" href="{{ post|url }}">
+                <div class="aspect-[16/10] rounded-2xl relative overflow-hidden flex items-center justify-center text-5xl text-white/25 thumb-{{ post.theme }}">
+                    {% if post.cover_image %}
+                    <img src="{{ post.cover_image }}" alt="{{ post.title }}" class="absolute inset-0 w-full h-full object-cover">
+                    {% else %}
+                    <i class="fa {{ theme_icons.get(post.theme, 'fa-code') }}"></i>
+                    {% endif %}
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="flex gap-3 font-mono text-[11px] text-slate-400 uppercase tracking-[0.08em]">
+                        <span>{{ post.pub_date.strftime('%b %d, %Y') }}</span>
+                        <span>{{ post.read_time }} de lectura</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 m-0 leading-[1.3]">{{ post.title }}</h3>
+                    <p class="text-slate-600 text-[14.5px] mt-1 m-0 leading-[1.55]">{{ post.excerpt }}</p>
+                    <div class="flex gap-2 flex-wrap mt-2">
+                        {% for tag in post.tags %}<span class="text-[11px] font-mono uppercase tracking-[0.06em] text-azure rounded-full">{{ tag }}</span>{% endfor %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
