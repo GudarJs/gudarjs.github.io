@@ -1,0 +1,28 @@
+{% set lang = 'en' if this.alt == 'en' else 'es' %}
+{% set t = bag('i18n_' + lang) %}
+<!doctype html>
+<html lang="{{ t.html_lang }}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block description %}Sitio personal de Guzmán D. Darío — Senior Python Developer{% endblock %}">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="{{ '/static/profile.png'|url }}">
+    <title>{% block title %}{{ this.title }} — Guzmán D. Darío{% endblock %}</title>
+    <link rel="stylesheet" href="{{ '/font-awesome/css/font-awesome.min.css'|url }}">
+    <link rel="stylesheet" href="{{ '/static/site.css'|url }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% include "_topnav.html" %}
+
+    {% block content %}{% endblock %}
+
+    {% include "_footer.html" %}
+
+    {% block scripts %}{% endblock %}
+    <script src="{{ '/static/site.js'|url }}"></script>
+</body>
+</html>
