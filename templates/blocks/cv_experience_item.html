@@ -1,0 +1,30 @@
+<div class="mb-[26px] last:mb-0">
+    <div class="flex gap-3.5 items-start">
+        <span class="size-11 rounded-xl shrink-0 inline-flex items-center justify-center text-white font-display font-bold text-sm tracking-[0.02em] shadow-sm overflow-hidden orbit-logo"
+              style="{% if this.logo_color %}background:{{ this.logo_color }};{% endif %}"
+              aria-hidden="true" title="{{ this.company }}">
+            {% if this.logo_image %}
+            <img src="{{ this.logo_image }}" alt="{{ this.company }}" class="w-full h-full object-contain bg-white">
+            {% else %}
+            {{ this.logo_initials }}
+            {% endif %}
+        </span>
+        <div class="flex-1 min-w-0">
+            <div class="relative overflow-hidden mb-0.5">
+                <h3 class="text-[15px] font-medium text-slate-800 m-0">{{ this.title }}</h3>
+                <div class="absolute right-0 top-0 text-slate-400 text-[13px]">{{ this.time }}</div>
+            </div>
+            <div class="text-slate-400 text-[13px] mb-2">{{ this.company }}</div>
+            <div class="text-slate-600 text-[13.5px]">
+                <strong class="text-slate-900">Responsibilities</strong>
+                <ul class="mt-1 mb-2.5 ml-[18px] p-0 leading-[1.5]">
+                    {% for r in this.responsibilities %}<li class="mb-0.5">{{ r }}</li>{% endfor %}
+                </ul>
+                <strong class="text-slate-900">Tools</strong>
+                <ul class="mt-1 mb-2.5 ml-[18px] p-0 leading-[1.5]">
+                    {% for tool in this.tools %}<li class="mb-0.5">{{ tool }}</li>{% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

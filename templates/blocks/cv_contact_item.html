@@ -1,0 +1,8 @@
+<li class="flex items-center gap-2 mb-3 text-[13px] last:mb-0{% if this.kind == 'email' %} min-w-0{% endif %}">
+    <i class="fa fa-{{ this.icon }} text-base w-[18px] text-center shrink-0"></i>
+    {% if this.kind == 'email' %}
+    <a href="{{ this.href }}" class="text-white hover:text-white hover:underline truncate block">{{ this.label }}</a>
+    {% else %}
+    <a href="{{ this.href }}" target="_blank" rel="noreferrer" class="text-white hover:text-white hover:underline">{{ this.label }}</a>
+    {% endif %}
+</li>

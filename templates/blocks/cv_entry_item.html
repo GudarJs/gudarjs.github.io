@@ -1,0 +1,18 @@
+<div class="mb-3.5 last:mb-0">
+    <div class="flex gap-2.5 items-start">
+        <span class="size-[30px] rounded-lg shrink-0 inline-flex items-center justify-center text-white font-display font-bold text-[10px] tracking-[0.02em] bg-white/12 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)] mt-0.5 overflow-hidden"
+              style="{% if this.logo_color %}background:{{ this.logo_color }};{% endif %}"
+              aria-hidden="true">
+            {% if this.logo_image %}
+            <img src="{{ this.logo_image }}" alt="{{ this.meta }}" class="w-full h-full object-contain bg-white">
+            {% else %}
+            {{ this.logo_initials }}
+            {% endif %}
+        </span>
+        <div class="flex-1 min-w-0">
+            <h4 class="text-[13px] font-bold text-white mb-0.5 m-0">{{ this.title }}</h4>
+            <h5 class="text-white/60 font-medium text-xs m-0">{{ this.meta }}</h5>
+            <div class="text-white/60 font-medium text-xs">{{ this.time }}</div>
+        </div>
+    </div>
+</div>
