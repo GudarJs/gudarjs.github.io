@@ -1,0 +1,178 @@
+{% extends "layout.html" %}
+{% block title %}Guzmán D. Darío — CV{% endblock %}
+{% block content %}
+<section class="pt-12 pb-20 bg-[#f8f9fa]">
+    <div class="max-w-[980px] mx-auto px-4">
+
+        <div class="cv-actions flex gap-2.5 justify-end mb-[18px] flex-wrap">
+            <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-azure text-white text-[13px] font-medium hover:bg-deep-blue hover:text-white transition-all cursor-pointer border-0" onclick="window.print()"><i class="fa fa-download"></i> {{ t.cv_btn_download }}</button>
+        </div>
+
+        {# === ORBIT CARD === #}
+        <div class="orbit-wrapper bg-terracotta max-w-[960px] mx-auto relative shadow-[0_2px_4px_rgba(0,0,0,0.1)] min-h-[1000px] rounded-[18px] overflow-hidden">
+
+            {# === SIDEBAR === #}
+            <aside class="orbit-sidebar absolute right-0 top-0 w-60 h-full min-h-[800px] bg-azure text-white max-[767px]:static max-[767px]:w-full max-[767px]:h-auto max-[767px]:min-h-0">
+
+                <div class="p-[30px] bg-black/20 text-center">
+                    <img class="orbit-profile w-[180px] h-[180px] rounded-full shadow-[0_0_5px_var(--color-deep-blue)] object-cover mx-auto mb-[15px] block" src="{{ '/static/profile.png'|url }}" alt="Foto de perfil — Guzmán D. Darío" />
+                    <h1 class="text-[28px] font-black leading-[1.1] text-white mb-2">Guzmán D. Darío</h1>
+                    <h3 class="text-white/60 text-[15px] font-normal m-0">Senior Python Developer</h3>
+                </div>
+
+                <div class="p-[24px_30px]">
+                    <h2 class="uppercase text-sm font-bold mb-3.5 tracking-[0.02em] text-white">{{ t.cv_sidebar_contact }}</h2>
+                    <ul class="list-none p-0 m-0 text-[13px]">
+                        {{ this.contact }}
+                    </ul>
+                </div>
+
+                <div class="p-[24px_30px]">
+                    <h2 class="uppercase text-sm font-bold mb-3.5 tracking-[0.02em] text-white">{{ t.cv_sidebar_education }}</h2>
+                    {{ this.education }}
+                </div>
+
+                <div class="p-[24px_30px]">
+                    <h2 class="uppercase text-sm font-bold mb-3.5 tracking-[0.02em] text-white">{{ t.cv_sidebar_volunteering }}</h2>
+                    {{ this.volunteering }}
+                </div>
+
+                <div class="p-[24px_30px]">
+                    <h2 class="uppercase text-sm font-bold mb-3.5 tracking-[0.02em] text-white">{{ t.cv_sidebar_languages }}</h2>
+                    <ul class="list-none p-0 m-0 text-[13px]">
+                        {% for lang in this.languages %}
+                        <li class="mb-2 text-white/60">{{ lang }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="p-[24px_30px]">
+                    <h2 class="uppercase text-sm font-bold mb-3.5 tracking-[0.02em] text-white">{{ t.cv_sidebar_interests }}</h2>
+                    <ul class="list-none p-0 m-0 text-[13px]">
+                        {% for item in this.interests %}
+                        <li class="mb-2 text-white/60">{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+            </aside>
+
+            {# === MAIN === #}
+            <main class="bg-[#DDE2E3] p-[50px_60px] pr-[290px] min-h-[1000px] max-[767px]:p-[30px] max-[767px]:pr-[30px]">
+
+                <section class="mb-12 last:mb-0">
+                    <h2 class="uppercase text-lg font-medium text-slate-900 mb-[18px] font-display tracking-[0.02em] flex items-center gap-2">
+                        <span class="size-7 inline-flex items-center justify-center text-white rounded-full bg-slate-900 text-sm shrink-0"><i class="fa fa-user"></i></span>
+                        {{ t.cv_section_about }}
+                    </h2>
+                    <div class="text-slate-600 text-sm">
+                        <div class="mb-3.5 text-justify leading-[1.55] flex items-start">
+                            <img src="{{ '/static/quote.png'|url }}" alt="" class="inline-block w-14 mr-3.5 shrink-0">
+                            <div>{{ this.summary_es }}</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-12 last:mb-0">
+                    <h2 class="uppercase text-lg font-medium text-slate-900 mb-[18px] font-display tracking-[0.02em] flex items-center gap-2">
+                        <span class="size-7 inline-flex items-center justify-center text-white rounded-full bg-slate-900 text-sm shrink-0"><i class="fa fa-briefcase"></i></span>
+                        {{ t.cv_section_experience }}
+                    </h2>
+                    {{ this.experience }}
+                </section>
+
+                <section class="mb-12 last:mb-0">
+                    <h2 class="uppercase text-lg font-medium text-slate-900 mb-[18px] font-display tracking-[0.02em] flex items-center gap-2">
+                        <span class="size-7 inline-flex items-center justify-center text-white rounded-full bg-slate-900 text-sm shrink-0"><i class="fa fa-archive"></i></span>
+                        {{ t.cv_section_talks }}
+                    </h2>
+                    <ul class="list-none p-0 m-0">
+                        {{ this.talks }}
+                    </ul>
+                </section>
+
+                <section class="mb-12 last:mb-0">
+                    <h2 class="uppercase text-lg font-medium text-slate-900 mb-[18px] font-display tracking-[0.02em] flex items-center gap-2">
+                        <span class="size-7 inline-flex items-center justify-center text-white rounded-full bg-slate-900 text-sm shrink-0"><i class="fa fa-rocket"></i></span>
+                        {{ t.cv_section_skills }}
+                    </h2>
+                    <div class="overflow-hidden">
+                        {{ this.skills }}
+                    </div>
+                </section>
+
+            </main>
+        </div>{# /.orbit-wrapper #}
+
+        {# === PRINT-ONLY LAYOUT — class names used in @media print in site.css === #}
+        <article class="print-cv" aria-hidden="true">
+            <header class="pcv-header">
+                <img class="pcv-photo" src="{{ '/static/profile.png'|url }}" alt="">
+                <div class="pcv-identity">
+                    <h1>Guzmán D. Darío</h1>
+                    <p class="pcv-role">Senior Python Developer</p>
+                    <ul class="pcv-contact">
+                        {% for block in this.contact.blocks %}
+                        <li><i class="fa fa-{{ block.icon }}"></i> {{ block.label }}</li>
+                        {% endfor %}
+                        <li><i class="fa fa-map-marker"></i> Barranquilla, Colombia</li>
+                    </ul>
+                    <p class="pcv-languages">
+                        <i class="fa fa-language"></i>
+                        <strong>{{ t.cv_sidebar_languages }}:</strong>
+                        {{ this.languages | join(' · ') }}
+                    </p>
+                </div>
+            </header>
+
+            <section class="pcv-section">
+                <h2>{{ t.cv_print_about }}</h2>
+                {{ this.summary_es }}
+            </section>
+
+            <section class="pcv-section">
+                <h2>{{ t.cv_print_experience }}</h2>
+                {% for block in this.experience.blocks %}
+                <article class="pcv-job">
+                    <header>
+                        <h3>{{ block.title }} · {{ block.company.split('—')[0].strip() if '—' in block.company else block.company }}</h3>
+                        <span class="pcv-when">{{ block.time }}{% if '—' in block.company %} · {{ block.company.split('—')[1].strip() }}{% endif %}</span>
+                    </header>
+                    <ul>
+                        {% for r in block.responsibilities %}<li>{{ r }}</li>{% endfor %}
+                    </ul>
+                    <p class="pcv-tools"><strong>Stack:</strong> {{ block.tools | join(' · ') }}</p>
+                </article>
+                {% endfor %}
+            </section>
+
+            <section class="pcv-section pcv-two-col">
+                <div>
+                    <h2>{{ t.cv_print_education }}</h2>
+                    {% for block in this.education.blocks %}
+                    <article class="pcv-misc">
+                        <h3>{{ block.title }}</h3>
+                        <span class="pcv-when">{{ block.meta }} · {{ block.time }}</span>
+                    </article>
+                    {% endfor %}
+                </div>
+                <div>
+                    <h2>{{ t.cv_print_volunteering }}</h2>
+                    {% for block in this.volunteering.blocks %}
+                    <article class="pcv-misc">
+                        <h3>{{ block.title }}</h3>
+                        <span class="pcv-when">{{ block.meta }} · {{ block.time }}</span>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <footer class="pcv-foot">
+                <span>guzmandario.com</span>
+                <span>guzmandario.com — {{ this.pub_date if this.pub_date else '' }}</span>
+            </footer>
+        </article>
+
+    </div>
+</section>
+{% endblock %}
