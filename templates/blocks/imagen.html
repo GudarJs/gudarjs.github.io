@@ -1,0 +1,6 @@
+<div class="my-6 rounded-2xl overflow-hidden border border-[#e9ecef] bg-white">
+    <img src="{{ this.imagen }}" alt="{{ this.pie or '' }}" class="block w-full h-auto">
+    {% if this.pie %}
+    <div class="px-4 py-3 text-[13px] text-slate-400 italic border-t border-[#e9ecef] bg-[#fafbfc]">{{ this.pie }}</div>
+    {% endif %}
+</div>
