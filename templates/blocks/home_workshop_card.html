@@ -1,0 +1,19 @@
+<a class="bg-white rounded-2xl overflow-hidden no-underline flex flex-col transition-all duration-[0.4s] border border-[#e9ecef] hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] hover:no-underline" href="{{ '/talleres'|url }}">
+    <div class="aspect-[16/10] bg-gradient-to-br from-azure to-deep-blue flex items-center justify-center text-white/90 text-5xl relative overflow-hidden{% if this.thumb_class %} thumb-{{ this.thumb_class }}{% endif %}">
+        {% if this.cover_image %}
+        <img src="{{ this.cover_image }}" alt="{{ this.title }}" class="absolute inset-0 w-full h-full object-cover">
+        {% else %}
+        <i class="fa {{ this.icon }} relative z-10"></i>
+        {% endif %}
+        <div class="absolute inset-0" style="background-image:radial-gradient(rgba(255,255,255,0.1) 1px,transparent 1px),radial-gradient(rgba(255,255,255,0.05) 1px,transparent 1px);background-size:24px 24px,12px 12px;background-position:0 0,6px 6px"></div>
+    </div>
+    <div class="p-[22px] pb-6 flex-1 flex flex-col gap-2">
+        <span class="font-mono text-[11px] uppercase tracking-[0.1em] text-slate-400">{{ this.kicker }}</span>
+        <h3 class="text-[17px] font-bold text-slate-900 leading-snug m-0">{{ this.title }}</h3>
+        <p class="text-sm text-slate-600 m-0 leading-[1.5]">{{ this.desc }}</p>
+        <div class="mt-auto pt-3 flex gap-3.5 text-xs text-slate-400">
+            <span><i class="fa fa-clock-o mr-1"></i>{{ this.duration }}</span>
+            <span>{{ this.lang_or_tag }}</span>
+        </div>
+    </div>
+</a>

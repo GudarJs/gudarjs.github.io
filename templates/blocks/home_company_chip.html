@@ -1,0 +1,10 @@
+<a class="inline-flex items-center gap-2.5 no-underline text-slate-600 font-bold text-sm font-display tracking-[0.02em] hover:text-azure hover:no-underline transition-colors" href="{{ '/cv'|url }}" title="{{ this.label }}">
+    <span class="size-9 rounded-xl inline-flex items-center justify-center text-white text-[13px] tracking-[0.02em] shrink-0 overflow-hidden" style="{% if this.logo_color %}background:{{ this.logo_color }};{% endif %}">
+        {% if this.logo_image %}
+        <img src="{{ this.logo_image }}" alt="{{ this.label }}" class="w-full h-full object-contain bg-white">
+        {% else %}
+        {{ this.mark }}
+        {% endif %}
+    </span>
+    <span>{{ this.label }}</span>
+</a>
