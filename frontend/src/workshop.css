@@ -1,0 +1,26 @@
+/* OS command tab panels — toggled by workshop.js */
+.os-tab-panel          { display: none; }
+.os-tab-panel.is-active { display: block; }
+
+/* Active OS tab — toggled by workshop.js */
+.os-tab.is-active {
+  background: #fff;
+  color: var(--color-azure);
+  border-bottom-color: var(--color-azure);
+}
+
+/* Terminal output block */
+.terminal {
+  background: #0c1018;
+  color: #e8f0ff;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.7;
+  padding: 18px 20px;
+  border-radius: 4px;
+  margin: 20px 0;
+  overflow-x: auto;
+}
+.terminal .prompt  { color: #6cd47a; user-select: none; margin-right: 6px; }
+.terminal .comment { color: rgba(232,240,255,0.45); }
+.terminal .output  { color: rgba(232,240,255,0.75); display: block; }
