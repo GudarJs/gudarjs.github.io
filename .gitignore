@@ -1,0 +1,8 @@
+*.pyc
+__pycache__/
+venv/
+dist/
+.lektor/
+scripts/.env
+scripts/.linkedin_token.json
+frontend/node_modules/
