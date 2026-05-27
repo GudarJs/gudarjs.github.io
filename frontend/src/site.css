@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&family=Roboto+Slab:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+/* Tell Tailwind where to scan for utility classes */
+@source "../../templates";
+@source "../../content";
+
+/* ── Design tokens ──────────────────────────────────── */
+@theme {
+  --color-azure:       #2D749F;
+  --color-deep-blue:   #1F4F6C;
+  --color-coral:       #fb866a;
+  --color-terracotta:  #B37C57;
+  --color-walnut:      #60412B;
+  --color-slate-900:   #3C455C;
+  --color-slate-800:   #3F4650;
+  --color-slate-600:   #545E6C;
+  --color-slate-400:   #9AACB8;
+  --font-sans:    'Roboto', system-ui, sans-serif;
+  --font-display: 'Roboto Slab', Georgia, serif;
+  --font-mono:    'SFMono-Regular', Menlo, Consolas, monospace;
+  --duration-link: 0.4s;
+  --easing-link:   ease-in-out;
+
+  /* Thumb gradient variants used in post/feature cards */
+  --color-thumb-warm-from:  #B37C57;
+  --color-thumb-warm-to:    #60412B;
+  --color-thumb-coral-from: #fb866a;
+  --color-thumb-coral-to:   #c8523a;
+  --color-thumb-slate-from: #3C455C;
+  --color-thumb-slate-to:   #1a1d28;
+  --color-thumb-green-from: #092e20;
+  --color-thumb-green-to:   #2a6f4b;
+  --color-thumb-blue-from:  #1F4F6C;
+  --color-thumb-blue-to:    #2D749F;
+  --color-thumb-red-from:   #A41E11;
+  --color-thumb-red-to:     #D82C20;
+}
+
+/* ── Base ───────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-slate-600);
+    background: #f8f9fa;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a {
+    color: var(--color-azure);
+    text-decoration: none;
+    transition: color var(--duration-link) var(--easing-link);
+  }
+  a:hover { color: var(--color-deep-blue); text-decoration: underline; }
+  p { margin: 0 0 1rem; }
+  h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700; color: var(--color-slate-900); }
+}
+
+/* ── JS-state hooks ─────────────────────────────────── */
+/* brand-photo: w-0 + opacity-0 at top; site.js adds .topbar--avatar to reveal it */
+.brand-photo {
+  width: 0;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out, width 0.25s ease-in-out;
+}
+.topbar--avatar .brand-photo {
+  opacity: 1;
+  width: 40px;
+}
+
+/* Active nav indicator — pseudo-element, can't be a utility */
+.topnav-link.is-current { color: var(--color-azure); font-weight: 700; }
+.topnav-link.is-current::after {
+  content: "";
+  display: block;
+  height: 2px;
+  margin-top: 6px;
+  margin-bottom: -8px;
+  background: var(--color-azure);
+  border-radius: 2px;
+}
+
+/* ── Thumb gradient variants ────────────────────────── */
+/* Used with class="thumb-warm" etc. on feature/post card thumbnails */
+.thumb-warm  { background: linear-gradient(135deg, #B37C57, #60412B); }
+.thumb-coral { background: linear-gradient(135deg, #fb866a, #c8523a); }
+.thumb-slate { background: linear-gradient(135deg, #3C455C, #1a1d28); }
+.thumb-green { background: linear-gradient(135deg, #092e20, #2a6f4b); }
+.thumb-blue  { background: linear-gradient(135deg, #1F4F6C, #2D749F); }
+.thumb-red   { background: linear-gradient(135deg, #A41E11, #D82C20); }
+
+/* ── Print CV ───────────────────────────────────────── */
+/* The on-screen orbit card is hidden; this layout is revealed only when printing. */
+.print-cv { display: none; }
+
+@media print {
+  .topbar, .site-footer, .cv-actions { display: none !important; }
+  section > .container > .orbit-wrapper { display: none !important; }
+  body, section, .container {
+    background: #fff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  @page { size: A4; margin: 12mm 14mm; }
+
+  .print-cv {
+    display: block !important;
+    font-family: var(--font-sans);
+    color: var(--color-slate-600);
+    font-size: 10.5pt;
+    line-height: 1.45;
+  }
+  .print-cv h1, .print-cv h2, .print-cv h3 { margin: 0; color: var(--color-slate-900); }
+
+  .pcv-header {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 18px;
+    align-items: center;
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--color-azure);
+  }
+  .pcv-photo {
+    width: 110px; height: 110px; border-radius: 50%; object-fit: cover;
+    border: 3px solid var(--color-azure);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.04);
+  }
+  .pcv-identity h1 {
+    font-size: 22pt; font-weight: 900; line-height: 1.05;
+    letter-spacing: -0.01em; margin: 0 0 4px;
+  }
+  .pcv-role { font-size: 12pt; color: var(--color-azure); font-weight: 500; margin: 0 0 10px; }
+  .pcv-contact {
+    list-style: none; padding: 0; margin: 0 0 8px;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 4px 18px; font-size: 9.5pt; color: var(--color-slate-600);
+  }
+  .pcv-contact li { display: flex; align-items: center; gap: 6px; }
+  .pcv-contact .fa { color: var(--color-azure); width: 12px; text-align: center; font-size: 10pt; }
+  .pcv-languages {
+    margin: 8px 0 0; padding-top: 8px; border-top: 1px solid #e9ecef;
+    font-size: 9.5pt; color: var(--color-slate-600);
+  }
+  .pcv-languages .fa { color: var(--color-azure); margin-right: 4px; }
+  .pcv-languages strong { color: var(--color-slate-900); }
+
+  .pcv-section { margin-bottom: 14px; }
+  .pcv-section h2 {
+    font-family: var(--font-display); font-size: 12.5pt; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-azure);
+    margin: 0 0 10px; padding-bottom: 4px; border-bottom: 1px solid #e9ecef;
+  }
+  .pcv-section > p { margin: 0; font-size: 10pt; line-height: 1.5; text-align: justify; }
+
+  .pcv-job { margin-bottom: 12px; page-break-inside: avoid; }
+  .pcv-job:last-child { margin-bottom: 0; }
+  .pcv-job > header {
+    display: flex; justify-content: space-between;
+    align-items: baseline; gap: 14px; margin-bottom: 4px;
+  }
+  .pcv-job h3 { font-size: 11pt; font-weight: 700; color: var(--color-slate-900); }
+  .pcv-when { font-size: 9pt; color: var(--color-slate-400); white-space: nowrap; font-weight: 500; }
+  .pcv-job ul { margin: 4px 0 4px 16px; padding: 0; font-size: 10pt; line-height: 1.45; }
+  .pcv-job li { margin-bottom: 1px; }
+  .pcv-tools { font-size: 9.5pt; color: var(--color-slate-600); margin: 4px 0 0; }
+  .pcv-tools strong { color: var(--color-slate-900); }
+
+  .pcv-two-col {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 24px; page-break-inside: avoid;
+  }
+  .pcv-misc { margin-bottom: 8px; page-break-inside: avoid; }
+  .pcv-misc h3 { font-size: 10.5pt; font-weight: 700; color: var(--color-slate-900); margin: 0 0 2px; }
+  .pcv-misc .pcv-when { font-size: 9pt; color: var(--color-slate-400); display: block; white-space: normal; }
+
+  .pcv-foot {
+    margin-top: 14px; padding-top: 8px; border-top: 1px solid #e9ecef;
+    display: flex; justify-content: space-between;
+    font-size: 8.5pt; color: var(--color-slate-400);
+  }
+  a { color: inherit !important; text-decoration: none !important; }
+}
