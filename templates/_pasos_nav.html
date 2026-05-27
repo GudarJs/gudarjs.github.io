@@ -1,0 +1,18 @@
+{% set taller_root = this if this._model == 'taller' else this.parent %}
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="{{ taller_root|url }}" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline {% if this == taller_root %}bg-azure/10 text-azure font-semibold{% else %}text-slate-600 hover:bg-azure/6 hover:text-azure{% endif %}">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        {% for paso in taller_root.children %}
+        <li>
+            <a href="{{ paso|url }}" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline {% if paso == this %}bg-azure/10 text-azure font-semibold{% else %}text-slate-600 hover:bg-azure/6 hover:text-azure{% endif %}">
+                <span>{{ paso.title }}</span>
+            </a>
+        </li>
+        {% endfor %}
+    </ol>
+</nav>

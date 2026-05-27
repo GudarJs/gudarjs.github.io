@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% block title %}{{ this.title }} — Talleres — Guzmán D. Darío{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{{ '/static/workshop.css'|url }}">{% endblock %}
+{% block content %}
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="{{ this|url }}" class="text-white hover:text-white hover:underline">{{ this.title }}</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Portada · <strong class="text-white">{{ this.children.count() }}</strong> pasos</span>
+    </div>
+</div>
+
+<section class="pt-16 pb-12 bg-gradient-to-b from-white to-[#f8f9fa] border-b border-[#e9ecef]">
+    <div class="max-w-[960px] mx-auto px-8 grid grid-cols-[1fr_320px] gap-12 items-start max-[900px]:grid-cols-1">
+        <div>
+            {% if this.cover_image %}
+            <div class="aspect-[16/7] overflow-hidden rounded-2xl mb-6">
+                <img src="{{ this.cover_image }}" alt="{{ this.title }}" class="w-full h-full object-cover block">
+            </div>
+            {% endif %}
+            <p class="font-mono text-xs uppercase tracking-[0.14em] text-azure mb-3">Taller</p>
+            <h1 class="text-[44px] font-black text-slate-900 leading-[1.05] tracking-[-0.02em] mb-4 max-[900px]:text-[32px]">{{ this.title }}</h1>
+            {% if this.descripcion %}<div class="text-[17px] text-slate-600 leading-[1.55] mb-6">{{ this.descripcion }}</div>{% endif %}
+        </div>
+        <aside class="bg-white border border-[#e9ecef] rounded-2xl p-[22px_24px]">
+            <h4 class="font-mono text-[10px] uppercase tracking-[0.14em] text-slate-400 mb-3.5 font-bold">Datos del taller</h4>
+            <dl class="m-0">
+                {% if this.duracion %}<dt class="text-xs uppercase tracking-[0.06em] text-slate-400 font-mono mt-3.5 first:mt-0">Duración</dt><dd class="mt-1 text-slate-900 font-medium flex items-center gap-2 m-0"><i class="fa fa-clock-o text-azure w-4"></i> {{ this.duracion }}</dd>{% endif %}
+                <dt class="text-xs uppercase tracking-[0.06em] text-slate-400 font-mono mt-3.5">Pasos</dt><dd class="mt-1 text-slate-900 font-medium flex items-center gap-2 m-0"><i class="fa fa-list-ol text-azure w-4"></i> {{ this.children.count() }}</dd>
+                {% if this.prerrequisitos_resumen %}<dt class="text-xs uppercase tracking-[0.06em] text-slate-400 font-mono mt-3.5">Prerrequisitos</dt><dd class="mt-1 text-slate-900 font-medium flex items-center gap-2 m-0"><i class="fa fa-check text-azure w-4"></i> {{ this.prerrequisitos_resumen }}</dd>{% endif %}
+            </dl>
+            {% set primer_paso = this.children.first() %}
+            {% if primer_paso %}
+            <div class="mt-[22px]">
+                <a class="w-full inline-flex justify-center items-center gap-2 px-6 py-3 rounded-full bg-azure text-white text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="{{ primer_paso|url }}"><i class="fa fa-play"></i> Empezar el taller</a>
+            </div>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    {% include "_pasos_nav.html" %}
+    <main class="max-w-[720px] min-w-0">
+        {% if this.producto_final %}
+        <h2 class="font-display text-[22px] uppercase font-medium text-slate-900 tracking-[0.02em] mt-0 mb-[18px] pb-2 border-b-2 border-coral">Qué vas a construir</h2>
+        {{ this.producto_final }}
+        {% endif %}
+
+        {% if this.objetivos %}
+        <h2 class="font-display text-[22px] uppercase font-medium text-slate-900 tracking-[0.02em] mt-11 mb-[18px] pb-2 border-b-2 border-azure">Objetivos de aprendizaje</h2>
+        {{ this.objetivos }}
+        {% endif %}
+
+        {% if this.stack %}
+        <h2 class="font-display text-[22px] uppercase font-medium text-slate-900 tracking-[0.02em] mt-11 mb-[18px] pb-2 border-b-2 border-azure">Prerrequisitos / Stack</h2>
+        {{ this.stack }}
+        {% endif %}
+
+        <h2 class="font-display text-[22px] uppercase font-medium text-slate-900 tracking-[0.02em] mt-11 mb-[18px] pb-2 border-b-2 border-azure">Contenido del taller</h2>
+        <ol class="list-none p-0 m-0">
+            {% for paso in this.children %}
+            <li>
+                <a href="{{ paso|url }}" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">{{ "%02d"|format(loop.index) }}</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">{{ paso.title }}</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            {% endfor %}
+        </ol>
+    </main>
+</div>
+{% endblock %}
