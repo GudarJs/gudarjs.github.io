@@ -1,0 +1,1 @@
+document.addEventListener("DOMContentLoaded",()=>{document.querySelectorAll(".os-tabs").forEach(c=>{const s=c.querySelectorAll(".os-tab"),o=c.querySelectorAll(".os-tab-panel"),l=t=>{s.forEach((e,a)=>e.classList.toggle("is-active",a===t)),o.forEach((e,a)=>e.classList.toggle("is-active",a===t))};s.forEach((t,e)=>t.addEventListener("click",()=>l(e)))})});
