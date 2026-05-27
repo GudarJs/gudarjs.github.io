@@ -1,0 +1,7 @@
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-[#e9ecef] bg-[#fff5f0] text-[15px] leading-relaxed{% if this.modo == 'trampa' %} border-l-[#b03a14] border-l-dashed{% else %} border-l-[#d4471a]{% endif %}">
+    <span class="size-7 rounded-full shrink-0 text-white flex items-center justify-center text-[13px] mt-px {% if this.modo == 'trampa' %}bg-[#b03a14]{% else %}bg-[#d4471a]{% endif %}"><i class="fa fa-bug"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#d4471a] mb-1">{% if this.modo == 'trampa' %}Algo va a fallar...{% else %}Vamos a equivocarnos a propósito{% endif %}{% if this.titulo %} · {{ this.titulo }}{% endif %}</p>
+        {{ this.texto }}
+    </div>
+</div>

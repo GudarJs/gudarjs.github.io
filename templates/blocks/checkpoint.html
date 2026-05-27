@@ -1,0 +1,7 @@
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">{% if this.titulo %}Checkpoint · {{ this.titulo }}{% else %}Checkpoint{% endif %}</p>
+        {{ this.texto }}
+    </div>
+</div>
