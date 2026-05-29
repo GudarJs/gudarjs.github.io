@@ -1,0 +1,160 @@
+_model: taller-paso
+---
+title: Streamlit: pulir la experiencia de usuario
+---
+orden: 18
+---
+body:
+
+#### texto ####
+texto:
+
+Un buen frontend no solo muestra datos: le habla claro al usuario cuando algo sale mal, indica cuándo está cargando y confirma que las acciones tuvieron éxito. En este paso vas a agregar los últimos toques que hacen la diferencia entre una app funcional y una app que se siente profesional.
+
+## Estado de sesión para evitar recarga completa
+
+Streamlit vuelve a ejecutar el script completo cada vez que el usuario interactúa. Puedes usar `st.session_state` para recordar qué envío se está viendo sin perder el contexto:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track_ui/pages/rastreo.py (actualizar mostrar)
+----
+codigo:
+
+def mostrar():
+    st.title("Rastreo de Envíos")
+
+    if "ultimo_rastreo" not in st.session_state:
+        st.session_state.ultimo_rastreo = None
+
+    col_input, col_btn = st.columns([3, 1])
+    envio_id = col_input.number_input(
+        "Número de envío", min_value=1, step=1, label_visibility="collapsed"
+    )
+    buscar = col_btn.button("Rastrear", use_container_width=True)
+
+    if buscar:
+        st.session_state.ultimo_rastreo = int(envio_id)
+
+    if st.session_state.ultimo_rastreo:
+        _mostrar_rastreo(st.session_state.ultimo_rastreo)
+#### texto ####
+texto:
+
+## Confirmación antes de eliminar
+
+Agrega un paso de confirmación antes de eliminar un envío. Actualiza el módulo de envíos con una opción de eliminación en la tab de lista:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track_ui/pages/envios.py (agregar al final de _tab_lista)
+----
+codigo:
+
+from api_client import get, post, patch, delete, APIError
+
+# al final de _tab_lista, después del dataframe:
+    st.divider()
+    with st.expander("Eliminar un envío"):
+        envio_id_del = st.number_input(
+            "ID del envío a eliminar", min_value=1, step=1, key="del_id"
+        )
+        confirmar = st.checkbox("Confirmo que quiero eliminar este envío")
+        if st.button("Eliminar", disabled=not confirmar, type="primary"):
+            try:
+                delete(f"/envios/{int(envio_id_del)}")
+                st.success(f"Envío #{int(envio_id_del)} eliminado.")
+                st.rerun()
+            except APIError as e:
+                st.error(f"Error {e.status_code}: {e.mensaje}")
+#### texto ####
+texto:
+
+## Feedback visual con colores de estado
+
+Agrega una función que muestra el estado con un color apropiado. Úsala en la tab de lista para resaltar los envíos según su estado:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track_ui/pages/envios.py (agregar función auxiliar)
+----
+codigo:
+
+COLORES_ESTADO = {
+    "PENDIENTE": "🟡",
+    "EN_TRANSITO": "🔵",
+    "ENTREGADO": "🟢",
+    "CANCELADO": "🔴",
+}
+
+
+def _badge_estado(estado: str) -> str:
+    return f"{COLORES_ESTADO.get(estado, '⚪')} {estado}"
+#### texto ####
+texto:
+
+## Recargar datos automáticamente
+
+Agrega un botón de recarga en la tab de lista para actualizar los datos sin cambiar de tab:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track_ui/pages/envios.py (agregar al inicio de _tab_lista)
+----
+codigo:
+
+def _tab_lista():
+    col_titulo, col_reload = st.columns([4, 1])
+    col_titulo.subheader("Envíos registrados")
+    if col_reload.button("Actualizar", use_container_width=True):
+        st.rerun()
+
+    # ... resto del código existente
+#### error_provocado ####
+modo: trampa
+----
+titulo: Intentar un estado inválido desde el frontend
+----
+texto:
+
+En la tab "Cambiar estado", selecciona un envío que ya está en `ENTREGADO` e intenta cambiarlo a `EN_TRANSITO`.
+#### solucion_error ####
+titulo: 
+----
+texto:
+
+El API responde con un `422` y el mensaje "No se puede cambiar de ENTREGADO a EN_TRANSITO". Gracias al `APIError` que definiste en `api_client.py`, el frontend muestra:
+
+```
+Error 422: No se puede cambiar de ENTREGADO a EN_TRANSITO
+```
+
+Eso es exactamente lo que quieres: el mensaje del API llegando claro al usuario, sin un traceback ni un error técnico incomprensible. El `APIError` captura el código y el mensaje, y `st.error()` lo muestra con el formato correcto.
+#### checkpoint ####
+titulo: 
+----
+texto:
+
+Verifica los últimos detalles de UX:
+
+1. El botón "Actualizar" en la tab de lista recarga los datos sin recargar toda la página
+2. Eliminar un envío requiere marcar el checkbox de confirmación antes de activar el botón
+3. Un cambio de estado inválido muestra el mensaje de error del API, no un traceback de Python
+4. El módulo de Rastreo recuerda el último envío consultado si cambias de tab y vuelves
+
+Si los cuatro puntos funcionan, el frontend está pulido y listo.
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+#### codigo ####
+lenguaje: bash
+----
+etiqueta: terminal
+----
+codigo:
+
+git add cargo_track_ui/api_client.py cargo_track_ui/pages/envios.py cargo_track_ui/pages/rastreo.py
+git commit -m "feat: pulir UX del frontend con manejo de errores, confirmación y session_state"

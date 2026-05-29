@@ -1,0 +1,138 @@
+_model: taller-paso
+---
+title: Instalación
+---
+orden: 1
+---
+body:
+
+#### texto ####
+texto:
+
+Vamos a dejar todo listo: un proyecto Django funcionando, las dependencias instaladas y Redis corriendo. Si ya tienes un proyecto Django con virtualenv activo, puedes saltarte directo a la parte de Channels.
+
+#### texto ####
+texto:
+
+## 1. Crear el entorno
+
+Primero verifica que tienes Python 3.10 o más nuevo.
+
+#### comando_os ####
+descripcion: Verifica la versión de Python instalada
+----
+windows: py --version
+----
+mac: python3 --version
+----
+linux: python3 --version
+
+#### texto ####
+texto:
+
+## 2. Crear el proyecto
+
+Crea una carpeta nueva, activa un entorno virtual e instala las dependencias.
+
+#### comando_os ####
+descripcion: Crear el proyecto, virtualenv e instalar dependencias
+----
+windows: mkdir pizarra
+cd pizarra
+py -m venv env
+env\Scripts\activate
+pip install django channels channels-redis daphne
+----
+mac: mkdir pizarra && cd pizarra
+python3 -m venv env
+source env/bin/activate
+pip install django channels channels-redis daphne
+----
+linux: mkdir pizarra && cd pizarra
+python3 -m venv env
+source env/bin/activate
+pip install django channels channels-redis daphne
+
+#### texto ####
+texto:
+
+Ahora arranca el proyecto y la app de la pizarra.
+
+#### codigo ####
+lenguaje: bash
+----
+etiqueta: Terminal
+----
+codigo: django-admin startproject pizarra .
+python manage.py startapp board
+
+#### texto ####
+texto:
+
+## 3. Redis
+
+Necesitamos Redis para que Channels pueda mandar mensajes entre clientes. La forma más rápida es con Docker.
+
+#### codigo ####
+lenguaje: bash
+----
+etiqueta: Terminal
+----
+codigo: docker run -d --name redis -p 6379:6379 redis:7-alpine
+
+#### advertencia ####
+texto:
+
+En producción nunca expongas Redis al internet público sin autenticación. Para desarrollo local en tu máquina, está bien.
+
+#### texto ####
+texto:
+
+## 4. Configurar Channels
+
+Abre el archivo de settings y modifica `INSTALLED_APPS` agregando `daphne` al inicio, `channels` y tu app `board`.
+
+#### codigo ####
+lenguaje: python
+----
+etiqueta: pizarra/settings.py
+----
+codigo: INSTALLED_APPS = [
+    "daphne",                       # va PRIMERO
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "channels",
+    "board",
+]
+
+ASGI_APPLICATION = "pizarra.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+    },
+}
+
+#### error_provocado ####
+modo: trampa
+----
+titulo: Olvido común de orden
+----
+texto:
+
+Si dejas `daphne` al final de `INSTALLED_APPS` (en lugar de al inicio) y arrancas el servidor con `python manage.py runserver`, Django va a usar el servidor WSGI normal y los WebSockets no funcionarán. Vas a ver `Starting development server` en lugar de `Starting ASGI/Daphne`.
+
+#### solucion_error ####
+texto:
+
+`daphne` tiene que ir antes de `django.contrib.staticfiles` en la lista. Es el primer item. Mueve `daphne` al inicio y reinicia el servidor.
+
+#### checkpoint ####
+texto:
+
+Si arrancas el servidor con `python manage.py runserver` y ves el mensaje `Starting ASGI/Daphne version X.X.X` en lugar del WSGI normal, todo está bien.

@@ -1,0 +1,18 @@
+[project]
+name = Guzmán D. Darío
+locale = es
+
+[alternatives.es]
+name = Español
+primary = yes
+locale = es_CO
+
+[alternatives.en]
+name = English
+primary = no
+locale = en_US
+url_prefix = /en/
+
+[servers.ghpages]
+name = GitHub Pages
+target = ghpages+git://github.com/GudarJs/gudarjs.github.io.git?branch=main

@@ -1,0 +1,208 @@
+_model: taller-paso
+---
+title: Streamlit: rastreo de un envío
+---
+orden: 17
+---
+body:
+
+#### texto ####
+texto:
+
+El rastreo es la función más visible para los clientes de Cargo Track: saber en qué estado está su paquete y qué pasos ha dado. En este paso vas a guardar el historial de estados en la base de datos y construir la vista de rastreo en Streamlit.
+
+## El modelo de historial
+
+Agrega el modelo `HistorialEstado` al final de `cargo_track/models.py`:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track/models.py (agregar al final)
+----
+codigo:
+
+from datetime import datetime
+
+
+class HistorialEstado(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    envio_id: int = Field(foreign_key="envio.id")
+    estado: EstadoEnvio
+    fecha: datetime = Field(default_factory=datetime.utcnow)
+    nota: Optional[str] = Field(default=None)
+#### texto ####
+texto:
+
+## Registrar cada cambio de estado
+
+Actualiza el endpoint `cambiar_estado` en `envios.py` para guardar cada transición en el historial:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track/routers/envios.py (actualizar cambiar_estado)
+----
+codigo:
+
+from ..models import Envio, Cliente, EstadoEnvio, HistorialEstado
+
+@router.patch("/{envio_id}/estado", response_model=EnvioRead)
+def cambiar_estado(
+    envio_id: int,
+    cambio: CambioEstado,
+    session: Session = Depends(get_session),
+    _: str = Depends(verificar_api_key),
+):
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail="Envío no encontrado")
+    if cambio.estado not in TRANSICIONES_VALIDAS[envio.estado]:
+        raise HTTPException(
+            status_code=422,
+            detail=f"No se puede cambiar de {envio.estado} a {cambio.estado}",
+        )
+    envio.estado = cambio.estado
+    historial = HistorialEstado(envio_id=envio_id, estado=cambio.estado)
+    session.add(envio)
+    session.add(historial)
+    session.commit()
+    session.refresh(envio)
+    return envio
+#### texto ####
+texto:
+
+## Endpoint del historial
+
+Agrega el endpoint para consultar el historial de un envío:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track/routers/envios.py (agregar al final)
+----
+codigo:
+
+@router.get("/{envio_id}/historial", summary="Historial de estados de un envío")
+def historial_envio(envio_id: int, session: Session = Depends(get_session)):
+    """Retorna todos los cambios de estado de un envío, ordenados cronológicamente."""
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail="Envío no encontrado")
+    historial = session.exec(
+        select(HistorialEstado)
+        .where(HistorialEstado.envio_id == envio_id)
+        .order_by(HistorialEstado.fecha)
+    ).all()
+    return historial
+#### texto ####
+texto:
+
+## La página de rastreo en Streamlit
+
+Crea `cargo_track_ui/pages/rastreo.py`:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track_ui/pages/rastreo.py
+----
+codigo:
+
+import streamlit as st
+from api_client import get, APIError
+
+ICONOS_ESTADO = {
+    "PENDIENTE": "🕐",
+    "EN_TRANSITO": "🚛",
+    "ENTREGADO": "✅",
+    "CANCELADO": "❌",
+}
+
+
+def mostrar():
+    st.title("Rastreo de Envíos")
+    st.caption("Ingresa el número de envío para ver su estado actual e historial.")
+
+    col_input, col_btn = st.columns([3, 1])
+    envio_id = col_input.number_input(
+        "Número de envío", min_value=1, step=1, label_visibility="collapsed"
+    )
+    buscar = col_btn.button("Rastrear", use_container_width=True)
+
+    if buscar:
+        _mostrar_rastreo(int(envio_id))
+
+
+def _mostrar_rastreo(envio_id: int):
+    try:
+        envio = get(f"/envios/{envio_id}")
+    except APIError:
+        st.error(f"No se encontró el envío #{envio_id}.")
+        return
+    except Exception:
+        st.error("No se pudo conectar con el API.")
+        return
+
+    estado = envio["estado"]
+    icono = ICONOS_ESTADO.get(estado, "📦")
+
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.subheader(f"Envío #{envio['id']}")
+        st.write(f"**Origen:** {envio['origen']}")
+        st.write(f"**Destino:** {envio['destino']}")
+        st.write(f"**Peso:** {envio['peso']} kg")
+        if envio.get("descripcion"):
+            st.write(f"**Descripción:** {envio['descripcion']}")
+    with col2:
+        st.metric(label="Estado actual", value=f"{icono} {estado}")
+
+    st.divider()
+    st.subheader("Historial de estados")
+
+    try:
+        historial = get(f"/envios/{envio_id}/historial")
+    except Exception:
+        st.info("No hay historial disponible para este envío.")
+        return
+
+    if not historial:
+        st.info("Este envío aún no tiene actualizaciones de estado registradas.")
+        return
+
+    for entrada in historial:
+        est = entrada["estado"]
+        fecha = entrada["fecha"][:19].replace("T", " ")
+        icono_h = ICONOS_ESTADO.get(est, "📦")
+        st.write(f"{icono_h} **{est}** — {fecha}")
+        if entrada.get("nota"):
+            st.caption(entrada["nota"])
+#### advertencia ####
+texto:
+
+Como agregaste el modelo `HistorialEstado`, SQLModel necesita crear la nueva tabla. La próxima vez que arranques Uvicorn, `create_db_and_tables()` la va a crear automáticamente. Si la tabla no aparece, borra el archivo `cargo_track.db` y reinicia el servidor para que SQLite vuelva a crear todas las tablas desde cero. En producción usarías migraciones con Alembic en lugar de borrar la base de datos.
+#### checkpoint ####
+titulo: 
+----
+texto:
+
+Para probar el rastreo completo:
+
+1. Crea un envío desde el módulo "Envíos"
+2. Cámbialo a `EN_TRANSITO` y luego a `ENTREGADO` usando la tab "Cambiar estado"
+3. Ve al módulo "Rastreo", ingresa el ID del envío y haz clic en "Rastrear"
+4. Debes ver el estado actual `ENTREGADO` y el historial con las dos transiciones registradas con su fecha
+
+Si el historial muestra las dos transiciones, el rastreo está funcionando.
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+#### codigo ####
+lenguaje: bash
+----
+etiqueta: terminal
+----
+codigo:
+
+git add cargo_track/models.py cargo_track/routers/envios.py cargo_track_ui/pages/rastreo.py cargo_track_ui/app.py
+git commit -m "feat: agregar historial de estados y módulo de rastreo en Streamlit"

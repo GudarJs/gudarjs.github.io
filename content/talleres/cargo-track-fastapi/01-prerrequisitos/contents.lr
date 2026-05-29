@@ -1,0 +1,51 @@
+_model: taller-paso
+---
+title: Prerrequisitos
+---
+orden: 1
+---
+body:
+
+#### texto ####
+texto:
+
+Antes de empezar a construir Cargo Track, necesitas tener algunas herramientas instaladas en tu computadora. Este paso es ligero: no vas a instalar nada nuevo aquí, solo vas a revisar que tienes todo listo.
+
+#### texto ####
+texto:
+
+## Python 3.12
+
+Descárgalo desde [python.org/downloads](https://www.python.org/downloads/). Verifica la instalación abriendo una terminal y ejecutando:
+
+```bash
+python --version
+```
+
+Deberías ver algo como `Python 3.12.x`. Si ves una versión anterior, actualiza antes de continuar.
+
+## pip
+
+pip viene incluido con Python 3.12. Verifica que esté disponible:
+
+```bash
+pip --version
+```
+
+## Un editor de código
+
+Recomendamos [Visual Studio Code](https://code.visualstudio.com/). Instala la extensión **Python** de Microsoft para tener autocompletado y detección de errores en tiempo real.
+
+## Una terminal
+
+En macOS y Linux ya la tienes. En Windows usa **PowerShell** o instala [Windows Terminal](https://aka.ms/terminal).
+
+#### advertencia ####
+texto:
+
+Si usas Windows, asegúrate de marcar la opción "Add Python to PATH" durante la instalación. Sin esa opción, el comando `python` no va a funcionar desde la terminal y tendrás que reinstalar.
+
+#### checkpoint ####
+texto:
+
+Si `python --version` muestra `Python 3.12.x` y `pip --version` muestra un número de versión, estás listo para el siguiente paso.

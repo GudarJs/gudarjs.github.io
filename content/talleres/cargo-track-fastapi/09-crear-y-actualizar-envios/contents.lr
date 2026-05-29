@@ -1,0 +1,263 @@
+_model: taller-paso
+---
+title: Crear y actualizar envíos
+---
+orden: 9
+---
+body:
+
+#### texto ####
+texto:
+
+Con los schemas listos, ya puedes controlar con precisión qué datos entran y qué datos salen. Ahora vas a agregar los endpoints que escriben en la base de datos: `POST` para crear y `PATCH` para actualizar.
+
+Crear un registro en la base de datos sigue siempre el mismo ciclo de cuatro pasos:
+
+1. **Validar** la entrada (Pydantic lo hace automáticamente antes de que tu función se ejecute)
+2. **Convertir** el schema a un objeto de base de datos
+3. **Persistir** el objeto (commit)
+4. **Refrescar** el objeto para obtener los valores generados por la base de datos (como el `id`)
+
+Cada uno de estos pasos tiene su razón de ser. Los vas a ver en el código a continuación.
+
+## El router de clientes
+
+Para crear un envío necesitas un cliente que exista en el sistema. Crea `cargo_track/routers/clientes.py`:
+
+#### codigo ####
+etiqueta: cargo_track/routers/clientes.py
+----
+lenguaje: python
+----
+codigo:
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+from ..database import get_session
+from ..models import Cliente
+from ..schemas import ClienteCreate, ClienteRead
+
+router = APIRouter(prefix="/clientes", tags=["Clientes"])
+
+
+@router.get("/", response_model=list[ClienteRead])
+def listar_clientes(session: Session = Depends(get_session)):
+    return session.exec(select(Cliente)).all()
+
+
+@router.get("/{cliente_id}", response_model=ClienteRead)
+def obtener_cliente(cliente_id: int, session: Session = Depends(get_session)):
+    cliente = session.get(Cliente, cliente_id)
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+    return cliente
+
+
+@router.post("/", response_model=ClienteRead, status_code=201)
+def crear_cliente(cliente: ClienteCreate, session: Session = Depends(get_session)):
+    db_cliente = Cliente.model_validate(cliente)
+    session.add(db_cliente)
+    session.commit()
+    session.refresh(db_cliente)
+    return db_cliente
+
+#### texto ####
+texto:
+
+Mira el endpoint `POST /clientes` en detalle. El ciclo de cuatro pasos que mencionamos antes aparece aquí claramente:
+
+**`status_code=201`**: el estándar REST dice que una creación exitosa retorna `201 Created`, no `200 OK`. FastAPI usa 200 por defecto, así que hay que especificarlo.
+
+**`Cliente.model_validate(cliente)`**: convierte el schema `ClienteCreate` (un objeto Pydantic) en un objeto `Cliente` de SQLModel listo para guardar en la base de datos. Es decir: "toma estos datos ya validados y crea la instancia del modelo de tabla".
+
+**`session.add(db_cliente)`**: pone el objeto en la sesión y lo "marca" para ser guardado. Todavía no escribe nada en la base de datos.
+
+**`session.commit()`**: aquí sí escribe en la base de datos y confirma la transacción.
+
+**`session.refresh(db_cliente)`**: después del commit, el objeto en memoria no tiene el `id` que la base de datos asignó (SQLite lo genera, no Python). `refresh()` vuelve a leer el objeto desde la base de datos y actualiza todos sus campos, incluyendo el `id`.
+
+## El router de envíos completo
+
+Actualiza `cargo_track/routers/envios.py` con los endpoints de escritura:
+
+#### codigo ####
+etiqueta: cargo_track/routers/envios.py
+----
+lenguaje: python
+----
+codigo:
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+from ..database import get_session
+from ..models import Envio, Cliente
+from ..schemas import EnvioCreate, EnvioRead, EnvioUpdate
+
+router = APIRouter(prefix="/envios", tags=["Envíos"])
+
+
+@router.get("/", response_model=list[EnvioRead])
+def listar_envios(session: Session = Depends(get_session)):
+    return session.exec(select(Envio)).all()
+
+
+@router.get("/{envio_id}", response_model=EnvioRead)
+def obtener_envio(envio_id: int, session: Session = Depends(get_session)):
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail="Envío no encontrado")
+    return envio
+
+
+@router.post("/", response_model=EnvioRead, status_code=201)
+def crear_envio(envio: EnvioCreate, session: Session = Depends(get_session)):
+    cliente = session.get(Cliente, envio.cliente_id)
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+    db_envio = Envio.model_validate(envio)
+    session.add(db_envio)
+    session.commit()
+    session.refresh(db_envio)
+    return db_envio
+
+
+@router.patch("/{envio_id}", response_model=EnvioRead)
+def actualizar_envio(
+    envio_id: int,
+    datos: EnvioUpdate,
+    session: Session = Depends(get_session),
+):
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail="Envío no encontrado")
+    datos_actualizados = datos.model_dump(exclude_unset=True)
+    for campo, valor in datos_actualizados.items():
+        setattr(envio, campo, valor)
+    session.add(envio)
+    session.commit()
+    session.refresh(envio)
+    return envio
+
+#### texto ####
+texto:
+
+Dos puntos clave que merecen más explicación:
+
+**Verificar que el cliente existe antes de crear el envío**
+
+```python
+cliente = session.get(Cliente, envio.cliente_id)
+if not cliente:
+    raise HTTPException(status_code=404, detail="Cliente no encontrado")
+```
+
+Si crearas el envío sin verificar, SQLite podría rechazarlo con un error de clave foránea que generaría un mensaje técnico confuso. Peor aún, en algunas configuraciones de SQLite la restricción no se aplica y el envío se guardaría apuntando a un cliente que no existe. La verificación explícita da un mensaje claro y útil antes de intentar guardar nada.
+
+**`model_dump(exclude_unset=True)` en el PATCH**
+
+Cuando el cliente envía solo `{"destino": "Cali"}`, Pydantic llena los demás campos de `EnvioUpdate` con `None` (su valor por defecto). Si actualizaras todos los campos sin filtrar, borrarías el origen, el peso y la descripción que ya tenía el envío.
+
+```python
+# El cliente envía: {"destino": "Cali"}
+datos_actualizados = datos.model_dump(exclude_unset=True)
+# resultado: {"destino": "Cali"}
+# los campos que no envió (origen, peso, descripcion) no aparecen
+```
+
+Con `exclude_unset=True`, el diccionario solo contiene los campos que el cliente realmente incluyó en el cuerpo de la petición. El loop `for campo, valor in datos_actualizados.items(): setattr(envio, campo, valor)` aplica solo esos cambios sobre el objeto existente.
+
+## Registrar los routers en main.py
+
+Actualiza `cargo_track/main.py` para incluir el router de clientes:
+
+#### codigo ####
+etiqueta: cargo_track/main.py
+----
+lenguaje: python
+----
+codigo:
+
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from .database import create_db_and_tables
+from .routers import envios, clientes
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
+
+
+app = FastAPI(
+    title="Cargo Track API",
+    description="API para gestión de envíos logísticos",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+app.include_router(clientes.router)
+app.include_router(envios.router)
+
+
+@app.get("/")
+def root():
+    return {"mensaje": "Bienvenido a la API de Cargo Track"}
+
+#### error_provocado ####
+modo: trampa
+----
+titulo: Crear un envío para un cliente que no existe
+----
+texto:
+
+Abre `http://127.0.0.1:8000/docs`, expande el endpoint `POST /envios` y haz clic en "Try it out". Envía este cuerpo (sin haber creado ningún cliente todavía):
+
+```json
+{
+  "cliente_id": 9999,
+  "origen": "Bogotá",
+  "destino": "Cali",
+  "peso": 2.0
+}
+```
+
+#### solucion_error ####
+texto:
+
+La respuesta es un 404 con mensaje claro:
+
+```json
+{"detail": "Cliente no encontrado"}
+```
+
+La verificación `if not cliente: raise HTTPException(status_code=404, ...)` en el endpoint produce ese mensaje antes de intentar guardar nada. Sin esa verificación, el error de base de datos que recibirías sería técnico y difícil de interpretar para el cliente de la API.
+
+#### checkpoint ####
+texto:
+
+Prueba el flujo completo desde Swagger (`http://127.0.0.1:8000/docs`):
+
+1. `POST /clientes` con `{"nombre": "Ana García", "email": "ana@cargo.co", "telefono": "3001234567"}`. La respuesta debe incluir `"id": 1`.
+2. `POST /envios` con `{"cliente_id": 1, "origen": "Bogotá", "destino": "Medellín", "peso": 3.5}`. El campo `estado` en la respuesta debe ser `"PENDIENTE"` aunque no lo hayas enviado.
+3. `GET /envios` debe mostrar el envío recién creado.
+4. `PATCH /envios/1` enviando solo `{"destino": "Cali"}`. Verifica en la respuesta que el destino cambió pero que el origen y el peso conservan sus valores originales.
+
+Si los cuatro pasos funcionan, el flujo de creación y actualización está completo.
+
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git add cargo_track/routers/clientes.py cargo_track/routers/envios.py cargo_track/main.py
+git commit -m "feat: agregar endpoints POST y PATCH para clientes y envíos"

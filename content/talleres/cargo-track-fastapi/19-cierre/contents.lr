@@ -1,0 +1,73 @@
+_model: taller-paso
+---
+title: Cierre
+---
+orden: 19
+---
+body:
+
+#### checkpoint ####
+texto:
+
+El sistema Cargo Track que construiste desde cero incluye:
+
+- Una API REST con FastAPI organizada en routers por entidad (clientes, envíos, conductores)
+- Modelos de base de datos con SQLModel: Cliente, Envio, Conductor, Ruta, ConductorRuta, HistorialEstado
+- Relaciones uno-a-muchos (cliente a envíos) y muchos-a-muchos (conductores a rutas)
+- Validación automática con Pydantic y schemas separados para entrada y salida
+- Lógica de transición de estados que protege la integridad de los datos del negocio
+- Autenticación con API key en todos los endpoints de escritura
+- Documentación interactiva generada automáticamente por Swagger
+- Un frontend en Streamlit con sidebar de navegación, tabs por acción, métricas de resumen, manejo de errores del API y confirmación antes de eliminar
+
+#### texto ####
+texto:
+
+## Los conceptos que aprendiste
+
+Este taller no fue solo sobre FastAPI. Detrás de cada paso hay un concepto que puedes aplicar en cualquier proyecto:
+
+**Separar schemas de modelos** es una práctica de diseño: el contrato con el cliente (qué puede enviar, qué recibe) no tiene por qué ser igual a la representación interna de los datos.
+
+**Los códigos HTTP son parte del contrato:** 201 no es lo mismo que 200, y 404 no es lo mismo que 422. Elegirlos bien hace que el API sea predecible para cualquier cliente que lo consuma.
+
+**La autenticación va al borde del sistema:** validas antes de ejecutar la lógica de negocio, no dentro de ella. La inyección de dependencias de FastAPI hace eso limpio y reutilizable.
+
+**Los entornos virtuales son no negociables:** cada proyecto tiene sus propias dependencias y versiones. Activar el entorno es lo primero que haces al abrir una terminal de trabajo.
+
+**La documentación automática no es magia:** viene de escribir tipos, docstrings y ejemplos correctamente en el código. Es un hábito, no un paso extra.
+
+#### texto ####
+texto:
+
+## Ideas para seguir aprendiendo
+
+Aquí van algunas extensiones ordenadas de menor a mayor complejidad:
+
+**Corto plazo:**
+- Agrega paginación a los listados: `GET /envios/?skip=0&limit=10`
+- Implementa búsqueda por ciudad: `GET /envios/?destino=Medellín`
+- Agrega un campo `fecha_entrega_estimada` al modelo de Envío y muéstralo en el rastreo
+
+**Medio plazo:**
+- Reemplaza la API key por autenticación JWT completa con login, roles y refresh tokens
+- Despliega el API en la nube: Railway, Fly.io o Google Cloud Run tienen planes gratuitos para proyectos pequeños
+- Agrega pruebas automáticas con `pytest` y `httpx.AsyncClient` para probar los endpoints sin levantar el servidor manualmente
+
+**Largo plazo:**
+- Reemplaza el frontend de Streamlit por una SPA en React, Vue o Angular que consuma los mismos endpoints del API: los endpoints no cambian, solo cambia quién los llama
+- Implementa notificaciones por email cuando cambia el estado de un envío usando Celery para las tareas asíncronas y Redis como broker
+- Implementa migraciones de base de datos con Alembic para que los cambios en los modelos no requieran borrar la base de datos
+
+#### texto ####
+texto:
+
+## Recursos para seguir
+
+- Documentación oficial de FastAPI: [fastapi.tiangolo.com](https://fastapi.tiangolo.com)
+- Documentación de SQLModel: [sqlmodel.tiangolo.com](https://sqlmodel.tiangolo.com)
+- Tutorial oficial de Streamlit: [docs.streamlit.io](https://docs.streamlit.io)
+- Códigos de estado HTTP ilustrados: [http.cat](https://http.cat)
+- HTTP Cats aparte, la referencia completa está en [developer.mozilla.org/es/docs/Web/HTTP/Status](https://developer.mozilla.org/es/docs/Web/HTTP/Status)
+
+Gracias por llegar hasta aquí. Cargo Track ya puede rastrear sus envíos.

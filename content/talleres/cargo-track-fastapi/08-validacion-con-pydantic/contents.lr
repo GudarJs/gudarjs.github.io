@@ -1,0 +1,283 @@
+_model: taller-paso
+---
+title: Validación con Pydantic
+---
+orden: 8
+---
+body:
+
+#### texto ####
+texto:
+
+En el paso anterior, los endpoints usan el modelo SQLModel (`Envio`) directamente como `response_model`. Eso funciona para leer datos, pero tiene un problema: el mismo modelo que define la tabla de la base de datos también controla qué información recibe el cliente y qué información devuelve la API. Eso mezcla dos responsabilidades.
+
+Por ejemplo, si el cliente pudiera enviar un `id` al crear un envío, estaría intentando asignarse su propio ID. Si pudiera enviar un `estado`, podría crear un envío directamente como `ENTREGADO`. La respuesta tampoco debería exponer campos internos innecesarios.
+
+La solución es tener **schemas de Pydantic separados** para cada operación: uno para recibir datos (`Create`), otro para devolver datos (`Read`), y otro para actualizaciones parciales (`Update`).
+
+#### analogia ####
+titulo: Los schemas son como formularios oficiales
+----
+texto:
+
+Cuando solicitas un pasaporte, el funcionario te da un formulario de ingreso con solo los campos que puedes llenar tú: nombre, fecha de nacimiento, dirección. Cuando te entregan el pasaporte, el documento tiene campos diferentes: el número de pasaporte (lo asignó la entidad), la fecha de expedición, campos que tú no controlas.
+
+Un mismo "objeto" (la persona) tiene formularios distintos según la dirección del flujo de información. Los schemas de Pydantic funcionan igual: `Create` define qué puede enviar el cliente, `Read` define qué le devuelve la API.
+
+#### texto ####
+texto:
+
+## Por qué Create es diferente de Read
+
+Mira la diferencia para el caso de `Envio`:
+
+| Campo | EnvioCreate (entrada) | EnvioRead (salida) |
+|-------|-----------------------|--------------------|
+| `id` | NO (lo asigna la base de datos) | SI |
+| `cliente_id` | SI | SI |
+| `origen` | SI | SI |
+| `destino` | SI | SI |
+| `peso` | SI | SI |
+| `descripcion` | SI | SI |
+| `estado` | NO (siempre empieza como PENDIENTE) | SI |
+
+Si usaras el mismo modelo para entrada y salida, el cliente podría intentar enviar un `id` o un `estado` arbitrario al crear un envío.
+
+## Los schemas de Cargo Track
+
+Crea el archivo `cargo_track/schemas.py`. Vas a agregar los schemas en grupos para entender cada uno.
+
+**Schemas de Cliente:**
+
+#### codigo ####
+etiqueta: cargo_track/schemas.py
+----
+lenguaje: python
+----
+codigo:
+
+from typing import Optional
+from pydantic import BaseModel, EmailStr, field_validator
+from .models import EstadoEnvio
+
+
+class ClienteCreate(BaseModel):
+    nombre: str
+    email: EmailStr
+    telefono: Optional[str] = None
+
+
+class ClienteRead(BaseModel):
+    id: int
+    nombre: str
+    email: str
+    telefono: Optional[str]
+
+    model_config = {"from_attributes": True}
+
+#### texto ####
+texto:
+
+`ClienteCreate` no tiene `id`: el cliente no puede asignarse su propio ID. El campo `email: EmailStr` usa un tipo especial de Pydantic que valida que el valor sea un email con formato válido. Si alguien envía `"esto-no-es-email"`, Pydantic lo rechaza antes de que el código del endpoint se ejecute.
+
+`ClienteRead` sí incluye `id` porque la respuesta muestra el ID que la base de datos asignó. El `model_config = {"from_attributes": True}` le dice a Pydantic que puede construir este schema a partir de un objeto SQLModel. Sin esa configuración, Pydantic esperaría un diccionario y no sabría cómo leer los atributos de un objeto ORM.
+
+**Schemas de Envio:**
+
+#### codigo ####
+etiqueta: cargo_track/schemas.py (agregar al final)
+----
+lenguaje: python
+----
+codigo:
+
+class EnvioCreate(BaseModel):
+    cliente_id: int
+    origen: str
+    destino: str
+    peso: float
+    descripcion: Optional[str] = None
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "cliente_id": 1,
+                "origen": "Bogotá",
+                "destino": "Medellín",
+                "peso": 5.5,
+                "descripcion": "Documentos urgentes",
+            }
+        }
+    }
+
+    @field_validator("peso")
+    @classmethod
+    def peso_positivo(cls, v):
+        if v <= 0:
+            raise ValueError("El peso debe ser mayor que cero")
+        return v
+
+
+class EnvioRead(BaseModel):
+    id: int
+    cliente_id: int
+    origen: str
+    destino: str
+    peso: float
+    descripcion: Optional[str]
+    estado: EstadoEnvio
+
+    model_config = {"from_attributes": True}
+
+
+class EnvioUpdate(BaseModel):
+    origen: Optional[str] = None
+    destino: Optional[str] = None
+    peso: Optional[float] = None
+    descripcion: Optional[str] = None
+
+#### texto ####
+texto:
+
+Dos cosas nuevas aquí:
+
+**`json_schema_extra`**: define los valores de ejemplo que aparecen automáticamente en el formulario de Swagger. Cuando abras `/docs` y expandes el endpoint `POST /envios`, el campo "Example Value" ya tiene datos de prueba listos. Documentas el API al mismo tiempo que desarrollas.
+
+**`@field_validator("peso")`**: es un validador personalizado. Pydantic lo llama cada vez que alguien crea un `EnvioCreate`. Si el peso es cero o negativo, lanza un `ValueError`. FastAPI convierte ese error en un `422 Unprocessable Entity` automáticamente. El decorador `@classmethod` es requerido por Pydantic v2 para los validadores de campo.
+
+**`EnvioUpdate`** tiene todos los campos como `Optional` con valor por defecto `None`. Eso permite enviar un PATCH con solo los campos que quieres cambiar. Origen puede faltar, destino puede faltar, etc. Cuando el endpoint reciba el body, usará `exclude_unset=True` para saber cuáles campos realmente envió el cliente.
+
+**Schemas de Conductor y estado:**
+
+#### codigo ####
+etiqueta: cargo_track/schemas.py (agregar al final)
+----
+lenguaje: python
+----
+codigo:
+
+class CambioEstado(BaseModel):
+    estado: EstadoEnvio
+
+
+class ConductorCreate(BaseModel):
+    nombre: str
+    licencia: str
+    email: EmailStr
+
+
+class ConductorRead(BaseModel):
+    id: int
+    nombre: str
+    licencia: str
+    email: str
+
+    model_config = {"from_attributes": True}
+
+#### texto ####
+texto:
+
+`CambioEstado` tiene un solo campo: el nuevo estado. Al usar `EstadoEnvio` (el enum que definiste en `models.py`), Pydantic valida que el valor sea uno de los estados válidos. Si el cliente envía `"VOLANDO"`, el error 422 llega automáticamente sin que escribas ningún `if`.
+
+## Actualizar el router para usar schemas
+
+Actualiza `cargo_track/routers/envios.py` para usar `EnvioRead` en lugar del modelo SQLModel directamente:
+
+#### codigo ####
+etiqueta: cargo_track/routers/envios.py
+----
+lenguaje: python
+----
+codigo:
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+from ..database import get_session
+from ..models import Envio
+from ..schemas import EnvioRead
+
+router = APIRouter(prefix="/envios", tags=["Envíos"])
+
+
+@router.get("/", response_model=list[EnvioRead])
+def listar_envios(session: Session = Depends(get_session)):
+    return session.exec(select(Envio)).all()
+
+
+@router.get("/{envio_id}", response_model=EnvioRead)
+def obtener_envio(envio_id: int, session: Session = Depends(get_session)):
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail="Envío no encontrado")
+    return envio
+
+#### error_provocado ####
+modo: guiado
+----
+titulo: Probar la validación de email inválido
+----
+texto:
+
+Con el entorno virtual activado, abre una terminal nueva (diferente a la que corre uvicorn) y ejecuta:
+
+```bash
+python -c "
+from cargo_track.schemas import ClienteCreate
+ClienteCreate(nombre='Juan', email='esto-no-es-email')
+"
+```
+
+#### solucion_error ####
+texto:
+
+Pydantic lanza una excepción de validación con el detalle del campo que falló:
+
+```
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ClienteCreate
+email
+  value is not a valid email address [...]
+```
+
+Cuando esto ocurre dentro de un endpoint de FastAPI, la respuesta automática al cliente es un `422 Unprocessable Entity`:
+
+```json
+{
+  "detail": [
+    {
+      "loc": ["body", "email"],
+      "msg": "value is not a valid email address",
+      "type": "value_error.email"
+    }
+  ]
+}
+```
+
+FastAPI valida todos los campos antes de que el código de tu endpoint se ejecute. Si la validación falla, retorna el 422 automáticamente, sin que tengas que escribir ningún `if` adicional. Esta es una de las grandes ventajas de combinar FastAPI con Pydantic.
+
+#### checkpoint ####
+texto:
+
+Verifica que los schemas se importan sin errores:
+
+```bash
+python -c "from cargo_track.schemas import EnvioCreate, EnvioRead, ClienteCreate, CambioEstado, ConductorCreate, ConductorRead; print('OK')"
+```
+
+Debes ver simplemente `OK` en la terminal. Si hay algún error de sintaxis o importación, aparecerá aquí antes de arrancar el servidor.
+
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git add cargo_track/schemas.py cargo_track/routers/envios.py
+git commit -m "feat: agregar schemas Pydantic separados para entrada y salida"

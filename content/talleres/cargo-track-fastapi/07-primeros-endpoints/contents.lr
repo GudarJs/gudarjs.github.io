@@ -1,0 +1,213 @@
+_model: taller-paso
+---
+title: Primeros endpoints
+---
+orden: 7
+---
+body:
+
+#### texto ####
+texto:
+
+Ya tienes la base de datos lista y el servidor corriendo. Ahora vas a construir los primeros endpoints: las funciones que responden cuando alguien hace una petición HTTP a tu API.
+
+Antes de escribir el código, hay dos conceptos que necesitas entender: los **decoradores** y la **inyección de dependencias**.
+
+#### analogia ####
+titulo: Un endpoint es como una ventanilla de servicio
+----
+texto:
+
+Imagina una empresa con varias ventanillas: una para consultar saldo, otra para hacer depósitos, otra para retirar. Cada ventanilla atiende un tipo de solicitud en una dirección específica. Los endpoints son esas ventanillas: cada uno tiene una URL y un método HTTP que define qué tipo de acción maneja.
+
+#### texto ####
+texto:
+
+## Los decoradores en Python
+
+Un **decorador** es una función que envuelve a otra función para agregarle comportamiento. Se reconoce por el símbolo `@` antes del nombre:
+
+```python
+@router.get("/")
+def listar_envios():
+    ...
+```
+
+El decorador `@router.get("/")` le dice a FastAPI: "cuando llegue una petición GET a `/envios/`, ejecuta esta función". Sin el decorador, la función existe en Python pero nadie la llama desde afuera: no es un endpoint, es solo código muerto.
+
+## Los métodos HTTP
+
+Antes de escribir el router, conviene tener claro qué hace cada método:
+
+| Método | Uso en Cargo Track |
+|--------|--------------------|
+| `GET` | Consultar envíos, clientes, conductores |
+| `POST` | Crear un envío, registrar un cliente |
+| `PATCH` | Actualizar el estado de un envío |
+| `DELETE` | Eliminar un envío cancelado |
+
+## El router de envíos
+
+Los endpoints se organizan en **routers**: módulos separados que agrupan los endpoints de un mismo recurso. Crea `cargo_track/routers/envios.py`:
+
+#### codigo ####
+etiqueta: cargo_track/routers/envios.py
+----
+lenguaje: python
+----
+codigo:
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+from ..database import get_session
+from ..models import Envio
+
+router = APIRouter(prefix="/envios", tags=["Envíos"])
+
+
+@router.get("/", response_model=list[Envio])
+def listar_envios(session: Session = Depends(get_session)):
+    return session.exec(select(Envio)).all()
+
+
+@router.get("/{envio_id}", response_model=Envio)
+def obtener_envio(envio_id: int, session: Session = Depends(get_session)):
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail="Envío no encontrado")
+    return envio
+
+#### texto ####
+texto:
+
+Vamos a desglosar las partes que pueden resultar nuevas:
+
+**`APIRouter(prefix="/envios")`**
+
+Agrupa todos los endpoints de este archivo bajo la URL `/envios`. Así, `@router.get("/")` responde en `/envios/` y `@router.get("/{envio_id}")` responde en `/envios/1`, `/envios/42`, etc. Sin el prefijo tendrías que escribir `/envios` en cada decorador por separado.
+
+**`Depends(get_session)`**
+
+Esto es **inyección de dependencias**: FastAPI llama a `get_session()` antes de ejecutar tu función y te entrega la sesión lista para usar. Tú no abres ni cierras nada.
+
+```python
+def listar_envios(session: Session = Depends(get_session)):
+#                  ↑ FastAPI inyecta esto automáticamente antes de llamar tu función
+```
+
+**`/{envio_id}` como parámetro de path**
+
+Las llaves `{envio_id}` en la URL definen un parámetro de path: el valor que el cliente pone en la URL (`/envios/5`) se extrae y se pasa a la función como argumento del mismo nombre. FastAPI también valida el tipo: si el cliente accede a `/envios/abc` (no es un entero), FastAPI retorna un 422 automáticamente antes de que tu función se ejecute.
+
+**`session.exec(select(Envio)).all()`**
+
+Es la forma SQLModel de hacer un `SELECT * FROM envio`. `select(Envio)` construye la consulta, `session.exec()` la ejecuta y `.all()` obtiene todos los resultados como lista.
+
+**`session.get(Envio, envio_id)`**
+
+Busca un registro por clave primaria. Si no existe, retorna `None`. Entonces verificamos y lanzamos el 404.
+
+## Registrar el router en main.py
+
+Un router no hace nada hasta que lo registras en la aplicación principal. Actualiza `cargo_track/main.py`:
+
+#### codigo ####
+etiqueta: cargo_track/main.py
+----
+lenguaje: python
+----
+codigo:
+
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from .database import create_db_and_tables
+from .routers import envios
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
+
+
+app = FastAPI(
+    title="Cargo Track API",
+    description="API para gestión de envíos logísticos",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+app.include_router(envios.router)
+
+
+@app.get("/")
+def root():
+    return {"mensaje": "Bienvenido a la API de Cargo Track"}
+
+#### error_provocado ####
+modo: trampa
+----
+titulo: Olvidar registrar el router
+----
+texto:
+
+Comenta temporalmente la línea `app.include_router(envios.router)` en `main.py` poniendo un `#` al frente, y guarda el archivo. Con `--reload` activo el servidor se reinicia solo. Ahora visita `http://127.0.0.1:8000/envios/` en el navegador.
+
+#### solucion_error ####
+texto:
+
+La respuesta es un 404:
+
+```json
+{"codigo": 404, "mensaje": "El recurso solicitado no existe"}
+```
+
+El router existe en `routers/envios.py`, pero `main.py` no sabe nada de él. `app.include_router(envios.router)` es el paso que conecta los dos. Sin esa línea, todos los endpoints del router son invisibles para FastAPI. Vuelve a descomentar esa línea.
+
+#### error_provocado ####
+modo: guiado
+----
+titulo: Buscar un envío que no existe
+----
+texto:
+
+Con el router registrado, visita `http://127.0.0.1:8000/envios/999` en el navegador. No hay ningún envío con ese ID en la base de datos.
+
+#### solucion_error ####
+texto:
+
+La API responde con un `404 Not Found`:
+
+```json
+{"detail": "Envío no encontrado"}
+```
+
+El `raise HTTPException(status_code=404, detail="Envío no encontrado")` que escribiste es exactamente lo que produce este resultado. En el paso de manejo de errores le vas a dar a todos los errores un formato consistente con `codigo`, `mensaje` y `detalle`.
+
+#### checkpoint ####
+texto:
+
+Verifica que los dos endpoints responden correctamente con el servidor corriendo:
+
+1. Abre `http://127.0.0.1:8000/envios/` en el navegador. Debe responder `[]` (la base de datos está vacía, eso es correcto).
+2. Abre `http://127.0.0.1:8000/envios/999`. Debe responder con el error 404 y el mensaje `"Envío no encontrado"`.
+3. Visita `http://127.0.0.1:8000/docs`. Debe aparecer Swagger UI con la sección "Envíos" y los dos endpoints listados.
+
+Si los tres puntos funcionan, los primeros endpoints están activos.
+
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git add cargo_track/routers/envios.py cargo_track/main.py
+git commit -m "feat: agregar endpoints GET /envios y GET /envios/{id}"

@@ -1,0 +1,191 @@
+_model: taller-paso
+---
+title: Eliminar y cambiar estados
+---
+orden: 10
+---
+body:
+
+#### texto ####
+texto:
+
+Con los endpoints de lectura y creación funcionando, vas a agregar los dos que completan la API: eliminar un envío y, el más importante del sistema, cambiar su estado con lógica de negocio.
+
+## Eliminar un envío
+
+Agrega el endpoint DELETE al final de `cargo_track/routers/envios.py`:
+
+#### codigo ####
+etiqueta: cargo_track/routers/envios.py (agregar al final)
+----
+lenguaje: python
+----
+codigo:
+
+@router.delete("/{envio_id}", status_code=204)
+def eliminar_envio(
+    envio_id: int,
+    session: Session = Depends(get_session),
+    _: str = Depends(verificar_api_key),
+):
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail="Envío no encontrado")
+    session.delete(envio)
+    session.commit()
+
+#### texto ####
+texto:
+
+El `status_code=204` (No Content) es el código estándar REST para DELETE exitoso: el servidor confirma que la operación funcionó pero no devuelve ningún cuerpo en la respuesta. Por eso la función no tiene `return`.
+
+## La lógica de estados
+
+El cambio de estado no es tan simple como actualizar un campo. En el negocio de Cargo Track existen reglas estrictas sobre qué transiciones son válidas. No tiene sentido que un envío entregado vuelva a estar en tránsito, ni que uno cancelado pase a entregado.
+
+Las reglas son:
+
+| Estado actual | Puede cambiar a |
+|---------------|-----------------|
+| PENDIENTE | EN_TRANSITO, CANCELADO |
+| EN_TRANSITO | ENTREGADO, CANCELADO |
+| ENTREGADO | (ninguno: estado final) |
+| CANCELADO | (ninguno: estado final) |
+
+Vas a codificar esas reglas en un diccionario y el endpoint la consultará antes de aplicar cualquier cambio.
+
+## El endpoint de cambio de estado
+
+Primero actualiza los imports al inicio de `envios.py` para incluir `EstadoEnvio` y `CambioEstado`:
+
+#### codigo ####
+etiqueta: cargo_track/routers/envios.py (actualizar imports)
+----
+lenguaje: python
+----
+codigo:
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+from ..database import get_session
+from ..models import Envio, Cliente, EstadoEnvio
+from ..schemas import EnvioCreate, EnvioRead, EnvioUpdate, CambioEstado
+from ..auth import verificar_api_key
+
+#### texto ####
+texto:
+
+Ahora agrega el diccionario de transiciones y el endpoint al final del archivo:
+
+#### codigo ####
+etiqueta: cargo_track/routers/envios.py (agregar al final)
+----
+lenguaje: python
+----
+codigo:
+
+TRANSICIONES_VALIDAS = {
+    EstadoEnvio.PENDIENTE: [EstadoEnvio.EN_TRANSITO, EstadoEnvio.CANCELADO],
+    EstadoEnvio.EN_TRANSITO: [EstadoEnvio.ENTREGADO, EstadoEnvio.CANCELADO],
+    EstadoEnvio.ENTREGADO: [],
+    EstadoEnvio.CANCELADO: [],
+}
+
+
+@router.patch("/{envio_id}/estado", response_model=EnvioRead)
+def cambiar_estado(
+    envio_id: int,
+    cambio: CambioEstado,
+    session: Session = Depends(get_session),
+    _: str = Depends(verificar_api_key),
+):
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail="Envío no encontrado")
+    if cambio.estado not in TRANSICIONES_VALIDAS[envio.estado]:
+        raise HTTPException(
+            status_code=422,
+            detail=f"No se puede cambiar de {envio.estado} a {cambio.estado}",
+        )
+    envio.estado = cambio.estado
+    session.add(envio)
+    session.commit()
+    session.refresh(envio)
+    return envio
+
+#### texto ####
+texto:
+
+`TRANSICIONES_VALIDAS[envio.estado]` devuelve la lista de estados a los que se puede llegar desde el estado actual. Si el estado pedido por el cliente no está en esa lista, el endpoint rechaza la operación con un 422 y un mensaje que explica exactamente qué transición se intentó.
+
+Por ejemplo:
+
+```python
+# El envío está en PENDIENTE
+TRANSICIONES_VALIDAS[EstadoEnvio.PENDIENTE]
+# → [EstadoEnvio.EN_TRANSITO, EstadoEnvio.CANCELADO]
+
+# El cliente pide ENTREGADO
+EstadoEnvio.ENTREGADO not in [EstadoEnvio.EN_TRANSITO, EstadoEnvio.CANCELADO]
+# → True → se lanza el 422
+```
+
+#### error_provocado ####
+modo: guiado
+----
+titulo: Intentar una transición inválida
+----
+texto:
+
+Crea un envío nuevo desde Swagger (estado inicial: `PENDIENTE`). Luego intenta cambiarlo directamente a `ENTREGADO` usando `PATCH /envios/{id}/estado` con:
+
+```json
+{"estado": "ENTREGADO"}
+```
+
+#### solucion_error ####
+texto:
+
+El endpoint responde con `422 Unprocessable Entity`:
+
+```json
+{"detail": "No se puede cambiar de PENDIENTE a ENTREGADO"}
+```
+
+Para llegar a `ENTREGADO`, la secuencia correcta es:
+
+1. `PENDIENTE` → `EN_TRANSITO` (primer cambio)
+2. `EN_TRANSITO` → `ENTREGADO` (segundo cambio)
+
+El diccionario `TRANSICIONES_VALIDAS` protege la integridad de los datos del negocio. Cualquier estado final (`ENTREGADO`, `CANCELADO`) tiene una lista vacía de transiciones válidas, lo que hace imposible "deshacer" un envío entregado o cancelado.
+
+#### checkpoint ####
+texto:
+
+Prueba el ciclo completo desde Swagger (`http://127.0.0.1:8000/docs`):
+
+1. Crea un envío nuevo. Confirma que el estado es `PENDIENTE`.
+2. Cámbialo a `EN_TRANSITO` con `PATCH /envios/{id}/estado`. El estado en la respuesta debe cambiar.
+3. Cámbialo a `ENTREGADO`. El estado debe ser `ENTREGADO`.
+4. Intenta cambiar ese mismo envío a `EN_TRANSITO`. Debe dar `422` con el mensaje de transición inválida.
+5. Crea otro envío y elimínalo con `DELETE /envios/{id}`. Debe responder sin cuerpo (código 204).
+6. Intenta `GET /envios/{id}` del envío eliminado. Debe responder `404`.
+
+Si los seis puntos funcionan, el ciclo completo de un envío está implementado.
+
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git add cargo_track/routers/envios.py
+git commit -m "feat: agregar DELETE y lógica de transición de estados"

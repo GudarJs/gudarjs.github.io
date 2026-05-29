@@ -1,0 +1,33 @@
+_model: taller
+---
+title: Tiempo real con Django Channels
+---
+orden: 1
+---
+duracion: 2 horas 30 minutos
+---
+prerrequisitos_resumen: Python 3.10+ y Django básico
+---
+descripcion:
+
+Construye una pizarra colaborativa multi-usuario en tiempo real usando WebSockets, Django Channels y un poco de JavaScript. En seis pasos pasaremos de un proyecto Django normal a uno que se actualiza en vivo en todos los navegadores conectados.
+---
+producto_final:
+
+Una pizarra colaborativa multi-usuario en la que varias personas pueden dibujar a la vez sobre el mismo canvas, y los trazos se ven en tiempo real en todos los navegadores.
+---
+objetivos:
+
+- Entender qué son los WebSockets y en qué se diferencian de HTTP.
+- Configurar Django Channels en un proyecto existente.
+- Escribir un Consumer async que reciba y emita mensajes.
+- Usar channel layers con Redis para hacer broadcast.
+- Conectar el frontend con la WebSocket API del navegador.
+- Desplegar la app a producción con Daphne y Nginx.
+---
+stack:
+
+- Python 3.10 o superior
+- Django 4.2+
+- Redis 7+ (o Docker para correrlo)
+- Saber crear un proyecto Django y la diferencia entre vista y URL

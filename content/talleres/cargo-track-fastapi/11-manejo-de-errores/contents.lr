@@ -1,0 +1,165 @@
+_model: taller-paso
+---
+title: Manejo de errores
+---
+orden: 11
+---
+body:
+
+#### texto ####
+texto:
+
+Ya estás usando `HTTPException` para errores puntuales. En este paso vas a centralizar el manejo de errores para que toda la API responda con un formato consistente, sin importar qué salga mal.
+
+#### analogia ####
+titulo: Un formulario de error uniforme
+----
+texto:
+
+Imagina que cada ventanilla de Cargo Track tiene su propio formato para decirte que algo salió mal: una te da un papel, otra te habla, otra te manda un correo. Sería confuso para el cliente. Un manejador de errores centralizado es como establecer que todas las ventanillas usan el mismo formulario de error, con los mismos campos y el mismo estilo.
+
+#### texto ####
+texto:
+
+## Los códigos HTTP más usados
+
+| Código | Nombre | Cuándo usarlo |
+|--------|--------|---------------|
+| 200 | OK | Respuesta exitosa en GET, PUT, PATCH |
+| 201 | Created | Recurso creado exitosamente (POST) |
+| 204 | No Content | Operación exitosa sin cuerpo de respuesta (DELETE) |
+| 400 | Bad Request | La petición tiene formato incorrecto |
+| 401 | Unauthorized | Falta autenticación |
+| 403 | Forbidden | Autenticado pero sin permisos |
+| 404 | Not Found | El recurso no existe |
+| 422 | Unprocessable Entity | Datos válidos en formato pero inválidos en lógica |
+| 500 | Internal Server Error | Error inesperado del servidor |
+
+## Manejadores de excepción globales
+
+Actualiza `cargo_track/main.py` para capturar los errores más comunes y darles un formato uniforme:
+
+#### codigo ####
+etiqueta: cargo_track/main.py
+----
+lenguaje: python
+----
+codigo:
+
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from .database import create_db_and_tables
+from .routers import envios, clientes
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
+
+
+app = FastAPI(
+    title="Cargo Track API",
+    description="API para gestión de envíos logísticos",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "codigo": 422,
+            "mensaje": "Error de validación en los datos enviados",
+            "detalle": str(exc.errors()),
+        },
+    )
+
+
+@app.exception_handler(404)
+async def not_found_handler(request: Request, exc):
+    return JSONResponse(
+        status_code=404,
+        content={
+            "codigo": 404,
+            "mensaje": "El recurso solicitado no existe",
+            "detalle": str(request.url),
+        },
+    )
+
+
+@app.exception_handler(500)
+async def server_error_handler(request: Request, exc):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "codigo": 500,
+            "mensaje": "Error interno del servidor",
+            "detalle": None,
+        },
+    )
+
+
+app.include_router(clientes.router)
+app.include_router(envios.router)
+
+
+@app.get("/")
+def root():
+    return {"mensaje": "Bienvenido a la API de Cargo Track"}
+
+#### error_provocado ####
+modo: trampa
+----
+titulo: Acceder a una ruta que no existe
+----
+texto:
+
+Prueba acceder a `http://127.0.0.1:8000/algo-que-no-existe` en el navegador.
+
+#### solucion_error ####
+texto:
+
+El manejador de 404 que agregaste responde ahora con el formato estándar de Cargo Track:
+
+```json
+{
+  "codigo": 404,
+  "mensaje": "El recurso solicitado no existe",
+  "detalle": "http://127.0.0.1:8000/algo-que-no-existe"
+}
+```
+
+Sin el manejador personalizado, FastAPI devuelve `{"detail": "Not Found"}`. Con el manejador, todos los errores hablan el mismo idioma y el frontend puede procesarlos de forma predecible.
+
+#### checkpoint ####
+texto:
+
+Verifica que los tres tipos de error responden con el formato correcto:
+
+1. `GET /envios/99999` debe dar `404` con los campos `{codigo, mensaje, detalle}`
+2. `POST /clientes` con email inválido debe dar `422` con el mismo formato
+3. `GET /algo-inventado` debe dar `404` con la URL en el campo `detalle`
+
+Si los tres responden con el formato `{codigo, mensaje, detalle}`, el manejo de errores está centralizado.
+
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git add cargo_track/main.py
+git commit -m "feat: centralizar manejo de errores con handlers globales"

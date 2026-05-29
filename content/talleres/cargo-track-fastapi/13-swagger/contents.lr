@@ -1,0 +1,137 @@
+_model: taller-paso
+---
+title: Swagger: tu API documentada
+---
+orden: 13
+---
+body:
+
+#### texto ####
+texto:
+
+Una de las grandes ventajas de FastAPI es que genera documentación interactiva automáticamente. No tienes que escribir nada extra: con lo que ya tienes, Swagger lee tus schemas, tipos y docstrings y construye una interfaz completa para explorar y probar la API.
+
+## Dónde encontrar la documentación
+
+FastAPI genera dos interfaces de documentación:
+
+- `http://127.0.0.1:8000/docs` — Swagger UI (interfaz interactiva para probar endpoints)
+- `http://127.0.0.1:8000/redoc` — ReDoc (documentación de lectura, más limpia visualmente)
+- `http://127.0.0.1:8000/openapi.json` — El schema OpenAPI en JSON crudo
+#### texto ####
+texto:
+
+## Mejorar la documentación con docstrings y summary
+
+FastAPI convierte los docstrings de tus funciones en descripción de endpoint. Actualiza los endpoints de envíos para enriquecerlos:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track/routers/envios.py (actualizar los GET)
+----
+codigo:
+
+@router.get(
+    "/",
+    response_model=list[EnvioRead],
+    summary="Listar todos los envíos",
+)
+def listar_envios(session: Session = Depends(get_session)):
+    """
+    Retorna la lista completa de envíos registrados en el sistema.
+    Los envíos se muestran con su estado actual.
+    """
+    return session.exec(select(Envio)).all()
+
+
+@router.get(
+    "/{envio_id}",
+    response_model=EnvioRead,
+    summary="Obtener un envío por ID",
+    responses={404: {"description": "Envío no encontrado"}},
+)
+def obtener_envio(envio_id: int, session: Session = Depends(get_session)):
+    """
+    Retorna los detalles de un envío específico por su ID.
+    Incluye el estado actual y la información de origen y destino.
+    """
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail="Envío no encontrado")
+    return envio
+#### texto ####
+texto:
+
+## Agrupar con tags y descripciones
+
+Actualiza `main.py` para agregar descripciones a los grupos de endpoints:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track/main.py (agregar tags_metadata)
+----
+codigo:
+
+tags_metadata = [
+    {
+        "name": "Envíos",
+        "description": "Gestión de envíos: crear, consultar, actualizar estado y eliminar.",
+    },
+    {
+        "name": "Clientes",
+        "description": "Registro y consulta de clientes del sistema Cargo Track.",
+    },
+    {
+        "name": "Conductores",
+        "description": "Registro y consulta de conductores.",
+    },
+]
+
+app = FastAPI(
+    title="Cargo Track API",
+    description="API REST para gestión de envíos logísticos de Cargo Track",
+    version="1.0.0",
+    lifespan=lifespan,
+    openapi_tags=tags_metadata,
+)
+#### texto ####
+texto:
+
+## Probar desde Swagger
+
+Swagger no es solo documentación: es una herramienta de pruebas. Con el botón **"Try it out"** en cualquier endpoint puedes:
+
+- Ver el schema de entrada esperado
+- Modificar los valores del cuerpo o los parámetros
+- Ejecutar la petición real y ver la respuesta
+- Verificar los códigos de estado documentados
+
+El ejemplo que definiste en `EnvioCreate` con `json_schema_extra` aparece precargado en el editor cuando haces "Try it out" en `POST /envios`.
+#### checkpoint ####
+titulo: 
+----
+texto:
+
+Abre `http://127.0.0.1:8000/docs` y verifica:
+
+1. Los endpoints están agrupados por tag con sus descripciones
+2. Los docstrings aparecen como descripción en cada endpoint
+3. El botón "Authorize" te permite ingresar la API key
+4. `POST /envios` muestra el ejemplo de Bogotá-Medellín precargado
+
+Si todo esto funciona, la documentación está completa y la API está lista para conectarse con el frontend.
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+#### codigo ####
+lenguaje: bash
+----
+etiqueta: terminal
+----
+codigo:
+
+git add cargo_track/main.py cargo_track/routers/envios.py cargo_track/schemas.py
+git commit -m "docs: enriquecer documentación Swagger con tags, docstrings y ejemplos"

@@ -1,0 +1,214 @@
+_model: taller-paso
+---
+title: Modelos de datos con SQLModel
+---
+orden: 4
+---
+body:
+
+#### texto ####
+texto:
+
+SQLModel es una librería que combina dos herramientas en una:
+
+- **SQLAlchemy**: maneja la comunicación con la base de datos (queries, transacciones)
+- **Pydantic**: valida que los datos tengan el tipo y formato correcto
+
+Con ella defines tus tablas como clases de Python con anotaciones de tipo. SQLModel se encarga de traducirlas a SQL.
+
+#### analogia ####
+titulo: Una clase es el molde, cada registro es el objeto
+----
+texto:
+
+Piensa en la clase `Cliente` como el molde de una galleta: define la forma, qué campos tiene (nombre, email, teléfono) y qué restricciones aplica (email único, nombre obligatorio). Cada cliente que guardas en la base de datos es una galleta hecha con ese molde: mismos campos, diferentes valores. El molde no cambia; los objetos son distintos cada vez.
+
+#### texto ####
+texto:
+
+## Crear el archivo models.py
+
+Vas a construir los modelos de a poco, en tres grupos, para entender qué hace cada parte antes de ver el conjunto completo.
+
+**Grupo 1: el enum de estados**
+
+Crea `cargo_track/models.py` con esto:
+
+#### codigo ####
+etiqueta: cargo_track/models.py
+----
+lenguaje: python
+----
+codigo:
+
+from typing import Optional, List
+from enum import Enum
+from sqlmodel import SQLModel, Field, Relationship
+
+
+class EstadoEnvio(str, Enum):
+    PENDIENTE = "PENDIENTE"
+    EN_TRANSITO = "EN_TRANSITO"
+    ENTREGADO = "ENTREGADO"
+    CANCELADO = "CANCELADO"
+
+#### texto ####
+texto:
+
+`EstadoEnvio` es un `Enum` que restringe los valores posibles del campo `estado` en un envío. Al heredar de `str`, los valores se guardan como texto en la base de datos (`"PENDIENTE"`, `"EN_TRANSITO"`, etc.) y Python los trata como strings comunes. Si alguien intenta asignar un estado que no está en la lista, Python lanza un error antes de que el dato llegue a la base de datos.
+
+**Grupo 2: los modelos simples (Cliente, Envio)**
+
+Agrega estos dos modelos al final de `models.py`:
+
+#### codigo ####
+etiqueta: cargo_track/models.py (agregar al final)
+----
+lenguaje: python
+----
+codigo:
+
+class Cliente(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    nombre: str = Field(max_length=100)
+    email: str = Field(unique=True, max_length=150)
+    telefono: Optional[str] = Field(default=None, max_length=20)
+
+    envios: List["Envio"] = Relationship(back_populates="cliente")
+
+
+class Envio(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    cliente_id: int = Field(foreign_key="cliente.id")
+    origen: str = Field(max_length=100)
+    destino: str = Field(max_length=100)
+    peso: float
+    descripcion: Optional[str] = Field(default=None)
+    estado: EstadoEnvio = Field(default=EstadoEnvio.PENDIENTE)
+
+    cliente: Optional[Cliente] = Relationship(back_populates="envios")
+
+#### texto ####
+texto:
+
+Hay algunos detalles que merecen explicación:
+
+**`SQLModel, table=True`**: el `table=True` le dice a SQLModel que esta clase representa una tabla real en la base de datos. Sin él, la clase existe como validador de datos (un schema Pydantic), pero nunca genera una tabla.
+
+**`id: Optional[int] = Field(default=None, primary_key=True)`**: la clave primaria es `Optional` porque cuando creas un nuevo `Cliente` en Python, todavía no tiene `id`. La base de datos lo asigna automáticamente al hacer el commit. Antes de guardarlo, `id` vale `None`.
+
+**`email: str = Field(unique=True)`**: `unique=True` le dice a la base de datos que no puede haber dos clientes con el mismo email. Si intentas guardar uno repetido, SQLite lanza un error de restricción.
+
+**`cliente_id: int = Field(foreign_key="cliente.id")`**: este es el campo que conecta `Envio` con `Cliente` a nivel de base de datos. Contiene el `id` del cliente al que pertenece el envío.
+
+**`Relationship(back_populates="cliente")`**: permite navegar entre objetos relacionados desde Python. Si tienes un `cliente` en memoria, puedes acceder a `cliente.envios` para obtener todos sus envíos. Si tienes un `envio`, puedes acceder a `envio.cliente` para obtener el cliente. El `back_populates` conecta los dos lados de la relación.
+
+**Grupo 3: la relación muchos-a-muchos (Conductor, Ruta, ConductorRuta)**
+
+Un conductor puede estar asignado a varias rutas, y una ruta puede tener varios conductores. Este tipo de relación requiere una **tabla intermedia**. Agrega los tres al final de `models.py`:
+
+#### codigo ####
+etiqueta: cargo_track/models.py (agregar al final)
+----
+lenguaje: python
+----
+codigo:
+
+class ConductorRuta(SQLModel, table=True):
+    conductor_id: Optional[int] = Field(
+        default=None, foreign_key="conductor.id", primary_key=True
+    )
+    ruta_id: Optional[int] = Field(
+        default=None, foreign_key="ruta.id", primary_key=True
+    )
+
+
+class Conductor(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    nombre: str = Field(max_length=100)
+    licencia: str = Field(unique=True, max_length=50)
+    email: str = Field(unique=True, max_length=150)
+
+    rutas: List["Ruta"] = Relationship(
+        back_populates="conductores", link_model=ConductorRuta
+    )
+
+
+class Ruta(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    nombre: str = Field(max_length=100)
+    origen: str = Field(max_length=100)
+    destino: str = Field(max_length=100)
+
+    conductores: List[Conductor] = Relationship(
+        back_populates="rutas", link_model=ConductorRuta
+    )
+
+#### advertencia ####
+texto:
+
+`ConductorRuta` debe definirse **antes** que `Conductor` y `Ruta` en el archivo. Las clases `Conductor` y `Ruta` la referencian con `link_model=ConductorRuta` y Python necesita que la clase ya exista en ese punto para poder usarla. Si las defines en el orden incorrecto, obtienes un `NameError`.
+
+#### texto ####
+texto:
+
+En `ConductorRuta`, los dos campos (`conductor_id` y `ruta_id`) son ambos `primary_key=True`. Eso crea una **clave primaria compuesta**: la combinación de conductor + ruta identifica de forma única cada fila en la tabla intermedia. No puede haber dos registros con el mismo par de valores.
+
+El `link_model=ConductorRuta` en los `Relationship` de `Conductor` y `Ruta` le dice a SQLModel que use `ConductorRuta` como puente al navegar entre los dos lados de la relación.
+
+#### error_provocado ####
+modo: guiado
+----
+titulo: Qué pasa si defines la tabla sin table=True
+----
+texto:
+
+Cambia temporalmente la definición de `Cliente` a:
+
+```python
+class Cliente(SQLModel):  # sin table=True
+    ...
+```
+
+Ahora importa el modelo desde Python:
+
+```bash
+python -c "from cargo_track.models import Cliente; print('OK')"
+```
+
+Verás `OK` sin error. El problema aparece más tarde, cuando arranques el servidor y SQLModel intente crear las tablas.
+
+#### solucion_error ####
+texto:
+
+Sin `table=True`, SQLModel trata la clase como un schema de validación Pydantic puro, no como una tabla. Cuando llamas `create_db_and_tables()`, simplemente ignora esa clase y la tabla `cliente` nunca se crea en la base de datos. Los errores aparecerán después, cuando intentes guardar o consultar clientes.
+
+Vuelve a agregar `table=True` en `Cliente` antes de continuar.
+
+#### checkpoint ####
+texto:
+
+Guarda `models.py` y verifica que todos los modelos se importan sin errores:
+
+```bash
+python -c "from cargo_track.models import Cliente, Envio, Conductor, Ruta, ConductorRuta, EstadoEnvio; print('OK')"
+```
+
+Debes ver `OK` en la terminal. Si hay algún error de sintaxis o de nombres, aparece aquí antes de arrancar el servidor.
+
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git add cargo_track/models.py
+git commit -m "feat: definir modelos de base de datos con SQLModel"

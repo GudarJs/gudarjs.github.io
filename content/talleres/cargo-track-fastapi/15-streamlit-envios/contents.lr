@@ -1,0 +1,178 @@
+_model: taller-paso
+---
+title: Streamlit: módulo de Envíos
+---
+orden: 15
+---
+body:
+
+#### texto ####
+texto:
+
+El módulo de Envíos es el corazón del frontend de Cargo Track. Aquí el operador puede ver todos los envíos, crear uno nuevo y cambiar el estado de un envío, todo desde tabs separados dentro de la misma página.
+
+Crea `cargo_track_ui/pages/envios.py`:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track_ui/pages/envios.py
+----
+codigo:
+
+import streamlit as st
+from api_client import get, post, patch, APIError
+
+
+def mostrar():
+    st.title("Gestión de Envíos")
+
+    try:
+        todos = get("/envios/")
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Total", len(todos))
+        col2.metric("Pendientes", sum(1 for e in todos if e["estado"] == "PENDIENTE"))
+        col3.metric("En tránsito", sum(1 for e in todos if e["estado"] == "EN_TRANSITO"))
+        col4.metric("Entregados", sum(1 for e in todos if e["estado"] == "ENTREGADO"))
+    except Exception:
+        pass
+
+    tab_lista, tab_crear, tab_estado = st.tabs(
+        ["Ver envíos", "Nuevo envío", "Cambiar estado"]
+    )
+
+    with tab_lista:
+        _tab_lista()
+    with tab_crear:
+        _tab_crear()
+    with tab_estado:
+        _tab_cambiar_estado()
+
+
+def _tab_lista():
+    st.subheader("Envíos registrados")
+
+    filtro = st.selectbox(
+        "Filtrar por estado",
+        options=["Todos", "PENDIENTE", "EN_TRANSITO", "ENTREGADO", "CANCELADO"],
+    )
+
+    with st.spinner("Cargando envíos..."):
+        try:
+            envios = get("/envios/")
+        except APIError as e:
+            st.error(f"Error {e.status_code}: {e.mensaje}")
+            return
+        except Exception:
+            st.error("No se pudo conectar con el API. Verifica que el servidor esté corriendo.")
+            return
+
+    if filtro != "Todos":
+        envios = [e for e in envios if e["estado"] == filtro]
+
+    if not envios:
+        st.info("No hay envíos que mostrar.")
+        return
+
+    st.dataframe(
+        envios,
+        column_config={
+            "id": "ID",
+            "cliente_id": "Cliente ID",
+            "origen": "Origen",
+            "destino": "Destino",
+            "peso": st.column_config.NumberColumn("Peso (kg)", format="%.1f kg"),
+            "estado": "Estado",
+            "descripcion": "Descripción",
+        },
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+def _tab_crear():
+    st.subheader("Registrar nuevo envío")
+
+    try:
+        clientes = get("/clientes/")
+        if not clientes:
+            st.warning("No hay clientes registrados. Crea uno primero en el módulo de Clientes.")
+            return
+        opciones_clientes = {f"{c['nombre']} (ID: {c['id']})": c["id"] for c in clientes}
+    except Exception as e:
+        st.error(f"No se pudo cargar la lista de clientes: {e}")
+        return
+
+    with st.form("form_crear_envio"):
+        cliente_sel = st.selectbox("Cliente", options=list(opciones_clientes.keys()))
+        col1, col2 = st.columns(2)
+        origen = col1.text_input("Ciudad de origen")
+        destino = col2.text_input("Ciudad de destino")
+        peso = st.number_input("Peso (kg)", min_value=0.1, step=0.1, value=1.0)
+        descripcion = st.text_area("Descripción (opcional)", height=80)
+        enviado = st.form_submit_button("Crear envío", use_container_width=True)
+
+    if enviado:
+        if not origen or not destino:
+            st.warning("Por favor completa origen y destino.")
+            return
+        try:
+            nuevo = post("/envios/", {
+                "cliente_id": opciones_clientes[cliente_sel],
+                "origen": origen,
+                "destino": destino,
+                "peso": peso,
+                "descripcion": descripcion or None,
+            })
+            st.success(f"Envío #{nuevo['id']} creado exitosamente. Estado: {nuevo['estado']}")
+            st.balloons()
+        except APIError as e:
+            st.error(f"Error {e.status_code}: {e.mensaje}")
+        except Exception:
+            st.error("No se pudo conectar con el API.")
+
+
+def _tab_cambiar_estado():
+    st.subheader("Actualizar estado de un envío")
+
+    envio_id = st.number_input("ID del envío", min_value=1, step=1)
+    nuevo_estado = st.selectbox(
+        "Nuevo estado",
+        options=["EN_TRANSITO", "ENTREGADO", "CANCELADO"],
+    )
+
+    if st.button("Actualizar estado", use_container_width=True):
+        try:
+            actualizado = patch(f"/envios/{int(envio_id)}/estado", {"estado": nuevo_estado})
+            st.success(f"Estado actualizado a: {actualizado['estado']}")
+        except APIError as e:
+            st.error(f"Error {e.status_code}: {e.mensaje}")
+        except Exception:
+            st.error("No se pudo conectar con el API.")
+#### checkpoint ####
+titulo: 
+----
+texto:
+
+Con el API corriendo, abre el módulo "Envíos" en Streamlit:
+
+1. Las métricas de la parte superior deben mostrar conteos reales
+2. La tab "Ver envíos" debe mostrar la tabla con los envíos existentes
+3. La tab "Nuevo envío" debe permitir crear un envío y mostrar el mensaje de éxito con `st.balloons()`
+4. La tab "Cambiar estado" debe actualizar el estado y mostrar el nuevo valor
+
+Si los cuatro puntos funcionan, el módulo de envíos está completo.
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+#### codigo ####
+lenguaje: bash
+----
+etiqueta: terminal
+----
+codigo:
+
+git add cargo_track_ui/pages/envios.py
+git commit -m "feat: agregar módulo de envíos con métricas, lista y formularios"

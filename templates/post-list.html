@@ -11,6 +11,7 @@
 <section class="py-20 bg-[#f8f9fa]">
     <div class="max-w-[1140px] mx-auto px-8">
         {% set theme_icons = {'green': 'fa-code', 'blue': 'fa-globe', 'red': 'fa-bolt', 'coral': 'fa-users'} %}
+        {% if this.children %}
         <div class="flex flex-col">
             {% for post in this.children %}
             <a class="grid grid-cols-[280px_1fr] gap-7 py-7 border-b border-[#e9ecef] no-underline last:border-b-0 hover:no-underline max-[900px]:grid-cols-1" href="{{ post|url }}">
@@ -35,6 +36,15 @@
             </a>
             {% endfor %}
         </div>
+        {% else %}
+        <div class="flex flex-col items-center justify-center py-24 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-azure/10 flex items-center justify-center mb-6">
+                <i class="fa fa-pencil text-2xl text-azure"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-3">{{ t.blog_empty_heading }}</h2>
+            <p class="text-slate-500 text-[16px] max-w-[28em] leading-[1.6]">{{ t.blog_empty_body }}</p>
+        </div>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

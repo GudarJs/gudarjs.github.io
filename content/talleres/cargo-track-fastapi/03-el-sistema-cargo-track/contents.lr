@@ -1,0 +1,119 @@
+_model: taller-paso
+---
+title: El sistema Cargo Track
+---
+orden: 3
+---
+body:
+
+#### texto ####
+texto:
+
+Antes de escribir código, vamos a entender qué estamos construyendo. Cargo Track necesita un sistema para gestionar sus operaciones logísticas: registrar clientes, crear envíos, asignar conductores a rutas y actualizar el estado de cada paquete a lo largo del tiempo.
+
+#### texto ####
+texto:
+
+## Las entidades del sistema
+
+El sistema tiene cuatro entidades principales:
+
+**Cliente:** las personas o empresas que envían paquetes. Tienen nombre, email y teléfono.
+
+**Envio:** el paquete que se mueve de un punto a otro. Pertenece a un cliente, tiene origen, destino, peso, descripción y un estado que cambia a lo largo del tiempo.
+
+**Conductor:** la persona que transporta los paquetes. Tiene nombre, número de licencia y email.
+
+**Ruta:** el trayecto entre dos ciudades. Un conductor puede trabajar en varias rutas, y una ruta puede tener varios conductores.
+
+#### texto ####
+texto:
+
+## Las relaciones
+
+- Un cliente puede tener muchos envíos (uno-a-muchos)
+- Un envío pertenece a un solo cliente (muchos-a-uno)
+- Un conductor puede trabajar en varias rutas (muchos-a-muchos)
+- Una ruta puede tener varios conductores (muchos-a-muchos)
+
+## Los estados de un envío
+
+Un envío pasa por estos estados a lo largo de su ciclo de vida:
+
+| Estado | Descripción |
+|--------|-------------|
+| `PENDIENTE` | Registrado pero aún no recogido |
+| `EN_TRANSITO` | En camino hacia el destino |
+| `ENTREGADO` | Llegó al destinatario |
+| `CANCELADO` | El envío fue cancelado |
+
+#### texto ####
+texto:
+
+## La estructura del proyecto
+
+Vamos a organizar el proyecto así:
+
+```
+cargo_track/
+├── __init__.py
+├── main.py              # punto de entrada de la API
+├── database.py          # conexión a la base de datos
+├── models.py            # modelos SQLModel (tablas)
+├── schemas.py           # schemas Pydantic (validación de entrada/salida)
+├── auth.py              # autenticación
+└── routers/
+    ├── __init__.py
+    ├── clientes.py
+    ├── envios.py
+    └── conductores.py
+```
+
+Y para el frontend:
+
+```
+cargo_track_ui/
+├── app.py               # punto de entrada de Streamlit
+├── api_client.py        # funciones para llamar al API
+└── pages/
+    ├── envios.py
+    ├── clientes.py
+    ├── conductores.py
+    └── rastreo.py
+```
+
+#### checkpoint ####
+texto:
+
+Crea la carpeta `cargo_track/` con la subcarpeta `routers/` dentro. No crees los archivos todavía, los vas a crear paso a paso a medida que los necesites. Si tienes clara la estructura del sistema, estás listo para modelar los datos.
+
+#### texto ####
+texto:
+
+## Inicializa Git
+
+Antes de escribir código, inicializa el repositorio y crea un `.gitignore` para no subir archivos innecesarios:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git init
+echo "venv/
+__pycache__/
+*.pyc
+cargo_track.db
+.env" > .gitignore
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git add .gitignore
+git commit -m "chore: inicializar repositorio y agregar .gitignore"

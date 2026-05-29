@@ -1,0 +1,41 @@
+_model: taller
+---
+title: Cargo Track: Diseña una API de rastreo logístico con FastAPI
+---
+orden: 1
+---
+duracion: 15 a 18 horas
+---
+descripcion:
+
+Cargo Track es una empresa de logística ficticia que necesita un sistema para gestionar sus envíos, clientes y conductores. En este taller vas a construir la API REST que hace funcionar ese sistema, desde los modelos de base de datos hasta los endpoints autenticados, y luego vas a conectar todo con un frontend en Streamlit.
+---
+producto_final:
+
+Una API REST funcional para Cargo Track con autenticación, documentación automática en Swagger y un frontend en Streamlit con sidebar y tabs para gestionar envíos, clientes y conductores.
+---
+objetivos:
+
+Al terminar este taller vas a poder:
+
+- Crear y organizar una API REST con FastAPI, definiendo rutas, métodos HTTP y respuestas correctas para cada operación
+- Modelar datos con SQLModel y diseñar relaciones entre tablas (uno-a-muchos y muchos-a-muchos)
+- Validar datos de entrada con Pydantic y devolver errores claros cuando la validación falla
+- Proteger endpoints con autenticación basada en API keys y entender cómo extenderlo con JWT
+- Manejar errores de forma consistente usando los códigos HTTP adecuados para cada situación
+- Explorar y probar la API desde la documentación automática que genera FastAPI con Swagger
+- Gestionar entornos virtuales de Python para aislar dependencias por proyecto
+- Conectar un frontend a los endpoints del API usando Streamlit, separando módulos con sidebar y tabs
+---
+stack:
+
+- Python 3.12
+- FastAPI 0.115
+- SQLModel 0.0.21
+- SQLite (incluido con Python) o PostgreSQL 16 (opcional)
+- Uvicorn 0.30
+- Streamlit 1.40
+- httpx 0.27
+- python-jose 3.3 (para JWT opcional)
+---
+prerrequisitos_resumen: Python 3.12, pip y un editor de código instalados. Conocimiento básico de Python: funciones, clases y tipos.

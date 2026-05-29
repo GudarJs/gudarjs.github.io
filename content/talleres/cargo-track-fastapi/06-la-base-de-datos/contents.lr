@@ -1,0 +1,309 @@
+_model: taller-paso
+---
+title: La base de datos
+---
+orden: 6
+---
+body:
+
+#### texto ####
+texto:
+
+Tienes los modelos definidos, pero Python todavía no sabe cómo comunicarse con la base de datos. Para eso necesitas dos cosas: el **motor de conexión** (engine), que sabe dónde está la base de datos y cómo hablarle, y la **sesión** (session), que maneja cada conversación individual.
+
+En este paso vas a crear `database.py` con esas dos piezas, y luego `main.py` para arrancar la aplicación.
+
+#### analogia ####
+titulo: El motor es la recepción, la sesión es el escritorio
+----
+texto:
+
+Imagina una empresa grande. La **recepción** sabe dónde está todo, tiene el directorio de extensiones y hay una sola en el edificio. Los **escritorios** son individuales: cada empleado abre uno para atender a un cliente, hace su trabajo, y cuando termina lo cierra para el siguiente.
+
+En la base de datos, el `engine` es la recepción: existe uno solo en toda la aplicación y sabe cómo conectarse a SQLite. La `session` es el escritorio: cada petición HTTP abre una, lee o escribe datos, y la cierra al terminar. Así se evita que una petición interfiera con otra.
+
+#### texto ####
+texto:
+
+## El archivo database.py
+
+Vas a construirlo en tres partes para entender qué hace cada una antes de ver el conjunto.
+
+**Parte 1: la conexión**
+
+Crea `cargo_track/database.py` con esto:
+
+#### codigo ####
+etiqueta: cargo_track/database.py
+----
+lenguaje: python
+----
+codigo:
+
+from sqlmodel import SQLModel, create_engine, Session
+
+DATABASE_URL = "sqlite:///cargo_track.db"
+
+engine = create_engine(DATABASE_URL, echo=True)
+
+#### texto ####
+texto:
+
+La URL `"sqlite:///cargo_track.db"` le dice a SQLModel tres cosas:
+
+- El motor de base de datos es **SQLite**
+- El archivo se llama `cargo_track.db`
+- Los tres `///` indican ruta relativa: el archivo se crea en la carpeta desde donde ejecutas el servidor
+
+El parámetro `echo=True` hace que SQLModel imprima en la terminal cada instrucción SQL que ejecuta. Cuando arrancas la aplicación por primera vez, verás algo como esto en la terminal:
+
+```
+CREATE TABLE cliente (
+    id INTEGER NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    ...
+)
+```
+
+Eso confirma que SQLModel tradujo tus clases Python a tablas SQL. Con el tiempo vas a aprender a leer ese output para entender qué hace el ORM por debajo y para depurar errores.
+
+**Parte 2: crear las tablas**
+
+Agrega esta función al final de `database.py`:
+
+#### codigo ####
+etiqueta: cargo_track/database.py (agregar al final)
+----
+lenguaje: python
+----
+codigo:
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+#### texto ####
+texto:
+
+`SQLModel.metadata` lleva un registro de todos los modelos que tienen `table=True`. Cuando llamas `create_all(engine)`, SQLModel genera el SQL para crear cada tabla en la base de datos. Si una tabla ya existe, la deja como está, así que es seguro llamar esta función cada vez que arranca la aplicación.
+
+**Parte 3: la sesión**
+
+Agrega esta función al final de `database.py`:
+
+#### codigo ####
+etiqueta: cargo_track/database.py (agregar al final)
+----
+lenguaje: python
+----
+codigo:
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+#### texto ####
+texto:
+
+Esta función tiene algo especial: usa `yield` en lugar de `return`. Eso la convierte en un **generador**, y su flujo es diferente al de una función normal:
+
+1. `with Session(engine) as session:` abre una conexión con la base de datos
+2. `yield session` pausa la función y entrega la sesión al endpoint que la pidió
+3. El endpoint hace su trabajo (leer, escribir, lo que necesite)
+4. Cuando el endpoint termina, Python vuelve aquí y ejecuta el cierre del `with`, cerrando la sesión limpiamente
+
+FastAPI usa este patrón con `Depends()`, que vas a ver en el siguiente paso. La ventaja es que la sesión siempre se cierra, incluso si el endpoint lanza una excepción en el medio.
+
+El archivo completo queda así:
+
+#### codigo ####
+etiqueta: cargo_track/database.py (completo)
+----
+lenguaje: python
+----
+codigo:
+
+from sqlmodel import SQLModel, create_engine, Session
+
+DATABASE_URL = "sqlite:///cargo_track.db"
+
+engine = create_engine(DATABASE_URL, echo=True)
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+#### texto ####
+texto:
+
+## El punto de entrada: main.py
+
+Crea `cargo_track/main.py`:
+
+#### codigo ####
+etiqueta: cargo_track/main.py
+----
+lenguaje: python
+----
+codigo:
+
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from .database import create_db_and_tables
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
+
+
+app = FastAPI(
+    title="Cargo Track API",
+    description="API para gestión de envíos logísticos",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
+
+@app.get("/")
+def root():
+    return {"mensaje": "Bienvenido a la API de Cargo Track"}
+
+#### texto ####
+texto:
+
+El decorador `@asynccontextmanager` convierte la función `lifespan` en el manejador del ciclo de vida de la aplicación. La parte **antes** del `yield` se ejecuta cuando la aplicación arranca. La parte **después** del `yield` se ejecutaría cuando la aplicación se apaga (útil para cerrar conexiones de red). Al pasar `lifespan=lifespan` a `FastAPI(...)`, le dices a FastAPI que use esa función para manejar el inicio y el cierre.
+
+El punto `@app.get("/")` es el endpoint raíz: cuando alguien visita `http://127.0.0.1:8000`, responde con ese JSON de bienvenida.
+
+Crea también los archivos `__init__.py` vacíos para que Python trate las carpetas como paquetes:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+touch cargo_track/__init__.py cargo_track/routers/__init__.py
+
+#### texto ####
+texto:
+
+## Arrancar el servidor
+
+Asegurate de estar en la carpeta raíz del proyecto (`cargo-track-fastapi/`) con el entorno virtual activado. Luego ejecuta:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+uvicorn cargo_track.main:app --reload
+
+#### texto ####
+texto:
+
+El comando tiene tres partes:
+
+- `cargo_track.main` es el módulo Python (el archivo `cargo_track/main.py`)
+- `:app` es el nombre del objeto FastAPI dentro de ese módulo
+- `--reload` hace que el servidor se reinicie automáticamente cada vez que guardas un archivo, sin que tengas que detenerlo y volver a ejecutarlo
+
+La primera vez que arranques verás el output de `echo=True` con los `CREATE TABLE` de cada modelo. Al final aparece:
+
+```
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+```
+
+#### error_provocado ####
+modo: trampa
+----
+titulo: Ejecutar uvicorn desde la carpeta equivocada
+----
+texto:
+
+Detén el servidor con `Ctrl+C`. Ahora entra a la subcarpeta `cargo_track/` y trata de arrancar uvicorn desde allí:
+
+```bash
+cd cargo_track
+uvicorn cargo_track.main:app --reload
+```
+
+#### solucion_error ####
+texto:
+
+Verás un error como este:
+
+```
+ModuleNotFoundError: No module named 'cargo_track'
+```
+
+Python busca los módulos desde la carpeta donde ejecutas el comando. Si estás dentro de `cargo_track/`, el paquete `cargo_track` ya no es visible porque estás dentro de él. Siempre ejecuta `uvicorn` desde la carpeta raíz del proyecto, donde está el directorio `cargo_track/` como subcarpeta. Vuelve con `cd ..` y vuelve a ejecutar el comando.
+
+#### checkpoint ####
+texto:
+
+Con el servidor corriendo, abre `http://127.0.0.1:8000` en el navegador. Debes ver:
+
+```json
+{"mensaje": "Bienvenido a la API de Cargo Track"}
+```
+
+Además, en la carpeta `cargo-track-fastapi/` debe haber aparecido un archivo `cargo_track.db`. Puedes verificarlo sin detener el servidor abriendo otra terminal:
+
+```bash
+ls -la cargo_track.db
+```
+
+Si el archivo existe y el navegador muestra el JSON, la base de datos está creada y el servidor está listo para recibir peticiones.
+
+#### texto ####
+texto:
+
+## Sección opcional: PostgreSQL
+
+Si prefieres usar PostgreSQL (por ejemplo, para prepararte para un despliegue en producción), el cambio es mínimo. Primero instala el driver:
+
+```bash
+pip install psycopg2-binary
+```
+
+Luego cambia la URL de conexión en `database.py`:
+
+```python
+DATABASE_URL = "postgresql://usuario:contraseña@localhost:5432/cargo_track"
+```
+
+Todo lo demás, los modelos, las sesiones y los endpoints, funciona igual. SQLModel abstrae las diferencias entre motores de base de datos.
+
+#### advertencia ####
+texto:
+
+Con PostgreSQL necesitas tener el servicio corriendo y la base de datos `cargo_track` creada antes de arrancar la aplicación. Con SQLite no hay nada que configurar: el archivo se crea solo la primera vez que arrancas el servidor.
+
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git add cargo_track/database.py cargo_track/main.py cargo_track/__init__.py cargo_track/routers/__init__.py
+git commit -m "feat: conectar base de datos y crear punto de entrada con FastAPI"

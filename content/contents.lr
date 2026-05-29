@@ -1,0 +1,202 @@
+_model: home
+---
+title: Inicio
+---
+hero_eyebrow: ¡Hola! Bienvenido
+---
+hero_heading: Soy Dario Guzmán.
+---
+hero_tagline: Desarrollador Python · Barranquilla, Colombia
+---
+hero_lede:
+
+Llevo **+10 años** construyendo APIs y aplicaciones web escalables con Django.
+Actualmente lidero el equipo de live streaming en [Roboduels](/cv),
+y co-organizo [Python Barranquilla](/cv).
+Escribo sobre lo que aprendo en [mi blog](/blog)
+y dicto talleres gratuitos con [Django Girls Colombia](/talleres).
+---
+worked_at_subtitle: 10+ años en producto y consultoría
+---
+worked_at:
+
+#### home_company_chip ####
+label: Roboduels
+----
+logo_image:
+----
+mark: RD
+----
+logo_color: linear-gradient(135deg,#1F4F6C,#0d2a3d)
+
+#### home_company_chip ####
+label: Huge
+----
+logo_image:
+----
+mark: H
+----
+logo_color: linear-gradient(135deg,#fb866a,#c8523a)
+
+#### home_company_chip ####
+label: Nokia
+----
+logo_image:
+----
+mark: N
+----
+logo_color: linear-gradient(135deg,#124191,#0a2960)
+
+#### home_company_chip ####
+label: Ebenezer
+----
+logo_image:
+----
+mark: ET
+----
+logo_color: linear-gradient(135deg,#2D749F,#1F4F6C)
+
+#### home_company_chip ####
+label: Globalsoft
+----
+logo_image:
+----
+mark: GS
+----
+logo_color: linear-gradient(135deg,#545E6C,#2c333d)
+---
+skills_deck: Backend en Python, frontend cuando se necesita, e infraestructura para que todo se mantenga en pie. Esto es lo que uso día a día.
+---
+skills:
+
+#### home_skill_card ####
+icon: fa-code
+----
+title: Python · Django · Celery
+----
+desc: El stack en el que vivo. APIs, sistemas legacy, integraciones complejas, tareas asíncronas.
+
+#### home_skill_card ####
+icon: fa-bolt
+----
+title: Django Channels · WebSockets
+----
+desc: Tiempo real en producción: dibujo colaborativo, chats, control remoto, streaming.
+
+#### home_skill_card ####
+icon: fa-cubes
+----
+title: React · Node JS
+----
+desc: Frontends cuando el equipo necesita un fullstack, o herramientas internas en Node.
+
+#### home_skill_card ####
+icon: fa-cloud
+----
+title: AWS · Linux · Docker
+----
+desc: Despliegues tolerantes a fallos en EC2, contenedores, CI/CD y monitoreo básico.
+
+#### home_skill_card ####
+icon: fa-database
+----
+title: MySQL · Postgres · MongoDB · Redis
+----
+desc: Modelado relacional, queries que no se mueren, cachés y colas con Redis.
+
+#### home_skill_card ####
+icon: fa-eye
+----
+title: Visión por computador
+----
+desc: Reconocimiento facial con CNN, pipelines de video con OpenCV y GStreamer.
+
+#### home_skill_card ####
+icon: fa-cog
+----
+title: C++ · ASP.NET
+----
+desc: Background de soporte y software de escritorio. Útil para entender sistemas legacy.
+
+#### home_skill_card ####
+icon: fa-cubes
+----
+title: 3D · Cinema 4D
+----
+desc: Background de diseño gráfico — visualizaciones, mockups arquitectónicos.
+---
+workshops:
+
+#### home_workshop_card ####
+icon: fa-pencil-square-o
+----
+thumb_class:
+----
+kicker: Pycon Colombia 2019 · Workshop
+----
+title: Dibujo colaborativo en tiempo real con Django Channels
+----
+desc: WebSockets paso a paso, construyendo una pizarra colaborativa multi-usuario.
+----
+duration: 3 h
+----
+lang_or_tag: Español
+
+#### home_workshop_card ####
+icon: fa-graduation-cap
+----
+thumb_class: warm
+----
+kicker: Django Girls Colombia
+----
+title: Tutorial completo de Django Girls
+----
+desc: Construye tu primer blog en Django desde cero. Sin requisitos previos. En español.
+----
+duration: 6 h
+----
+lang_or_tag: Para 1ª vez
+
+#### home_workshop_card ####
+icon: fa-eye
+----
+thumb_class: slate
+----
+kicker: Pycon Colombia 2018 · Talk
+----
+title: Reconocimiento facial con redes neuronales
+----
+desc: Introducción amable a CNN aplicadas a visión por computador. Con demo en vivo.
+----
+duration: 40 min
+----
+lang_or_tag: Python + Keras
+---
+testimonials:
+
+#### home_testimonial ####
+quote: Dario explica WebSockets de una forma que por fin tiene sentido. Salí del taller con un proyecto funcionando y ganas de seguir construyendo.
+----
+name: María Restrepo
+----
+role: Asistente · Pycon Colombia 2019
+----
+avatar: MR
+
+#### home_testimonial ####
+quote: Trabajar con Dario en el equipo de live streaming es aprender algo nuevo cada semana. Tiene paciencia para enseñar y rigor para arquitectura.
+----
+name: Alex Kuznetsov
+----
+role: Product Owner · Roboduels
+----
+avatar: AK
+
+#### home_testimonial ####
+quote: Como coach de Django Girls, Dario hace que las personas que nunca habían tocado código se sientan capaces. Eso es invaluable.
+----
+name: Laura Pérez
+----
+role: Organizadora · Django Girls Colombia
+----
+avatar: LP

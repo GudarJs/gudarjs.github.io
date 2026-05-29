@@ -1,0 +1,92 @@
+_model: taller-paso
+---
+title: Relaciones entre modelos
+---
+orden: 5
+---
+body:
+
+#### texto ####
+texto:
+
+Ya definiste las relaciones en el paso anterior, pero vale la pena entenderlas en profundidad porque son el corazón del diseño de una base de datos relacional. Las relaciones determinan cómo se conectan los datos entre sí.
+
+#### analogia ####
+titulo: Llaves y cerraduras
+----
+texto:
+
+Una llave foránea (foreign key) es como una llave que abre la puerta de otra tabla. En `Envio`, el campo `cliente_id` es la llave que conecta cada envío con su cliente. La base de datos garantiza que esa llave siempre apunte a un cliente que existe: no puedes tener un envío sin dueño.
+
+#### texto ####
+texto:
+
+## Uno-a-muchos: Cliente y Envíos
+
+Un cliente puede tener muchos envíos, pero cada envío pertenece a un solo cliente:
+
+```python
+# En Cliente:
+envios: List["Envio"] = Relationship(back_populates="cliente")
+
+# En Envio:
+cliente_id: int = Field(foreign_key="cliente.id")
+cliente: Optional[Cliente] = Relationship(back_populates="envios")
+```
+
+El `foreign_key="cliente.id"` en `Envio` crea la columna real en la tabla. Los `Relationship` de ambos lados te permiten navegar entre entidades desde Python:
+
+```python
+# Dado un cliente, ver todos sus envíos:
+cliente.envios  # lista de objetos Envio
+
+# Dado un envío, ver su cliente:
+envio.cliente   # objeto Cliente
+```
+
+#### texto ####
+texto:
+
+## Muchos-a-muchos: Conductores y Rutas
+
+Un conductor puede trabajar en varias rutas, y una ruta puede tener varios conductores. Para esto se necesita una tabla intermedia:
+
+```python
+class ConductorRuta(SQLModel, table=True):
+    conductor_id: Optional[int] = Field(
+        default=None, foreign_key="conductor.id", primary_key=True
+    )
+    ruta_id: Optional[int] = Field(
+        default=None, foreign_key="ruta.id", primary_key=True
+    )
+```
+
+Esta tabla no tiene un ID propio: la clave primaria es la combinación de `conductor_id` y `ruta_id`. Eso garantiza que un conductor no pueda estar asignado dos veces a la misma ruta.
+
+#### texto ####
+texto:
+
+## Navegación entre entidades
+
+Con las relaciones definidas puedes consultar datos asociados directamente desde Python, sin escribir JOINs a mano:
+
+```python
+from sqlmodel import Session, select
+
+with Session(engine) as session:
+    cliente = session.get(Cliente, 1)
+    print(cliente.envios)      # todos los envíos de este cliente
+
+    ruta = session.get(Ruta, 1)
+    print(ruta.conductores)    # todos los conductores de esta ruta
+```
+
+#### advertencia ####
+texto:
+
+SQLModel carga las relaciones de forma diferida (lazy loading): solo las consulta cuando accedes a ellas, y solo funciona dentro de una sesión activa. Si intentas acceder a `cliente.envios` fuera del bloque `with Session(...)`, vas a ver un error de sesión cerrada. Más adelante, cuando definamos los endpoints, vamos a manejar esto correctamente.
+
+#### checkpoint ####
+texto:
+
+Revisa tu `models.py` y confirma que tienes los cuatro modelos (`Cliente`, `Envio`, `Conductor`, `Ruta`) y la tabla intermedia `ConductorRuta`. Si la importación `from cargo_track.models import Cliente, Envio, Conductor, Ruta, ConductorRuta` no da errores, las relaciones están bien definidas.

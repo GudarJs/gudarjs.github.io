@@ -40,3 +40,6 @@ $RECYCLE.BIN/
 *.skill
 
 docs/superpowers/
+
+# Claude Code local settings
+.claude/

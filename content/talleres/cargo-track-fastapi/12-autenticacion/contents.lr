@@ -1,0 +1,345 @@
+_model: taller-paso
+---
+title: Autenticación con JWT
+---
+orden: 12
+---
+body:
+
+#### texto ####
+texto:
+
+Hasta ahora cualquier persona puede llamar a tu API sin identificarse y crear o eliminar datos libremente. Vamos a proteger los endpoints de escritura con **OAuth2 Password + JWT**: el cliente envía usuario y contraseña una vez, recibe un token con tiempo de expiración, y lo usa en cada petición posterior.
+
+Los endpoints de lectura (`GET`) siguen siendo públicos: cualquier visitante puede consultar envíos. Los de escritura (`POST`, `PATCH`, `DELETE`) requieren el token.
+
+#### analogia ####
+titulo: La pulsera de entrada
+----
+texto:
+
+Imagina que Cargo Track organiza un evento de logística. En la entrada, presentas tu identificación (usuario y contraseña). A cambio recibes una pulsera con la fecha de hoy impresa: es tu token. Con la pulsera puesta, puedes entrar y salir del salón sin volver a identificarte. Cuando el evento termina (el token expira), la pulsera ya no sirve y necesitas sacar una nueva.
+
+#### texto ####
+texto:
+
+## Cómo funciona OAuth2 Password Flow
+
+El flujo tiene tres pasos:
+
+1. El cliente hace `POST /auth/token` enviando `username` y `password` como datos de formulario.
+2. El servidor valida las credenciales y devuelve un **JWT** (JSON Web Token) con tiempo de expiración.
+3. El cliente incluye ese token en todas las peticiones protegidas: `Authorization: Bearer <token>`.
+
+Un JWT es una cadena de texto en tres partes separadas por puntos (`header.payload.signature`). La parte del medio (payload) contiene los datos que guardaste, como el nombre de usuario y la fecha de expiración. La firma garantiza que nadie modificó el contenido.
+
+## Instalar las dependencias
+
+Necesitas dos librerías nuevas:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+pip install "python-jose[cryptography]" "passlib[bcrypt]"
+
+#### texto ####
+texto:
+
+`python-jose` crea y verifica los JWT. `passlib` hashea las contraseñas con bcrypt para que nunca las guardes en texto plano.
+
+## Crear auth.py
+
+Crea `cargo_track/auth.py`. Lo vas a construir en dos partes.
+
+**Parte 1: configuración y utilidades**
+
+#### codigo ####
+etiqueta: cargo_track/auth.py
+----
+lenguaje: python
+----
+codigo:
+
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+
+SECRET_KEY = "cargo-track-dev-secret-cambia-en-produccion"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
+
+USUARIOS = {
+    "admin": {
+        "username": "admin",
+        "hashed_password": pwd_context.hash("secret123"),
+    }
+}
+
+
+def verificar_password(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)
+
+#### texto ####
+texto:
+
+Algunos detalles:
+
+**`CryptContext(schemes=["bcrypt"])`**: configura el hasheador de contraseñas. Bcrypt es lento a propósito: hace que atacar contraseñas por fuerza bruta sea impráctico. `pwd_context.hash("secret123")` convierte la contraseña en texto plano a algo como `$2b$12$...`, que es lo que guardas.
+
+**`OAuth2PasswordBearer(tokenUrl="/auth/token")`**: le dice a FastAPI que las peticiones protegidas deben enviar el token en el header `Authorization: Bearer <token>`. El `tokenUrl` apunta al endpoint donde el cliente obtiene ese token: Swagger lo usa para saber dónde hacer el login.
+
+**`USUARIOS`**: un diccionario en memoria para este taller. En producción, los usuarios vendrían de la base de datos.
+
+**Parte 2: crear y verificar tokens**
+
+Agrega esto al final de `auth.py`:
+
+#### codigo ####
+etiqueta: cargo_track/auth.py (continúa)
+----
+lenguaje: python
+----
+codigo:
+
+def crear_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (
+        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    to_encode["exp"] = expire
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Token inválido o expirado",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        return {"username": username}
+    except JWTError:
+        raise credentials_exception
+
+#### texto ####
+texto:
+
+**`crear_token(data)`**: toma un diccionario (por ejemplo `{"sub": "admin"}`), le agrega el campo `"exp"` con la fecha de expiración, y lo convierte en un JWT firmado con `SECRET_KEY`. El campo `"sub"` (subject) es la convención estándar de JWT para identificar al usuario.
+
+**`get_current_user`**: esta es la dependencia que protege tus endpoints. Recibe el token del header `Authorization`, lo verifica con la misma `SECRET_KEY` y algoritmo, extrae el `"sub"` (username) del payload, y devuelve el diccionario del usuario. Si el token falta, expiró o fue modificado, `jwt.decode` lanza un `JWTError` y la función devuelve un `401` con el header `WWW-Authenticate: Bearer` (requerido por el estándar OAuth2).
+
+## Crear el endpoint de login
+
+Crea `cargo_track/routers/auth.py`:
+
+#### codigo ####
+etiqueta: cargo_track/routers/auth.py
+----
+lenguaje: python
+----
+codigo:
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from ..auth import USUARIOS, verificar_password, crear_token
+
+router = APIRouter(prefix="/auth", tags=["Autenticación"])
+
+
+@router.post("/token")
+def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    usuario = USUARIOS.get(form_data.username)
+    if not usuario or not verificar_password(form_data.password, usuario["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Usuario o contraseña incorrectos",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    token = crear_token(data={"sub": form_data.username})
+    return {"access_token": token, "token_type": "bearer"}
+
+#### texto ####
+texto:
+
+**`OAuth2PasswordRequestForm`**: un formulario estándar de OAuth2. Espera los campos `username` y `password` como datos de formulario (`application/x-www-form-urlencoded`), no como JSON. FastAPI lo provee directamente, no necesitas definir un schema.
+
+Si las credenciales son correctas, se crea un token con `{"sub": "admin"}` en el payload y se devuelve en el formato estándar: `{"access_token": "...", "token_type": "bearer"}`.
+
+## Registrar el router en main.py
+
+Agrega el router de autenticación en `cargo_track/main.py`:
+
+#### codigo ####
+etiqueta: cargo_track/main.py (modificación)
+----
+lenguaje: python
+----
+codigo:
+
+from .routers import envios, clientes, conductores, auth
+
+# ... (el resto del archivo no cambia)
+
+app.include_router(auth.router)   # agregar antes de los demás routers
+app.include_router(clientes.router)
+app.include_router(envios.router)
+app.include_router(conductores.router)
+
+#### texto ####
+texto:
+
+## Proteger los endpoints de escritura
+
+La dependencia se agrega con `_: dict = Depends(get_current_user)`. El guion bajo indica que no vas a usar el valor de retorno en el endpoint: solo importa el efecto, que es el `401` si el token es inválido.
+
+Actualiza `cargo_track/routers/envios.py` (solo se muestran los endpoints que cambian):
+
+#### codigo ####
+etiqueta: cargo_track/routers/envios.py (cambios)
+----
+lenguaje: python
+----
+codigo:
+
+from ..auth import get_current_user
+
+# ...
+
+@router.post("/", response_model=EnvioRead, status_code=201)
+def crear_envio(
+    envio: EnvioCreate,
+    session: Session = Depends(get_session),
+    _: dict = Depends(get_current_user),
+):
+    ...
+
+
+@router.patch("/{envio_id}", response_model=EnvioRead)
+def actualizar_envio(
+    envio_id: int,
+    datos: EnvioUpdate,
+    session: Session = Depends(get_session),
+    _: dict = Depends(get_current_user),
+):
+    ...
+
+
+@router.delete("/{envio_id}", status_code=204)
+def eliminar_envio(
+    envio_id: int,
+    session: Session = Depends(get_session),
+    _: dict = Depends(get_current_user),
+):
+    ...
+
+
+@router.patch("/{envio_id}/estado", response_model=EnvioRead)
+def cambiar_estado(
+    envio_id: int,
+    cambio: CambioEstado,
+    session: Session = Depends(get_session),
+    _: dict = Depends(get_current_user),
+):
+    ...
+
+#### texto ####
+texto:
+
+Aplica el mismo patrón en `clientes.py` (agrega la dependencia en `crear_cliente`) y en `conductores.py` (en `crear_conductor`).
+
+#### error_provocado ####
+modo: guiado
+----
+titulo: Llamar a un endpoint protegido sin token
+----
+texto:
+
+Reinicia Uvicorn. Abre `http://127.0.0.1:8000/docs`. Expande `POST /envios`, haz clic en "Try it out" y envía la petición sin autenticarte.
+
+#### solucion_error ####
+texto:
+
+La API responde con `401 Unauthorized`:
+
+```json
+{"detail": "Not authenticated"}
+```
+
+Swagger no incluyó el header `Authorization` porque no has hecho login. Para autenticarte:
+
+1. Haz clic en el botón **"Authorize"** (candado en la parte superior derecha)
+2. En la sección `OAuth2PasswordBearer` escribe:
+   - Username: `admin`
+   - Password: `secret123`
+3. Haz clic en "Authorize" y luego en "Close"
+
+Swagger hace `POST /auth/token` en segundo plano, obtiene el JWT y lo incluye automáticamente en todas las peticiones posteriores. Ahora `POST /envios` devuelve `201`.
+
+#### error_provocado ####
+modo: guiado
+----
+titulo: Qué contiene un JWT
+----
+texto:
+
+Copia el token que devuelve `POST /auth/token` (el valor del campo `access_token`) y pégalo en `https://jwt.io`. Observa el payload.
+
+#### solucion_error ####
+texto:
+
+Vas a ver algo como:
+
+```json
+{
+  "sub": "admin",
+  "exp": 1234567890
+}
+```
+
+El `sub` es el username. El `exp` es la fecha de expiración en formato Unix timestamp. El sitio también te muestra que la firma es inválida (porque no tiene tu `SECRET_KEY`): eso confirma que solo tu servidor puede verificar los tokens que emitió.
+
+#### advertencia ####
+texto:
+
+Nunca guardes el `SECRET_KEY` en el código que subes a un repositorio. En producción, cárgalo desde una variable de entorno con `python-dotenv`. Commitear secretos es un error de seguridad grave.
+
+#### checkpoint ####
+texto:
+
+Reinicia Uvicorn, abre Swagger y verifica:
+
+1. `POST /auth/token` con `username=admin` y `password=secret123` devuelve un objeto con `access_token`
+2. `POST /envios` sin autenticación devuelve `401`
+3. Después de hacer login en Swagger (botón "Authorize"), `POST /envios` devuelve `201`
+4. `GET /envios` sigue funcionando sin autenticación
+
+Si los cuatro puntos funcionan, los endpoints de escritura están protegidos y los de lectura siguen siendo públicos.
+
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git add cargo_track/auth.py cargo_track/routers/auth.py cargo_track/routers/envios.py cargo_track/routers/clientes.py cargo_track/routers/conductores.py cargo_track/main.py
+git commit -m "feat: reemplazar API key con OAuth2 Password y JWT"

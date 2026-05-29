@@ -1,0 +1,274 @@
+_model: cv
+---
+title: CV
+---
+summary_es:
+
+Hi there, my name is Dario Guzman. I'm a Colombian 🇨🇴 Software Engineer, Web Developer & AI / Computer Vision enthusiast with 10+ years of experience in Python, Django, startups, structuring scalable web applications from start, re-implementation of legacy systems and integrations with third party services.
+
+Expertise building APIs and websites with Django in Python. Familiar with automation strategies and quality assurance standards. Setting up fault tolerant, scalable hosting environments using AWS EC2 services. Using Ubuntu Server / Amazon Linux.
+---
+contact:
+
+#### cv_contact_item ####
+kind: email
+----
+icon: envelope
+----
+label: guzman.d.dario@gmail.com
+----
+href: mailto:guzman.d.dario@gmail.com
+
+#### cv_contact_item ####
+kind: github
+----
+icon: github
+----
+label: github.com/GudarJs
+----
+href: https://github.com/GudarJs
+
+#### cv_contact_item ####
+kind: linkedin
+----
+icon: linkedin
+----
+label: linkedin.com/in/gudarjs
+----
+href: https://linkedin.com/in/gudarjs
+
+#### cv_contact_item ####
+kind: twitter
+----
+icon: twitter
+----
+label: @GudarJs
+----
+href: https://twitter.com/GudarJs
+---
+education:
+
+#### cv_entry_item ####
+title: Software Engineer
+----
+meta: CUES · Salamanca
+----
+time: 2019 - 2021
+----
+logo_image:
+----
+logo_initials: C
+----
+logo_color: linear-gradient(135deg,#B37C57,#60412B)
+
+#### cv_entry_item ####
+title: Software Developer
+----
+meta: CUES · Salamanca
+----
+time: 2014 - 2018
+----
+logo_image:
+----
+logo_initials: C
+----
+logo_color: linear-gradient(135deg,#B37C57,#60412B)
+
+#### cv_entry_item ####
+title: System Technician
+----
+meta: SENA
+----
+time: 2012 - 2013
+----
+logo_image:
+----
+logo_initials: S
+----
+logo_color: linear-gradient(135deg,#1F4F6C,#0d2a3d)
+---
+volunteering:
+
+#### cv_entry_item ####
+title: Co-organizer
+----
+meta: Python Barranquilla
+----
+time: 2017 - 2020
+----
+logo_image:
+----
+logo_initials: Py
+----
+logo_color: linear-gradient(135deg,#FFD43B,#FF9F1C)
+
+#### cv_entry_item ####
+title: Coach
+----
+meta: Django Girls Colombia
+----
+time: 2017 - Hoy
+----
+logo_image:
+----
+logo_initials: DG
+----
+logo_color: linear-gradient(135deg,#fb866a,#c8523a)
+---
+languages:
+
+Español (Nativo)
+English (Advanced)
+---
+interests:
+
+Cocina
+Impresión 3D
+Código abierto
+---
+experience:
+
+#### cv_experience_item ####
+title: SR Backend & Live Streaming Engineer
+----
+time: Mar 2019 — Present
+----
+company: Roboduels — Brooklyn, New York (Remote)
+----
+logo_image:
+----
+logo_initials: RD
+----
+logo_color: linear-gradient(135deg,#1F4F6C,#0d2a3d)
+----
+responsibilities:
+In charge of the live video streaming team
+Translation of the product owner's ideas into tasks
+Designing and developing software to control and stream video from a robot remotely
+Integration of new robot hardware modules
+Managing the cloud architecture and deploy strategy
+Technical support for customers
+----
+tools:
+Python & Django & Celery
+Javascript & Node JS & React JS
+MySQL
+Redis
+
+#### cv_experience_item ####
+title: SSR Python Developer
+----
+time: Jun 2021 — Feb 2022 · 9 m
+----
+company: Huge — Medellín, Colombia (Remote)
+----
+logo_image:
+----
+logo_initials: H
+----
+logo_color: linear-gradient(135deg,#fb866a,#c8523a)
+----
+responsibilities:
+New translations to an existing project
+Static site generators connected to headless CMS
+Tests strategy for a project remake
+----
+tools:
+Python & Django & Wagtail
+MySQL
+Redis
+
+#### cv_experience_item ####
+title: SSR Python Developer
+----
+time: Mar 2019 — Sept 2019 · 7 m
+----
+company: Nokia — Bogotá D.C, Colombia
+----
+logo_image:
+----
+logo_initials: N
+----
+logo_color: linear-gradient(135deg,#124191,#0a2960)
+----
+responsibilities:
+In charge of one of the software development teams
+Mentoring junior software developers
+New features in legacy software using Django, DRF and Celery
+PDF parsers to extract data from purchase orders
+Web crawlers to automate financial software
+----
+tools:
+Python & Django & Celery
+SQL Server
+Redis
+
+#### cv_experience_item ####
+title: Full Stack Developer
+----
+time: Aug 2017 — Mar 2019 · 1y 8m
+----
+company: Ebenezer Technologies — Barranquilla, Colombia
+----
+logo_image:
+----
+logo_initials: ET
+----
+logo_color: linear-gradient(135deg,#2D749F,#1F4F6C)
+----
+responsibilities:
+In charge of the web development team
+Designing and developing projects for international customers
+Integrating with third-party services via REST, web services and webhooks
+----
+tools:
+Python & Django & Celery
+Javascript & Node JS & React JS
+Ruby on Rails
+C++
+Postgres
+MongoDB
+Redis
+---
+talks:
+
+#### cv_talk_item ####
+title: Crea un sitio web de dibujo colaborativo en tiempo real con Django Channels
+----
+href: https://2019.pycon.co/ponencias/crea-un-sitio-web-de-dibujo-colaborativo-en-tiempo-real-con-django-channels/
+----
+tag: Pycon Colombia 2019 · Workshop
+
+#### cv_talk_item ####
+title: Facial recognition with neural networks
+----
+href: https://2018.pycon.co/talks/facial-recognition-with-neural-networks/
+----
+tag: Pycon Colombia 2018 · Talk
+---
+skills:
+
+#### cv_skill_item ####
+label: Python & Django & Celery
+----
+level: 99
+
+#### cv_skill_item ####
+label: Javascript & React JS
+----
+level: 98
+
+#### cv_skill_item ####
+label: Node JS
+----
+level: 98
+
+#### cv_skill_item ####
+label: HTML5 & CSS
+----
+level: 95
+
+#### cv_skill_item ####
+label: C++
+----
+level: 85

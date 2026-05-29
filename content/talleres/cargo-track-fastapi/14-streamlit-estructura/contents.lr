@@ -1,0 +1,244 @@
+_model: taller-paso
+---
+title: Streamlit: estructura y conexión
+---
+orden: 14
+---
+body:
+
+#### texto ####
+texto:
+
+Streamlit es un framework de Python para construir aplicaciones web de datos sin escribir HTML ni JavaScript. Cada vez que el usuario interactúa con la interfaz (hace clic en un botón, cambia un valor), Streamlit re-ejecuta el script de Python completo y actualiza lo que se muestra en pantalla.
+
+Esa característica, re-ejecutar el script en cada interacción, es lo que hace a Streamlit tan simple de usar: no hay estado del servidor que manejar, no hay callbacks ni eventos. Solo Python de arriba hacia abajo.
+
+En este capítulo vas a configurar la estructura base del frontend de Cargo Track: el cliente que consume el API, la barra lateral de navegación y el punto de entrada de la aplicación.
+
+## Estructura del frontend
+
+Crea la carpeta del frontend desde la raíz del proyecto:
+#### codigo ####
+lenguaje: bash
+----
+etiqueta: terminal
+----
+codigo:
+
+mkdir cargo_track_ui cargo_track_ui/pages
+touch cargo_track_ui/app.py cargo_track_ui/api_client.py cargo_track_ui/pages/__init__.py
+#### texto ####
+texto:
+
+La estructura completa del frontend:
+
+```
+cargo_track_ui/
+├── app.py               # punto de entrada de Streamlit
+├── api_client.py        # funciones para llamar al API
+└── pages/
+    ├── __init__.py
+    ├── envios.py
+    ├── clientes.py
+    ├── conductores.py
+    └── rastreo.py
+```
+
+Cada archivo en `pages/` corresponde a un módulo de la aplicación. El `app.py` decide cuál mostrar según la selección en la barra lateral.
+
+## El cliente del API
+
+El archivo `api_client.py` centraliza todas las llamadas al API: la URL base, el header de autenticación y el manejo de errores. Los módulos de páginas lo importan y nunca tienen que preocuparse por esos detalles.
+
+Crea `cargo_track_ui/api_client.py`:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track_ui/api_client.py
+----
+codigo:
+
+import httpx
+import streamlit as st
+
+BASE_URL = "http://127.0.0.1:8000"
+USERNAME = "admin"
+PASSWORD = "secret123"
+
+
+class APIError(Exception):
+    def __init__(self, status_code: int, mensaje: str):
+        self.status_code = status_code
+        self.mensaje = mensaje
+        super().__init__(mensaje)
+
+
+def _manejar_respuesta(response: httpx.Response):
+    if response.status_code >= 400:
+        try:
+            detalle = response.json().get("detail", response.text)
+        except Exception:
+            detalle = response.text
+        raise APIError(response.status_code, detalle)
+    return response
+
+
+def _obtener_token() -> str:
+    if "access_token" not in st.session_state:
+        response = httpx.post(
+            f"{BASE_URL}/auth/token",
+            data={"username": USERNAME, "password": PASSWORD},
+        )
+        _manejar_respuesta(response)
+        st.session_state["access_token"] = response.json()["access_token"]
+    return st.session_state["access_token"]
+
+
+def _auth_headers() -> dict:
+    return {"Authorization": f"Bearer {_obtener_token()}"}
+
+
+def get(endpoint: str):
+    response = httpx.get(f"{BASE_URL}{endpoint}")
+    return _manejar_respuesta(response).json()
+
+
+def post(endpoint: str, data: dict) -> dict:
+    response = httpx.post(f"{BASE_URL}{endpoint}", json=data, headers=_auth_headers())
+    return _manejar_respuesta(response).json()
+
+
+def patch(endpoint: str, data: dict) -> dict:
+    response = httpx.patch(f"{BASE_URL}{endpoint}", json=data, headers=_auth_headers())
+    return _manejar_respuesta(response).json()
+
+
+def delete(endpoint: str) -> None:
+    response = httpx.delete(f"{BASE_URL}{endpoint}", headers=_auth_headers())
+    _manejar_respuesta(response)
+#### texto ####
+texto:
+
+La clase `APIError` empaqueta el código HTTP y el mensaje de error. Cuando un endpoint devuelve 401, 404 o 422, `_manejar_respuesta` lanza un `APIError` en lugar de retornar la respuesta sin procesar. Los módulos de páginas hacen `except APIError as e:` y muestran `e.mensaje` al usuario.
+
+**`_obtener_token()`**: la primera vez que se llama, hace `POST /auth/token` con las credenciales y guarda el JWT en `st.session_state`. Streamlit re-ejecuta el script completo en cada interacción, pero `session_state` persiste entre re-ejecuciones: el login ocurre solo una vez por sesión.
+
+**`_auth_headers()`**: construye el header `Authorization: Bearer <token>` que van en todas las peticiones de escritura.
+
+Las funciones `get`, `post`, `patch` y `delete` son una capa fina sobre `httpx`. Los `GET` no necesitan autenticación (endpoints públicos). Los `POST`, `PATCH` y `DELETE` incluyen el token automáticamente.
+
+## El punto de entrada con sidebar
+
+Crea `cargo_track_ui/app.py`:
+#### codigo ####
+lenguaje: python
+----
+etiqueta: cargo_track_ui/app.py
+----
+codigo:
+
+import streamlit as st
+
+st.set_page_config(
+    page_title="Cargo Track",
+    page_icon="📦",
+    layout="wide",
+)
+
+with st.sidebar:
+    st.title("📦 Cargo Track")
+    st.caption("Sistema de gestión logística")
+    st.divider()
+
+    pagina = st.radio(
+        "Módulo",
+        options=["Rastreo", "Envíos", "Clientes", "Conductores"],
+        label_visibility="collapsed",
+    )
+
+if pagina == "Rastreo":
+    from pages import rastreo
+    rastreo.mostrar()
+elif pagina == "Envíos":
+    from pages import envios
+    envios.mostrar()
+elif pagina == "Clientes":
+    from pages import clientes
+    clientes.mostrar()
+elif pagina == "Conductores":
+    from pages import conductores
+    conductores.mostrar()
+#### texto ####
+texto:
+
+Puntos importantes:
+
+**`st.set_page_config(...)`**: debe ser la primera llamada de Streamlit en el script. Define el título de la pestaña del navegador, el ícono y el layout (`"wide"` usa todo el ancho de la pantalla).
+
+**`with st.sidebar:`**: todo lo que renderices dentro de ese bloque aparece en la barra lateral izquierda.
+
+**`label_visibility="collapsed"`**: oculta la etiqueta del `st.radio` pero mantiene el componente accesible. Como el título del sidebar ya dice "Cargo Track", la etiqueta "Módulo" sería redundante.
+
+**Importación dinámica dentro del `if`**: en lugar de importar todos los módulos al inicio, el `import` se hace solo cuando se selecciona ese módulo. Así, si un archivo tiene un error de sintaxis, no rompe toda la aplicación.
+
+## Arrancar el frontend
+
+El frontend y el API son dos servidores independientes. Para trabajar con ambos al mismo tiempo necesitas dos terminales.
+
+**Terminal 1: el API (FastAPI)**
+
+```bash
+# En la carpeta cargo-track-fastapi/, con el entorno virtual activado
+uvicorn cargo_track.main:app --reload
+```
+
+**Terminal 2: el frontend (Streamlit)**
+
+```bash
+# En la carpeta cargo-track-fastapi/, con el entorno virtual activado
+streamlit run cargo_track_ui/app.py
+```
+
+Streamlit abre el navegador automáticamente en `http://localhost:8501`.
+#### error_provocado ####
+modo: trampa
+----
+titulo: Intentar cambiar de módulo con el backend apagado
+----
+texto:
+
+Detén Uvicorn con Ctrl+C en su terminal. Sin cerrarlo, ve a la aplicación de Streamlit en el navegador y cambia al módulo "Envíos".
+#### solucion_error ####
+titulo: 
+----
+texto:
+
+Vas a ver un error de conexión en la interfaz porque `httpx` no puede conectarse a `http://127.0.0.1:8000`. El problema no está en Streamlit: es que el servidor de FastAPI no está corriendo.
+
+Para trabajar con el frontend necesitas tener los dos servidores activos al mismo tiempo. Vuelve a arrancar Uvicorn en su terminal antes de continuar.
+#### checkpoint ####
+titulo: 
+----
+texto:
+
+Con ambos servidores corriendo:
+
+1. Abre `http://localhost:8501` en el navegador. Debes ver la barra lateral con los cuatro módulos: Rastreo, Envíos, Clientes, Conductores.
+2. Al hacer clic en cada módulo, Streamlit intentará cargar la página correspondiente. Como los archivos de `pages/` están vacíos (solo tienen el `__init__.py`), verás un error de importación: eso es esperado y lo resuelves en los próximos pasos.
+
+Si la sidebar aparece y puedes hacer clic en los módulos, la estructura base está lista.
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+#### codigo ####
+lenguaje: bash
+----
+etiqueta: terminal
+----
+codigo:
+
+git add cargo_track_ui/app.py cargo_track_ui/api_client.py cargo_track_ui/pages/__init__.py
+git commit -m "feat: crear estructura base del frontend con Streamlit"

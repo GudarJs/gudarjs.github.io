@@ -1,0 +1,135 @@
+_model: taller-paso
+---
+title: Entornos virtuales
+---
+orden: 2
+---
+body:
+
+#### texto ####
+texto:
+
+Un entorno virtual es una carpeta que contiene una instalación de Python aislada del resto de tu sistema. Cada proyecto tiene sus propias versiones de las librerías, sin interferir con otros proyectos ni con el Python del sistema.
+
+#### analogia ####
+titulo: Una caja de herramientas por proyecto
+----
+texto:
+
+Imagina que eres electricista y tienes una caja de herramientas para cada obra: una para el edificio A y otra para el edificio B. Si cambias las herramientas de la caja A, las de B no se ven afectadas. El entorno virtual funciona igual: FastAPI 0.115 para Cargo Track no afecta a otro proyecto que use una versión diferente.
+
+#### texto ####
+texto:
+
+## Crear el entorno virtual
+
+Abre una terminal, navega a la carpeta donde vas a guardar el proyecto y ejecuta:
+
+#### comando_os ####
+windows: python -m venv venv
+----
+mac: python3 -m venv venv
+----
+linux: python3 -m venv venv
+
+#### texto ####
+texto:
+
+Esto crea una carpeta llamada `venv/` con una copia aislada de Python. Ahora actívala:
+
+#### comando_os ####
+windows: venv\Scripts\activate
+----
+mac: source venv/bin/activate
+----
+linux: source venv/bin/activate
+
+#### texto ####
+texto:
+
+Sabes que el entorno está activo cuando ves `(venv)` al inicio de la línea en tu terminal.
+
+#### texto ####
+texto:
+
+## Instalar las dependencias
+
+Con el entorno activo, instala todo lo que vamos a necesitar en este taller:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+pip install fastapi==0.115.0 uvicorn==0.30.0 sqlmodel==0.0.21 httpx==0.27.0 streamlit==1.40.0 python-jose[cryptography]==3.3.0 email-validator==2.1.0
+
+#### error_provocado ####
+modo: trampa
+----
+titulo: Trabajar sin activar el entorno
+----
+texto:
+
+Cierra la terminal y ábrela de nuevo sin activar el entorno virtual. Luego intenta importar FastAPI:
+
+```bash
+python -c "import fastapi"
+```
+
+#### solucion_error ####
+texto:
+
+Si no activaste el entorno, vas a ver:
+
+```
+ModuleNotFoundError: No module named 'fastapi'
+```
+
+Este es el error más común al trabajar con entornos virtuales. FastAPI está instalado dentro de `venv/`, pero Python no sabe dónde buscarlo porque el entorno no está activo.
+
+La solución: activa el entorno antes de cualquier cosa. Repite el comando de activación según tu sistema operativo y vuelve a intentar la importación. Desde ahora, lo primero que haces al abrir una terminal para trabajar en Cargo Track es activar el entorno.
+
+#### texto ####
+texto:
+
+## Guardar las dependencias
+
+Guarda la lista de paquetes instalados en un archivo para que cualquier persona pueda reproducir el entorno:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+pip freeze > requirements.txt
+
+#### advertencia ####
+texto:
+
+Agrega la carpeta `venv/` a tu `.gitignore` si usas Git. Nunca subas el entorno virtual al repositorio: es pesado y cada persona debe crear el suyo con `pip install -r requirements.txt`.
+
+#### checkpoint ####
+texto:
+
+Con el entorno activo, ejecuta `pip list` y verifica que ves `fastapi`, `uvicorn`, `sqlmodel` y `streamlit` en la lista. Si los ves, el entorno está listo para los siguientes pasos.
+
+#### texto ####
+texto:
+
+## Guarda tu progreso
+
+Haz un commit con los cambios de este paso:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+git add requirements.txt
+git commit -m "chore: agregar requirements.txt con dependencias del proyecto"

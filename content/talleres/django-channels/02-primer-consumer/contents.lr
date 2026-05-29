@@ -1,0 +1,46 @@
+_model: taller-paso
+---
+title: Tu primer Consumer
+---
+orden: 2
+---
+body:
+
+#### texto ####
+texto:
+
+Un Consumer es a un WebSocket lo que una View es a HTTP. Recibe conexiones, recibe mensajes, y responde. Vamos a escribir uno mínimo que solo eco-responda lo que le manden.
+
+#### analogia ####
+titulo: La centralita telefónica
+----
+texto:
+
+Piensa en una View como una secretaria que contesta llamadas: alguien marca, ella responde una pregunta, cuelga. Un Consumer es más como una conversación abierta: la línea queda activa y los dos pueden hablar cuando quieran, hasta que alguno cuelga.
+
+#### codigo ####
+lenguaje: python
+----
+etiqueta: board/consumers.py
+----
+codigo: import json
+from channels.generic.websocket import AsyncWebsocketConsumer
+
+
+class EchoConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        await self.send(text_data=json.dumps({
+            "msg": "¡Bienvenido a la pizarra!"
+        }))
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        await self.send(text_data=json.dumps({
+            "msg": f"Recibí: {data}",
+        }))
+
+#### checkpoint ####
+texto:
+
+Si abres la consola de tu navegador en `http://127.0.0.1:8000/` y haces `new WebSocket("ws://127.0.0.1:8000/ws/board/")`, deberías recibir el mensaje "¡Bienvenido a la pizarra!" en pocos segundos.
