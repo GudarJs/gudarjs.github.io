@@ -1,0 +1,147 @@
+_model: taller-paso
+---
+title: Etapas desacopladas de punta a punta
+---
+orden: 8
+---
+body:
+
+#### texto ####
+texto:
+
+Tenemos las tres piezas: ingesta que no bloquea, colas acotadas e inferencia en executor. Ahora las ensamblamos en un pipeline que fluya de la cámara al disco, con las tres etapas corriendo como tareas independientes conectadas por colas. Empezamos con una sola cámara para ver el flujo completo; en el siguiente paso saltamos a N.
+
+#### texto ####
+texto:
+
+## La etapa de escritura
+
+Crea `storage.py`. El escritor abre el `VideoWriter` de forma perezosa, con el tamaño del primer frame que recibe (recuerda la trampa del paso 3: el tamaño debe coincidir):
+
+#### codigo ####
+etiqueta: storage.py
+----
+lenguaje: python
+----
+codigo:
+
+import cv2
+from pathlib import Path
+
+class ClipWriter:
+    def __init__(self, out_dir, cam_id, fps=25):
+        Path(out_dir).mkdir(parents=True, exist_ok=True)
+        self.path = str(Path(out_dir) / f"{cam_id}_anotado.mp4")
+        self.fps = fps
+        self.writer = None
+
+    def escribir(self, frame):
+        """Bloqueante (I/O de disco). Se llama vía asyncio.to_thread."""
+        if self.writer is None:
+            h, w = frame.shape[:2]
+            self.writer = cv2.VideoWriter(
+                self.path, cv2.VideoWriter_fourcc(*"mp4v"), self.fps, (w, h))
+        self.writer.write(frame)
+
+    def cerrar(self):
+        if self.writer is not None:
+            self.writer.release()
+
+#### texto ####
+texto:
+
+## Las tres etapas como corutinas
+
+Vuelve a `pipeline.py` y añade una marca de fin de flujo y las tres etapas. Cada una consume de su cola de entrada y produce a su cola de salida; ninguna conoce a las demás:
+
+#### codigo ####
+etiqueta: pipeline.py
+----
+lenguaje: python
+----
+codigo:
+
+import asyncio
+
+SENTINEL = None    # marca de "no habra mas frames"
+
+async def etapa_ingesta(source, out_q, stats):
+    async for frame in source.frames():
+        msg = FrameMsg(cam_id=source.cam_id, seq=stats["leidos"], frame=frame)
+        stats["leidos"] += 1
+        if not poner_o_descartar(out_q, msg):
+            stats["descartados"] += 1
+    await out_q.put(SENTINEL)          # avisa a la siguiente etapa
+
+async def etapa_inferencia(in_q, out_q, pool, detector, stats):
+    loop = asyncio.get_running_loop()
+    while True:
+        msg = await in_q.get()
+        if msg is SENTINEL:
+            await out_q.put(SENTINEL)
+            break
+        anotado, n = await loop.run_in_executor(pool, detector.detectar, msg.frame)
+        msg.frame, msg.detecciones = anotado, n
+        await out_q.put(msg)           # backpressure: no perdemos lo ya inferido
+        stats["inferidos"] += 1
+
+async def etapa_escritura(in_q, writer, stats):
+    while True:
+        msg = await in_q.get()
+        if msg is SENTINEL:
+            break
+        await asyncio.to_thread(writer.escribir, msg.frame)
+        stats["escritos"] += 1
+    writer.cerrar()
+
+#### advertencia ####
+texto:
+
+Fíjate en las dos políticas de cola en acción, cada una donde toca. En la ingesta usamos `poner_o_descartar` (tiempo real: si vamos justos, soltamos frames viejos). En la inferencia usamos `await out_q.put(msg)` (backpressure: lo que ya costó inferir no lo tiramos, preferimos frenar). La política no es global: la eliges por etapa según lo que puedas permitirte perder.
+
+#### texto ####
+texto:
+
+## Conéctalo todo
+
+Crea `main.py`. Lanza las tres etapas como tareas, conectadas por dos colas acotadas:
+
+#### codigo ####
+etiqueta: main.py
+----
+lenguaje: python
+----
+codigo:
+
+import asyncio, time
+from concurrent.futures import ThreadPoolExecutor
+from sources import VideoFileSource
+from inference import Detector
+from storage import ClipWriter
+from pipeline import etapa_ingesta, etapa_inferencia, etapa_escritura
+
+async def main():
+    infer_q = asyncio.Queue(maxsize=8)
+    write_q = asyncio.Queue(maxsize=8)
+    stats = {"leidos": 0, "descartados": 0, "inferidos": 0, "escritos": 0}
+
+    source = VideoFileSource("videos/cam0.mp4", "cam0", fps=25, loop_video=False)
+    detector = Detector()
+    writer = ClipWriter("salida", "cam0", fps=25)
+
+    t0 = time.perf_counter()
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        await asyncio.gather(
+            etapa_ingesta(source, infer_q, stats),
+            etapa_inferencia(infer_q, write_q, pool, detector, stats),
+            etapa_escritura(write_q, writer, stats),
+        )
+    print(f"tiempo: {time.perf_counter() - t0:.1f}s")
+    print("stats:", stats)
+
+asyncio.run(main())
+
+#### checkpoint ####
+texto:
+
+Corre `python main.py`. Al terminar deberías ver un `salida/cam0_anotado.mp4` con las detecciones dibujadas, y un `stats` donde `escritos == inferidos`. Las tres etapas corrieron a la vez: mientras se inferia el frame 10, la ingesta ya iba por el 15 y el escritor guardaba el 8. Acabas de construir el pipeline desacoplado de la animación del paso 2. Ahora, lo que de verdad querías: varias cámaras.

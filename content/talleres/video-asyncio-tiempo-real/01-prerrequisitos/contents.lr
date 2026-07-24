@@ -1,0 +1,50 @@
+_model: taller-paso
+---
+title: Prerrequisitos
+---
+orden: 1
+---
+body:
+
+#### texto ####
+texto:
+
+Antes de empezar, asegúrate de tener listo lo siguiente. Esta página es ligera a propósito: solo enumera lo necesario y te enlaza a las guías oficiales de instalación. No vamos a instalar todo paso a paso, cada herramienta tiene su documentación y las versiones cambian.
+
+#### texto ####
+texto:
+
+## Lo que necesitas instalado
+
+- **Python 3.12** o superior. Verifica con `python --version`. Guía oficial: [python.org/downloads](https://www.python.org/downloads/).
+- **Un editor de código.** Recomiendo [VS Code](https://code.visualstudio.com/) con la extensión de Python, pero cualquiera sirve.
+- **Git** (opcional pero recomendado para versionar tu proyecto): [git-scm.com](https://git-scm.com/).
+
+## Lo que sabemos que ya sabes
+
+Este taller es de nivel intermedio. Asumimos que estás cómodo con:
+
+- Funciones, clases y `import` en Python.
+- List comprehensions y diccionarios.
+- Ejecutar scripts desde la terminal.
+
+No necesitas saber `asyncio` de antemano. Ese es justo el corazón del taller y lo construimos desde cero.
+
+#### advertencia ####
+texto:
+
+`asyncio` forma parte de la librería estándar de Python: no se instala con pip, ya viene incluido. Las únicas dependencias que instalaremos son las de visión (OpenCV y ultralytics). Las instalamos en el paso 2, dentro de un entorno virtual.
+
+#### texto ####
+texto:
+
+## Material del taller: videos de muestra
+
+Vas a necesitar unos cuantos archivos de video cortos que harán de "cámaras". Sirve cualquier `.mp4` que tengas a mano (clips del teléfono, por ejemplo). Lo ideal es que **tengan personas, coches u objetos** para que el detector tenga algo que encontrar.
+
+Si no tienes ninguno, en el paso 3 te muestro cómo generar videos de prueba con OpenCV en dos líneas, así que puedes seguir el taller aunque empieces con las manos vacías.
+
+#### checkpoint ####
+texto:
+
+Si al escribir `python --version` en tu terminal ves `Python 3.12.x` (o superior) y tienes tu editor abierto, estás listo. Pasa al siguiente paso, donde montamos el proyecto y hacemos nuestra primera detección.

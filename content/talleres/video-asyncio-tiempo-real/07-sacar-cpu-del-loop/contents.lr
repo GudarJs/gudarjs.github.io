@@ -1,0 +1,137 @@
+_model: taller-paso
+---
+title: Sacar la CPU del event loop
+---
+orden: 7
+---
+body:
+
+#### texto ####
+texto:
+
+Ya tenemos ingesta que no bloquea y colas que frenan al productor. Pero falta el mayor peligro de todos: la inferencia del modelo es **CPU-bound**, y si la llamamos dentro de una corutina, congela el event loop entero. Todo el diseño async se viene abajo por una sola línea. En este paso lo demostramos y lo arreglamos.
+
+#### texto ####
+texto:
+
+## El detector, encapsulado
+
+Crea `inference.py` con una clase que envuelve YOLO. Fíjate en que `detectar` es una función **síncrona** normal: es cómputo puro, no tiene ningún `await`.
+
+#### codigo ####
+etiqueta: inference.py
+----
+lenguaje: python
+----
+codigo:
+
+import cv2
+from ultralytics import YOLO
+
+class Detector:
+    def __init__(self, pesos="yolo11n.pt", conf=0.35):
+        self.model = YOLO(pesos)
+        self.conf = conf
+
+    def detectar(self, frame):
+        """CPU-bound: NO llamar directamente dentro del event loop."""
+        resultados = self.model(frame, conf=self.conf, verbose=False)
+        anotado = resultados[0].plot()
+        n = len(resultados[0].boxes)
+        return anotado, n
+
+#### error_provocado ####
+modo: guiado
+----
+titulo: Vamos a bloquear el loop a propósito
+----
+texto:
+
+Quiero que sientas el bloqueo, no solo que te lo cuente. Vamos a poner un "latido" que imprime cada 0.1 s, y en paralelo una tarea que llama al detector **directamente** en el loop. Si el loop está sano, el latido es regular. Guarda esto como `bloquear_loop.py`:
+
+```python
+import asyncio, time, cv2
+from inference import Detector
+
+async def latido():
+    while True:
+        print(f"tic {time.strftime('%H:%M:%S')}")
+        await asyncio.sleep(0.1)
+
+async def inferir_mal(det, frame):
+    for _ in range(20):
+        det.detectar(frame)          # <- CPU pura DENTRO del loop
+        await asyncio.sleep(0)       # este await no ayuda: el trabajo ya bloqueó
+
+async def main():
+    det = Detector()
+    frame = cv2.VideoCapture("videos/cam0.mp4").read()[1]   # un frame cualquiera
+    asyncio.create_task(latido())
+    await inferir_mal(det, frame)
+
+asyncio.run(main())
+```
+
+Córrelo y mira los `tic`. En lugar de salir cada 0.1 s como un reloj, se **congelan** en bloques: mientras el detector calcula, el latido no imprime. El event loop está secuestrado.
+
+#### solucion_error ####
+texto:
+
+El latido se congela porque `det.detectar(frame)` es cómputo puro sin ningún punto de `await` real donde el loop pueda saltar. El `await asyncio.sleep(0)` no salva nada: el bloqueo ya ocurrió durante la llamada síncrona. Mientras el núcleo calcula, ninguna otra corutina avanza. En el pipeline, eso significa que ninguna cámara se lee y ninguna cola se vacía mientras se infiere.
+
+La solución es sacar ese trabajo a un **executor**: un pool de hilos (o procesos) donde el cálculo corre fuera del event loop. `loop.run_in_executor(pool, funcion, arg)` devuelve un `await` de verdad: el loop queda libre mientras el pool trabaja.
+
+#### imagen ####
+imagen: executor.gif
+----
+pie: Arriba, el modelo se planta en el carril del event loop y las cámaras se congelan detrás. Abajo, el modelo se manda a un executor (pool de hilos o procesos) aparte: el carril sigue fluido y las cámaras siguen leyéndose. Regla de oro: el event loop solo debe hacer `await`, nunca trabajo pesado.
+
+#### texto ####
+texto:
+
+## La inferencia, ahora en un executor
+
+`run_in_executor` acepta un `ThreadPoolExecutor`. Funciona porque las librerías de inferencia (PyTorch, ONNXRuntime, OpenCV) **liberan el GIL** durante el cálculo nativo, así que los hilos sí corren en paralelo de verdad. Prueba la versión sana:
+
+#### codigo ####
+etiqueta: inferir_bien.py
+----
+lenguaje: python
+----
+codigo:
+
+import asyncio, time, cv2
+from concurrent.futures import ThreadPoolExecutor
+from inference import Detector
+
+async def latido():
+    while True:
+        print(f"tic {time.strftime('%H:%M:%S')}")
+        await asyncio.sleep(0.1)
+
+async def main():
+    det = Detector()
+    frame = cv2.VideoCapture("videos/cam0.mp4").read()[1]
+    loop = asyncio.get_running_loop()
+    asyncio.create_task(latido())
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        for _ in range(20):
+            anotado, n = await loop.run_in_executor(pool, det.detectar, frame)
+    print("hecho")
+
+asyncio.run(main())
+
+#### texto ####
+texto:
+
+Ahora los `tic` salen regulares mientras la inferencia corre en el pool. El event loop respira. Esta es la pieza que faltaba: **el loop solo hace `await`; el cómputo pesado vive en el executor**.
+
+#### advertencia ####
+texto:
+
+Si tu cómputo pesado fuera Python puro (que retiene el GIL), un `ThreadPoolExecutor` no aceleraría nada, y tocaría usar `ProcessPoolExecutor` (procesos de verdad, a costa de serializar los datos entre procesos). Con YOLO y OpenCV no hace falta: liberan el GIL, y los hilos bastan y son más baratos. Saber cuál usar es cuestión de conocer tu carga.
+
+#### checkpoint ####
+texto:
+
+Viste el event loop congelarse con la inferencia en línea, y volver a la vida con `run_in_executor`. Ya tienes las tres etapas resueltas por separado: ingesta con `to_thread`, colas acotadas, e inferencia en un executor. Toca ensamblarlas en un pipeline que fluya de punta a punta.

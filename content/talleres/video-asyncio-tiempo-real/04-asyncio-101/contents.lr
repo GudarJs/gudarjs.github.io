@@ -1,0 +1,130 @@
+_model: taller-paso
+---
+title: asyncio 101: event loop, corutinas y await
+---
+orden: 4
+---
+body:
+
+#### texto ####
+texto:
+
+`asyncio` intimida al principio porque introduce palabras nuevas (event loop, corutina, `await`, tarea) que parecen magia. No lo son. En este paso construimos el modelo mental correcto y lo probamos con un ejemplo diminuto. Sin video todavía: solo las piezas.
+
+#### texto ####
+texto:
+
+## Concurrencia no es paralelismo
+
+Esta es la idea que hay que interiorizar antes que nada:
+
+- **Paralelismo** es hacer varias cosas *literalmente al mismo tiempo* (varios núcleos de CPU trabajando en paralelo).
+- **Concurrencia** es *gestionar* varias tareas a la vez, avanzando un poco en cada una, aunque haya un solo trabajador.
+
+`asyncio` te da **concurrencia en un solo hilo**. No hay varios núcleos trabajando: hay un único hilo que salta de una tarea a otra en los momentos en que cada una se queda esperando.
+
+#### analogia ####
+titulo: El event loop es un mesero, no un ejército de meseros
+----
+texto:
+
+Un buen mesero atiende diez mesas él solo. No se queda plantado esperando a que la mesa 3 decida su pedido: toma nota, va a la cocina, de paso recoge un plato de la mesa 7, lleva la cuenta a la mesa 1. Aprovecha cada momento de espera de una mesa para avanzar con otra.
+
+El event loop es ese mesero. Cada mesa es una tarea. El momento en que una mesa "está pensando" es un `await`: el punto donde la tarea dice "voy a esperar, mientras tanto atiende a otro". Un solo mesero (un hilo) da la sensación de atender todo a la vez, siempre que nadie lo secuestre con una tarea que no le deje moverse.
+
+#### texto ####
+texto:
+
+## Las tres piezas
+
+- Una **corutina** es una función declarada con `async def`. Llamarla no la ejecuta: devuelve un objeto corutina, como una receta que aún no has cocinado.
+- **`await`** es el punto donde una corutina cede el control al event loop mientras espera algo (I/O, un temporizador, otra corutina). Es el "voy a esperar, atiende a otro" del mesero.
+- El **event loop** es ese único hilo que corre las corutinas y, cada vez que una hace `await`, salta a otra que esté lista.
+
+#### imagen ####
+imagen: event-loop.gif
+----
+pie: Cada tarea (cámara) entra al carril del event loop, avanza hasta un `await` (esperando I/O) y se aparta a esperar, dejando el carril libre para otra. Cuando su I/O termina, vuelve a la cola. El carril, un solo hilo, nunca se queda ocioso mientras haya trabajo listo.
+
+#### texto ####
+texto:
+
+## Pruébalo tú
+
+Guarda esto como `saludo_async.py`. Lanza tres "tareas" que esperan tiempos distintos y observa que **terminan concurrentemente**, no una tras otra:
+
+#### codigo ####
+etiqueta: saludo_async.py
+----
+lenguaje: python
+----
+codigo:
+
+import asyncio
+import time
+
+async def tarea(nombre, segundos):
+    print(f"{nombre}: empiezo")
+    await asyncio.sleep(segundos)      # cede el control mientras "espera"
+    print(f"{nombre}: termino tras {segundos}s")
+
+async def main():
+    t0 = time.perf_counter()
+    await asyncio.gather(
+        tarea("A", 2),
+        tarea("B", 1),
+        tarea("C", 3),
+    )
+    print(f"total: {time.perf_counter() - t0:.1f}s")
+
+asyncio.run(main())
+
+#### texto ####
+texto:
+
+Córrelo. Las tres tareas empiezan casi a la vez, terminan en orden B, A, C (por sus tiempos de espera) y el total es de unos **3 segundos**, no 6. Mientras A y C esperan, el loop avanza con las demás. Eso es concurrencia en un solo hilo.
+
+#### error_provocado ####
+modo: guiado
+----
+titulo: Vamos a olvidar el await a propósito
+----
+texto:
+
+Este es el error número uno de quien empieza con asyncio, y quiero que lo veas ahora, en un ejemplo pequeño, en vez de dentro del pipeline. Cambia la línea del `gather` para llamar a las corutinas **sin** await ni gather, así:
+
+```python
+async def main():
+    tarea("A", 2)      # <- llamada sin await
+    print("fin")
+```
+
+Corre el script. En vez de ver los mensajes de la tarea, Python te suelta:
+
+`RuntimeWarning: coroutine 'tarea' was never awaited`
+
+#### solucion_error ####
+texto:
+
+Ese warning significa que creaste el objeto corutina (la receta) pero nunca lo cocinaste. Una corutina **no hace nada** hasta que la esperas con `await`, la lanzas con `asyncio.create_task(...)`, o la agrupas con `asyncio.gather(...)`.
+
+Es el fallo más silencioso de asyncio: no revienta con una excepción, solo "no pasa nada" y un warning fácil de ignorar. Cuando notes que una parte de tu pipeline async "no se ejecuta" sin razón aparente, tu primer sospechoso es un `await` olvidado. Recupera el `await asyncio.gather(...)` del script original y todo vuelve a funcionar.
+
+#### texto ####
+texto:
+
+## El matiz que lo cambia todo: I/O-bound vs CPU-bound
+
+Aquí está la trampa que hunde a la mayoría. `asyncio` brilla cuando las tareas pasan el tiempo **esperando** (I/O-bound): leer de una cámara, escribir a disco, mandar por red. Ese `await asyncio.sleep(...)` del ejemplo simula justo esa espera.
+
+Pero si una tarea **ocupa el núcleo** haciendo cálculo puro (CPU-bound), como la inferencia de un modelo, no hay ningún `await` en medio donde ceder el control. Esa tarea **secuestra el event loop entero**: mientras calcula, ninguna otra tarea avanza. El mesero se queda atascado cocinando un plato imposible y las diez mesas esperan.
+
+#### imagen ####
+imagen: io-vs-cpu.gif
+----
+pie: A la izquierda, trabajo I/O-bound: casi todo es espera, así que las tareas se intercalan y asyncio las gestiona de maravilla. A la derecha, trabajo CPU-bound: cada tarea ocupa el núcleo de principio a fin, así que meterlas en el mismo loop solo las serializa. El cómputo pesado necesita salir del event loop, a un executor. Lo veremos en el paso 7.
+
+#### checkpoint ####
+texto:
+
+Deberías poder responder tres preguntas: (1) ¿qué devuelve llamar a una `async def` sin await? (un objeto corutina que no se ejecuta), (2) ¿qué hace `await`? (cede el control al loop mientras espera), y (3) ¿por qué asyncio no acelera por sí solo la inferencia de un modelo? (es CPU-bound, no hay espera donde ceder). Con eso, estamos listos para meter el video en escena.

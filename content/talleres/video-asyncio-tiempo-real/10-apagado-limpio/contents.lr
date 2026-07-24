@@ -1,0 +1,130 @@
+_model: taller-paso
+---
+title: Apagado limpio: cancelación y sentinels
+---
+orden: 10
+---
+body:
+
+#### texto ####
+texto:
+
+Un pipeline en vivo no termina solo: corre hasta que alguien lo para. Y pararlo bien es lo que separa un demo de un sistema serio. Si matas el proceso a lo bruto en mitad de una escritura, el video queda corrupto y las cámaras quedan "ocupadas". En este paso aprendemos a apagar con limpieza.
+
+#### texto ####
+texto:
+
+Asegúrate de tener las fuentes con `loop_video=True` (del reto final del paso anterior), para que el pipeline corra indefinidamente y podamos interrumpirlo nosotros.
+
+#### error_provocado ####
+modo: trampa
+----
+titulo: Interrumpe el pipeline a mitad de camino
+----
+texto:
+
+Arranca `python main.py` con las cámaras en bucle infinito, deja que corra unos segundos y pulsa **Ctrl+C** para cortarlo, como harías con cualquier script.
+
+Verás un traceback con `KeyboardInterrupt` y puede que algún `CancelledError`. Ahora abre los archivos de `salida/`: varios **no se reproducen** o aparecen truncados. Acabas de perder la grabación.
+
+#### solucion_error ####
+texto:
+
+Los videos quedan corruptos porque el `VideoWriter` necesita su `release()` para cerrar bien el contenedor MP4 (escribir el índice final). Cuando pulsaste Ctrl+C, el escritor estaba esperando en `await in_q.get()`, recibió un `CancelledError` y saltó fuera del bucle **sin llegar** a la línea que cierra los writers. Archivo a medio escribir, sin cerrar, corrupto.
+
+La lección: en asyncio, `Ctrl+C` cancela las tareas, y una cancelación es un `CancelledError` que interrumpe justo donde la tarea estaba esperando. Cualquier recurso que deba cerrarse (writers, cámaras, sockets) tiene que cerrarse en un bloque `finally`, para que se ejecute también cuando la tarea es cancelada.
+
+#### texto ####
+texto:
+
+## Cierra los recursos en `finally`
+
+Envuelve el cuerpo del escritor en `try/finally` para que los writers se cierren pase lo que pase, incluida la cancelación:
+
+#### codigo ####
+etiqueta: pipeline.py (escritor a prueba de cancelación)
+----
+lenguaje: python
+----
+codigo:
+
+async def escritor_multi(in_q, out_dir, fps, stats):
+    writers = {}
+    try:
+        while True:
+            msg = await in_q.get()
+            if msg is SENTINEL:
+                break
+            if msg.cam_id not in writers:
+                writers[msg.cam_id] = ClipWriter(out_dir, msg.cam_id, fps)
+            await asyncio.to_thread(writers[msg.cam_id].escribir, msg.frame)
+            stats["escritos"] += 1
+    finally:
+        for w in writers.values():   # se cierra también si nos cancelan
+            w.cerrar()
+
+#### advertencia ####
+texto:
+
+Tu fuente (`VideoFileSource`) ya hace bien esto: el `cap.release()` vive en un `finally`. Por eso, al cancelar, las cámaras se liberan solas. El patrón es siempre el mismo: **adquiere el recurso, úsalo en un `try`, libéralo en el `finally`**. Nunca cierres recursos solo en el "camino feliz".
+
+#### texto ####
+texto:
+
+## Un apagado ordenado en `main`
+
+Ahora orquesta el cierre. Envuelve el `TaskGroup` en `try/finally`: si todo termina normal, inyectas los sentinels; si te cancelan (Ctrl+C), el `finally` cancela a los consumidores y los espera para que corran sus `finally`:
+
+#### codigo ####
+etiqueta: main.py (apagado limpio)
+----
+lenguaje: python
+----
+codigo:
+
+async def main():
+    infer_q = asyncio.Queue(maxsize=16)
+    write_q = asyncio.Queue(maxsize=16)
+    stats = {"leidos": 0, "descartados": 0, "escritos": 0}
+    detector = Detector()
+    sources = [VideoFileSource(f"videos/cam{i}.mp4", f"cam{i}",
+                               fps=25, loop_video=True) for i in range(4)]
+
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        escritor = asyncio.create_task(escritor_multi(write_q, "salida", 25, stats))
+        workers = [asyncio.create_task(
+            worker_inferencia(infer_q, write_q, pool, detector, stats))
+            for _ in range(3)]
+        consumidores = workers + [escritor]
+        try:
+            async with asyncio.TaskGroup() as tg:
+                for s in sources:
+                    tg.create_task(ingesta_fuente(s, infer_q, stats))
+            # fin normal (no ocurre con loop_video=True, pero lo dejamos correcto)
+            for _ in workers:
+                await infer_q.put(SENTINEL)
+            await asyncio.gather(*workers)
+            await write_q.put(SENTINEL)
+            await escritor
+        finally:
+            # apagado por cancelación: paramos y esperamos a los consumidores
+            for c in consumidores:
+                c.cancel()
+            await asyncio.gather(*consumidores, return_exceptions=True)
+            print("apagado limpio; stats:", stats)
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass   # el finally de main ya hizo el trabajo sucio
+
+#### advertencia ####
+texto:
+
+`return_exceptions=True` en el `gather` final es importante: al cancelar tareas, cada una lanza `CancelledError`, y sin ese flag el `gather` volvería a propagar la primera y te saltaríamos el resto de la limpieza. Con él, esperamos a que **todas** terminen su cierre antes de seguir. Y nunca captures un `CancelledError` para tragártelo y seguir como si nada: si lo capturas en una tarea, vuelve a lanzarlo (`raise`) tras limpiar, o romperás la cancelación cooperativa de asyncio.
+
+#### checkpoint ####
+texto:
+
+Vuelve a arrancar el pipeline en bucle, déjalo correr y pulsa Ctrl+C. Esta vez verás "apagado limpio", y los videos de `salida/` se reproducen sin corromperse. Tienes un pipeline que arranca, escala a N cámaras, y se apaga sin dejar destrozos. Solo falta una cosa para operarlo de verdad: saber, en marcha, dónde está el cuello de botella.

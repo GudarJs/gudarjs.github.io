@@ -1,0 +1,44 @@
+_model: taller
+---
+title: De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio
+---
+orden: 3
+---
+duracion: 7 a 9 horas
+---
+descripcion:
+
+¿Cómo procesar varias fuentes de video a la vez, correr un modelo de IA sobre cada cuadro y guardar el resultado, sin saturar la CPU ni perder frames por el camino? En este taller vas a romper con el pipeline bloqueante de siempre y construir, paso a paso, una arquitectura asíncrona en Python: ingesta concurrente, inferencia desacoplada y almacenamiento persistente, todo conectado con colas acotadas y apagado limpio.
+---
+producto_final:
+
+Un pipeline funcional que ingesta varios videos como si fueran cámaras en vivo, corre detección de objetos con YOLO en paralelo sin bloquear el event loop, dibuja las detecciones sobre cada cuadro y guarda clips anotados en disco. Con backpressure para no reventar la memoria, tolerancia a fallos por fuente, medición de las colas para encontrar el cuello de botella, y capítulos bonus para conectar tu webcam, cámaras IP (RTSP) y video desde el navegador por WebRTC, hasta servirlo todo como una API con FastAPI.
+---
+objetivos:
+
+Al terminar este taller vas a poder:
+
+- Explicar por qué un pipeline de video síncrono colapsa al pasar de una a varias fuentes
+- Entender el modelo mental de asyncio: event loop, corutinas y `await`, y cuándo ayuda de verdad
+- Distinguir trabajo I/O-bound de CPU-bound y sacar la CPU del event loop con executors
+- Conectar etapas desacopladas (ingesta, inferencia, escritura) con `asyncio.Queue` acotadas
+- Aplicar backpressure y descarte controlado de frames como una decisión de política, no un accidente
+- Ingerir N fuentes concurrentes con `asyncio.TaskGroup` y balancear la carga con un pool de workers
+- Implementar un apagado limpio con cancelación y sentinels de fin de flujo
+- Medir la longitud de cada cola para diagnosticar el cuello de botella
+- Adaptar el pipeline a fuentes reales: webcam local y cámaras IP por RTSP
+- Recibir video del navegador por WebRTC con aiortc, la fuente nativa de asyncio
+- Servir el pipeline completo como una API con FastAPI: señalización WebRTC, métricas y vista en vivo sobre un único event loop
+---
+stack:
+
+- Python 3.12
+- asyncio (incluido con Python)
+- OpenCV (opencv-python 4.10)
+- ultralytics 8.3 (YOLO11n / YOLOv8n, corre en CPU)
+- NumPy 2.x
+- aiortc 1.9 + av (para el bonus de WebRTC)
+- FastAPI + uvicorn (para el bonus de servir el pipeline como API)
+- Manim Community 0.18+ (opcional, solo si quieres re-renderizar las animaciones del taller)
+---
+prerrequisitos_resumen: Python 3.12 y un editor de código. Cómodo con funciones, clases y list comprehensions de Python. No necesitas saber asyncio de antes: empezamos desde cero.

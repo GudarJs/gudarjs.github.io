@@ -1,0 +1,72 @@
+_model: taller-paso
+---
+title: El problema y el panorama
+---
+orden: 2
+---
+body:
+
+#### texto ####
+texto:
+
+Antes de escribir código, entendamos qué vamos a construir y, sobre todo, **por qué** la forma "obvia" de hacerlo falla. Casi todo el mundo empieza un proyecto de visión con un bucle como este:
+
+#### codigo ####
+etiqueta: el pipeline ingenuo
+----
+lenguaje: python
+----
+codigo:
+
+while True:
+    frame = camara.read()          # 1. espera a la cámara      (I/O)
+    resultado = modelo.detectar(frame)   # 2. ocupa la CPU/GPU  (cómputo)
+    disco.escribir(resultado)      # 3. espera al disco         (I/O)
+
+#### texto ####
+texto:
+
+Todo ocurre en serie, en un solo hilo. Fíjate en el detalle clave: mientras el modelo detecta (paso 2), **nadie lee la cámara**; mientras el disco escribe (paso 3), **el modelo está ocioso**. Cada etapa espera a que la anterior termine del todo.
+
+Con una sola cámara y poca carga, "funciona". El problema aparece al escalar.
+
+#### analogia ####
+titulo: El pipeline bloqueante es una cocina con un solo cocinero
+----
+texto:
+
+Imagina un restaurante donde un único cocinero hace todo, y de uno en uno: corta la verdura de un plato, luego lo cocina, luego lo emplata, y solo entonces empieza el siguiente pedido. Mientras cocina, el cuchillo está quieto. Mientras emplata, la sartén se enfría.
+
+No es que el cocinero sea lento: es que **nunca hace dos cosas a la vez**, aunque cortar el siguiente plato mientras el actual se cocina sería gratis. Con un pedido va bien. Con la sala llena, la cola de comandas crece sin control y los clientes se van.
+
+#### texto ####
+texto:
+
+## Por qué colapsa al escalar
+
+Cuando metes N cámaras en ese mismo bucle:
+
+- Cada cámara espera su turno. La latencia crece de forma **lineal** con el número de fuentes.
+- Si una etapa se atrasa (el disco se satura, la red se congestiona), **toda la cadena se detiene**.
+- Los frames que llegan mientras estás ocupado se encolan sin límite o se pierden sin control. O revientas la memoria, o pierdes cuadros sin saber cuáles.
+
+El throughput queda limitado por la **suma** de las latencias de todas las etapas, no por la más lenta. Y esa suma es justo lo que no podemos permitirnos en tiempo real.
+
+#### imagen ####
+imagen: timeline-bloqueante.gif
+----
+pie: Arriba, el modelo bloqueante: cada frame pasa por captura, inferencia y escritura de forma secuencial, y el tiempo total es la suma. Abajo, la meta del taller: las tres etapas trabajan a la vez sobre frames distintos, y el tiempo total colapsa al de la etapa más lenta.
+
+#### texto ####
+texto:
+
+## La meta
+
+Ese "abajo" de la animación es exactamente lo que vamos a construir: **tres etapas desacopladas que trabajan en paralelo**, conectadas por colas. La captura no espera a la inferencia; la inferencia no espera a la escritura. Cada una avanza a su ritmo y el sistema entero se mueve a la velocidad de la etapa más lenta, no de la suma.
+
+Para llegar ahí necesitamos una herramienta que sepa hacer muchas cosas "a la vez" sin abrir mil hilos: `asyncio`. Pero antes de teoría, vamos a ver el problema con nuestros propios ojos. En el siguiente paso construimos el pipeline bloqueante de verdad y lo medimos.
+
+#### checkpoint ####
+texto:
+
+En este punto deberías tener claras tres ideas: (1) el pipeline ingenuo hace una cosa a la vez, (2) su tiempo total es la suma de las etapas, y (3) nuestra meta es solapar las etapas para que el total sea el de la más lenta. Si eso tiene sentido, sigamos.

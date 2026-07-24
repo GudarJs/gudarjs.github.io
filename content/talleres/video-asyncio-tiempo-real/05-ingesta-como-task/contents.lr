@@ -1,0 +1,117 @@
+_model: taller-paso
+---
+title: La ingesta como una corutina
+---
+orden: 5
+---
+body:
+
+#### texto ####
+texto:
+
+Empezamos a construir el pipeline de verdad. La primera etapa es la **ingesta**: leer frames de una fuente de video y entregarlos al resto del sistema. Vamos a convertir esa lectura en una corutina para que varias cámaras puedan convivir en el mismo event loop.
+
+#### texto ####
+texto:
+
+## El problema escondido: `cap.read()` bloquea
+
+`cv2.VideoCapture.read()` es una llamada **bloqueante**: lee del archivo o de la cámara y decodifica el frame, y mientras lo hace, no cede el control. Si la llamamos directamente dentro de una corutina, secuestra el event loop igual que haría la inferencia. Aunque parezca I/O, para asyncio es una función síncrona opaca.
+
+La solución es ejecutarla en un hilo aparte con `asyncio.to_thread(...)`, que sí devuelve un `await` donde el loop puede saltar a otra tarea.
+
+#### analogia ####
+titulo: to_thread es mandar un recado
+----
+texto:
+
+Si el mesero tuviera que bajar él mismo a la bodega por una botella, dejaría la sala desatendida. En su lugar manda a un ayudante (un hilo) y sigue atendiendo mesas mientras la botella sube. `asyncio.to_thread` es exactamente eso: "haz esta tarea bloqueante en un hilo aparte y avísame cuando esté; mientras, sigo con lo mío".
+
+#### texto ####
+texto:
+
+## La fuente de video como generador asíncrono
+
+Crea un archivo `sources.py`. Una fuente es una clase con un **generador asíncrono** (`async def` que usa `yield`) que va soltando frames uno a uno, esperando entre ellos para imitar la cadencia real de una cámara:
+
+#### codigo ####
+etiqueta: sources.py
+----
+lenguaje: python
+----
+codigo:
+
+import asyncio
+import cv2
+
+class VideoFileSource:
+    """Una fuente de video basada en un archivo, que se comporta como una
+    cámara en vivo: entrega frames a una cadencia fija y puede repetirse."""
+
+    def __init__(self, path, cam_id, fps=None, loop_video=True):
+        self.path = path
+        self.cam_id = cam_id
+        self.fps = fps
+        self.loop_video = loop_video
+
+    async def frames(self):
+        cap = cv2.VideoCapture(self.path)
+        if not cap.isOpened():
+            raise RuntimeError(f"No pude abrir la fuente {self.path}")
+        cadencia = self.fps or cap.get(cv2.CAP_PROP_FPS) or 25
+        espera = 1.0 / cadencia
+        try:
+            while True:
+                ok, frame = await asyncio.to_thread(cap.read)  # no bloquea el loop
+                if not ok:
+                    if self.loop_video:
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)   # rebobina y sigue
+                        continue
+                    break
+                yield frame
+                await asyncio.sleep(espera)   # cadencia de la cámara
+        finally:
+            cap.release()                     # siempre libera el recurso
+
+#### advertencia ####
+texto:
+
+Fíjate en el `try/finally` alrededor del bucle. Pase lo que pase (fin del video, un error, una cancelación), el `cap.release()` se ejecuta y liberamos la cámara. Con recursos de hardware como cámaras, olvidar liberar es una fuente clásica de bugs: la próxima vez que intentes abrir esa cámara, estará "ocupada".
+
+#### texto ####
+texto:
+
+## Pruébala con una cámara
+
+Vamos a consumir una fuente y contar cuántos frames entrega en unos segundos. Guarda esto como `probar_fuente.py`:
+
+#### codigo ####
+etiqueta: probar_fuente.py
+----
+lenguaje: python
+----
+codigo:
+
+import asyncio
+from sources import VideoFileSource
+
+async def main():
+    fuente = VideoFileSource("videos/cam0.mp4", cam_id="cam0", fps=25)
+    n = 0
+    async for frame in fuente.frames():   # async for: consume el generador
+        n += 1
+        if n >= 50:
+            break
+    print(f"recibí {n} frames de {fuente.cam_id}")
+
+asyncio.run(main())
+
+#### texto ####
+texto:
+
+Fíjate en el `async for`: es la forma de consumir un generador asíncrono. En cada vuelta, el `await` interno de la fuente (el `to_thread` y el `sleep`) le da al event loop la oportunidad de atender otras tareas. Ahora mismo solo hay una fuente, así que no se nota, pero esa es la puerta por la que entrará la concurrencia en el paso 9.
+
+#### checkpoint ####
+texto:
+
+Al correr `python probar_fuente.py` deberías ver `recibí 50 frames de cam0`. Ya tienes la etapa de ingesta encapsulada como una corutina que no bloquea el event loop. El problema ahora es: ¿dónde ponemos esos frames para que otra etapa los procese? Ahí entran las colas.

@@ -1,0 +1,97 @@
+_model: taller-paso
+---
+title: Bonus: tu webcam como fuente en vivo
+---
+orden: 12
+---
+body:
+
+#### texto ####
+texto:
+
+Hora del premio. Todo el pipeline se construyó contra una interfaz: una fuente es "algo que produce frames con un `async for`". Cambiar archivos por tu **webcam real** es, literalmente, escribir una clase nueva con esa misma interfaz. El resto del sistema, ingesta, inferencia, colas, escritura, apagado, no se entera.
+
+#### texto ####
+texto:
+
+## Una fuente para la webcam
+
+Añade a `sources.py` una clase gemela de `VideoFileSource`, pero apuntando a la cámara del sistema (índice `0` suele ser la webcam integrada):
+
+#### codigo ####
+etiqueta: sources.py
+----
+lenguaje: python
+----
+codigo:
+
+import asyncio
+import cv2
+
+class WebcamSource:
+    """Cámara en vivo local. A diferencia de un archivo, no podemos ir más
+    lento que ella: si no leemos a tiempo, los frames viejos ya no sirven."""
+
+    def __init__(self, index, cam_id, ancho=640, alto=480):
+        self.index = index
+        self.cam_id = cam_id
+        self.ancho = ancho
+        self.alto = alto
+
+    async def frames(self):
+        cap = cv2.VideoCapture(self.index)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.ancho)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.alto)
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)      # buffer mínimo: menos latencia
+        if not cap.isOpened():
+            raise RuntimeError(f"No pude abrir la webcam {self.index}")
+        try:
+            while True:
+                ok, frame = await asyncio.to_thread(cap.read)
+                if not ok:
+                    break
+                yield frame
+                # sin sleep: la cámara marca su propia cadencia
+        finally:
+            cap.release()
+
+#### advertencia ####
+texto:
+
+Diferencia clave con el archivo: aquí **no ponemos** `await asyncio.sleep(...)`. Una cámara en vivo ya impone su propio ritmo (la `cap.read()` espera al siguiente frame real). Y ponemos `CAP_PROP_BUFFERSIZE = 1` para que el driver no acumule frames viejos: en tiempo real, el frame que importa es el último, no el que la cámara guardó hace un segundo.
+
+#### texto ####
+texto:
+
+## Enchúfala sin tocar nada más
+
+En `main.py`, cambia la lista de fuentes. Puedes mezclar webcam y archivos: la arquitectura los trata igual.
+
+#### codigo ####
+etiqueta: main.py (solo la línea de fuentes)
+----
+lenguaje: python
+----
+codigo:
+
+from sources import WebcamSource, VideoFileSource
+
+sources = [
+    WebcamSource(0, cam_id="webcam"),          # tu cámara real
+    VideoFileSource("videos/cam1.mp4", "cam1", fps=25, loop_video=True),
+]
+
+#### texto ####
+texto:
+
+Corre `python main.py`. Ahora el pipeline ingesta tu webcam en vivo, corre YOLO sobre cada frame en el pool, guarda un `salida/webcam_anotado.mp4`, y sigue apagándose limpio con Ctrl+C. Ponte delante de la cámara: deberías detectarte como `person`.
+
+#### advertencia ####
+texto:
+
+Como la política de la etapa de ingesta es `poner_o_descartar`, si la inferencia se atrasa, los frames de la webcam se **descartan** en vez de acumularse. Eso es exactamente lo que quieres en vivo: preferimos saltarnos cuadros y seguir en el presente, antes que ir cada vez más rezagados. Revisa el contador `descartados` del monitor: bajo carga, subirá, y está bien.
+
+#### checkpoint ####
+texto:
+
+Si te ves detectado en la ventana de salida y el clip `webcam_anotado.mp4` se reproduce, has conectado hardware real a tu pipeline async sin cambiar una sola línea de las etapas. Esa es la recompensa de programar contra interfaces. Vamos a por la fuente más "de producción": cámaras IP.

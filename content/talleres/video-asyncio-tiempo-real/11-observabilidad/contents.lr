@@ -1,0 +1,109 @@
+_model: taller-paso
+---
+title: Observabilidad: mide las colas
+---
+orden: 11
+---
+body:
+
+#### texto ####
+texto:
+
+Tu pipeline funciona, pero ¿va bien? ¿Sobra o falta capacidad? ¿Qué etapa es el freno? En sistemas concurrentes no se adivina, se mide. Y la mejor sonda que tienes es baratísima: **la longitud de cada cola en el tiempo**.
+
+#### texto ####
+texto:
+
+## Lo que dice una cola
+
+La longitud de una cola cuenta una historia clara:
+
+- **Cola casi siempre vacía:** el consumidor va sobrado, hay capacidad de sobra. Quizá demasiada.
+- **Cola estable en un nivel medio:** producción y consumo están equilibrados. Salud.
+- **Cola que solo crece (o vive pegada al `maxsize`, descartando):** el consumidor **no da abasto**. Esa etapa es tu cuello de botella.
+
+#### imagen ####
+imagen: colas-diagnostico.gif
+----
+pie: Tres colas monitorizadas en el tiempo. Las de ingesta y escritura se mantienen planas, pero la de inferencia solo crece: ahí está el cuello de botella. La longitud de cola te señala con el dedo qué etapa reforzar, sin tener que perfilar nada.
+
+#### texto ####
+texto:
+
+## Una sonda de colas
+
+Añade un monitor: una corutina que muestrea el tamaño de las colas cada cierto tiempo y registra el pico. Agrégalo a `pipeline.py`:
+
+#### codigo ####
+etiqueta: pipeline.py
+----
+lenguaje: python
+----
+codigo:
+
+async def monitor(colas: dict, stop, periodo=0.5):
+    """Muestrea la longitud de cada cola hasta que se pide parar.
+    Devuelve el pico observado por cola."""
+    picos = {nombre: 0 for nombre in colas}
+    while not stop.is_set():
+        linea = []
+        for nombre, q in colas.items():
+            picos[nombre] = max(picos[nombre], q.qsize())
+            linea.append(f"{nombre}={q.qsize():>2}")
+        print("colas:", "  ".join(linea))
+        try:
+            await asyncio.wait_for(stop.wait(), timeout=periodo)
+        except asyncio.TimeoutError:
+            pass
+    return picos
+
+#### advertencia ####
+texto:
+
+El truco de `await asyncio.wait_for(stop.wait(), timeout=periodo)` es un "duerme, pero despierta antes si me piden parar". Mejor que un `asyncio.sleep(periodo)` a secas, porque el monitor reacciona al apagado al instante en vez de quedarse dormido medio segundo. Detalles así hacen que el cierre se sienta limpio.
+
+#### texto ####
+texto:
+
+## Conéctalo al pipeline
+
+En `main.py`, crea un `stop = asyncio.Event()`, lanza el monitor sobre tus dos colas, y al terminar (en el `finally` del apagado) haz `stop.set()` y recoge los picos:
+
+#### codigo ####
+etiqueta: main.py (fragmentos)
+----
+lenguaje: python
+----
+codigo:
+
+from pipeline import monitor
+
+# ... dentro de main, junto al resto de tareas:
+stop = asyncio.Event()
+mon = asyncio.create_task(monitor({"infer": infer_q, "write": write_q}, stop))
+
+# ... en el finally del apagado, tras cerrar los consumidores:
+stop.set()
+picos = await mon
+print("picos de cola:", picos)
+
+#### texto ####
+texto:
+
+## Lee los números y actúa
+
+Corre el pipeline un rato y observa la salida del monitor. Interpreta:
+
+- Si `infer` vive pegada a su `maxsize` y `descartados` en las stats sube rápido, la **inferencia** es el cuello. Sube `N_WORKERS`, o usa un modelo más pequeño, o reduce la resolución de entrada.
+- Si `write` crece, el **disco** no da abasto: reduce el bitrate, agrupa escrituras, o usa un disco más rápido.
+- Si ninguna crece y hay pocos descartes, vas holgado: podrías subir la cadencia de las cámaras o bajar recursos.
+
+#### checkpoint ####
+texto:
+
+Deberías ver la telemetría de colas en tiempo real y, al final, sus picos. Prueba a bajar `N_WORKERS` a 1 y verás la cola `infer` dispararse y los descartes subir: has reproducido, y diagnosticado, un cuello de botella de inferencia. Súbelo de nuevo y observa cómo se estabiliza. Acabas de cerrar el ciclo: construir, medir, ajustar.
+
+#### texto ####
+texto:
+
+Con esto tienes el pipeline completo y operable. Los dos siguientes pasos son bonus: cambiar los archivos de video por fuentes reales, tu webcam y cámaras IP, sin tocar el resto de la arquitectura. Ese es el premio de haber desacoplado todo por interfaces limpias.

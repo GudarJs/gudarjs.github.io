@@ -1,0 +1,248 @@
+_model: taller-paso
+---
+title: Bonus: sirve el pipeline con FastAPI
+---
+orden: 15
+---
+body:
+
+#### texto ####
+texto:
+
+Tu pipeline ya es potente, pero vive en un script. Vamos a convertirlo en un **servicio**: una API con FastAPI que arranca el pipeline, expone sus métricas por HTTP, recibe streams WebRTC del navegador en caliente y sirve una vista en vivo de las detecciones. Y encaja de forma natural, porque FastAPI y su servidor (uvicorn) corren **sobre el mismo asyncio** que has usado todo el taller. Tu pipeline y tus endpoints comparten un único event loop.
+
+#### texto ####
+texto:
+
+## Instala FastAPI
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+pip install "fastapi[standard]" uvicorn
+
+#### texto ####
+texto:
+
+## El ciclo de vida de la app ES el apagado limpio del paso 10
+
+FastAPI tiene un **lifespan**: código que corre al arrancar y al apagar el servidor. Es el sitio perfecto para lanzar las etapas del pipeline al inicio y cerrarlas con limpieza al final. Reconocerás la coreografía de sentinels y cancelación del paso 10, ahora atada al ciclo de vida del servidor. Crea `server.py`:
+
+#### codigo ####
+etiqueta: server.py
+----
+lenguaje: python
+----
+codigo:
+
+import asyncio
+from contextlib import asynccontextmanager
+from concurrent.futures import ThreadPoolExecutor
+from fastapi import FastAPI, Request
+from sources import VideoFileSource
+from inference import Detector
+from pipeline import worker_inferencia, ingesta_fuente, SENTINEL
+
+N_WORKERS = 3
+
+def anadir_fuente(app, source):
+    """Enchufa una fuente nueva en caliente: crea su tarea de ingesta."""
+    st = app.state
+    st.source_tasks.append(
+        asyncio.create_task(ingesta_fuente(source, st.infer_q, st.stats)))
+
+async def consumidor_preview(in_q, latest, stats):
+    """Como el escritor, pero guarda el ultimo frame anotado por cam para
+    poder servirlo en vivo por HTTP."""
+    while True:
+        msg = await in_q.get()
+        if msg is SENTINEL:
+            break
+        latest[msg.cam_id] = msg.frame
+        stats["escritos"] += 1
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    st = app.state
+    st.infer_q = asyncio.Queue(maxsize=32)
+    st.write_q = asyncio.Queue(maxsize=32)
+    st.stats = {"leidos": 0, "descartados": 0, "escritos": 0}
+    st.latest = {}                       # ultimo frame anotado por cam
+    st.detector = Detector()
+    st.pool = ThreadPoolExecutor(max_workers=N_WORKERS)
+    st.source_tasks = []
+    st.workers = [asyncio.create_task(
+        worker_inferencia(st.infer_q, st.write_q, st.pool, st.detector, st.stats))
+        for _ in range(N_WORKERS)]
+    st.preview = asyncio.create_task(
+        consumidor_preview(st.write_q, st.latest, st.stats))
+
+    anadir_fuente(app, VideoFileSource("videos/cam0.mp4", "cam0",
+                                       fps=25, loop_video=True))
+    yield                                # <- aqui la app atiende peticiones
+    # apagado (paso 10, ahora en el shutdown del servidor)
+    for t in st.source_tasks:
+        t.cancel()
+    for _ in st.workers:
+        await st.infer_q.put(SENTINEL)
+    await asyncio.gather(*st.workers, return_exceptions=True)
+    await st.write_q.put(SENTINEL)
+    await asyncio.gather(st.preview, return_exceptions=True)
+    st.pool.shutdown(wait=False)
+
+app = FastAPI(lifespan=lifespan)
+
+#### texto ####
+texto:
+
+## Observabilidad por HTTP
+
+El monitor de colas del paso 11, ahora como endpoint. Un `GET /stats` te da el estado del pipeline en JSON, listo para un dashboard:
+
+#### codigo ####
+etiqueta: server.py (añade)
+----
+lenguaje: python
+----
+codigo:
+
+@app.get("/stats")
+async def stats(request: Request):
+    st = request.app.state
+    return {
+        "stats": st.stats,
+        "colas": {"infer": st.infer_q.qsize(), "write": st.write_q.qsize()},
+        "fuentes_activas": len(st.source_tasks),
+    }
+
+#### texto ####
+texto:
+
+## El endpoint de señalización WebRTC
+
+Aquí se cierra el círculo con el paso anterior. El navegador manda su oferta SDP por HTTP, respondemos con `responder_oferta`, y cuando llega el track, la fuente WebRTC se **enchufa en caliente** al pipeline que ya está corriendo:
+
+#### codigo ####
+etiqueta: server.py (añade)
+----
+lenguaje: python
+----
+codigo:
+
+from webrtc import responder_oferta
+
+@app.post("/webrtc/offer")
+async def webrtc_offer(request: Request):
+    data = await request.json()
+    def al_recibir_fuente(source):
+        anadir_fuente(request.app, source)   # fan-in dinamico: nueva camara viva
+    answer = await responder_oferta(data["sdp"], data["type"], al_recibir_fuente)
+    return {"sdp": answer.sdp, "type": answer.type}
+
+#### texto ####
+texto:
+
+## Ver las detecciones en vivo (MJPEG)
+
+Servimos el último frame anotado de cada cámara como un stream MJPEG, que cualquier `<img>` de un navegador sabe mostrar:
+
+#### codigo ####
+etiqueta: server.py (añade)
+----
+lenguaje: python
+----
+codigo:
+
+import cv2
+from fastapi.responses import StreamingResponse
+
+async def mjpeg(latest, cam_id):
+    while True:
+        frame = latest.get(cam_id)
+        if frame is not None:
+            ok, buf = cv2.imencode(".jpg", frame)
+            if ok:
+                yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                       + buf.tobytes() + b"\r\n")
+        await asyncio.sleep(0.03)        # ~30 fps, y cede el control al loop
+
+@app.get("/stream/{cam_id}")
+async def stream(cam_id: str, request: Request):
+    return StreamingResponse(
+        mjpeg(request.app.state.latest, cam_id),
+        media_type="multipart/x-mixed-replace; boundary=frame")
+
+#### advertencia ####
+texto:
+
+La misma regla de oro de todo el taller aplica dentro de un endpoint: **no bloquees el event loop**. Un endpoint `async def` que haga cómputo pesado congela a todos los demás clientes a la vez. `cv2.imencode` de un solo frame es ligero, pero si una ruta tuya hiciera trabajo serio (redimensionar en lote, inferir), mándalo a tu executor con `run_in_executor`, igual que la inferencia. FastAPI no te salva de bloquear el loop: eso sigue siendo tu responsabilidad.
+
+#### texto ####
+texto:
+
+## Una página mínima para probar WebRTC
+
+Guarda esto como `static/index.html`. Captura tu webcam en el navegador, la envía por WebRTC al servidor, y muestra de vuelta el stream anotado:
+
+#### codigo ####
+etiqueta: static/index.html
+----
+lenguaje: html
+----
+codigo:
+
+<!doctype html>
+<video id="local" autoplay muted playsinline width="320"></video>
+<img id="anotado" src="/stream/navegador" width="320">
+<script>
+async function start() {
+  const stream = await navigator.mediaDevices.getUserMedia({video: true});
+  document.getElementById("local").srcObject = stream;
+  const pc = new RTCPeerConnection();
+  stream.getTracks().forEach(t => pc.addTrack(t, stream));
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  const resp = await fetch("/webrtc/offer", {
+    method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({sdp: pc.localDescription.sdp,
+                          type: pc.localDescription.type}),
+  });
+  await pc.setRemoteDescription(await resp.json());
+}
+start();
+</script>
+
+#### codigo ####
+etiqueta: server.py (sirve la página)
+----
+lenguaje: python
+----
+codigo:
+
+from fastapi.staticfiles import StaticFiles
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+#### texto ####
+texto:
+
+## Arráncalo
+
+Levanta el servidor con uvicorn y abre el navegador:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+uvicorn server:app --reload
+
+#### checkpoint ####
+texto:
+
+Abre `http://localhost:8000`, acepta el permiso de cámara, y tras un instante verás a la derecha tu webcam con las detecciones de YOLO dibujadas encima, servidas desde el pipeline. Consulta `http://localhost:8000/stats` para ver las colas en vivo, y pulsa Ctrl+C: el lifespan cierra el pipeline con limpieza. Acabas de convertir tu pipeline asíncrono en un servicio web completo, con ingesta WebRTC en caliente, inferencia sin bloquear, observabilidad y apagado ordenado, todo sobre un único event loop.

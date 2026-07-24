@@ -1,0 +1,122 @@
+_model: taller-paso
+---
+title: Bonus: video por WebRTC con asyncio
+---
+orden: 14
+---
+body:
+
+#### texto ####
+texto:
+
+Hasta ahora las fuentes venían de archivos, de la webcam local o de cámaras IP. Pero, ¿y si la cámara está en el navegador de otra persona, al otro lado de internet? Para eso está **WebRTC**: streaming de video en tiempo real, de baja latencia, directo desde un navegador. Y lo mejor para nosotros: la librería de WebRTC en Python, `aiortc`, está construida **sobre asyncio**. Es la fuente que mejor encaja en todo lo que hemos hecho.
+
+#### analogia ####
+titulo: WebRTC es una llamada telefónica
+----
+texto:
+
+Una llamada tiene dos fases. Primero intercambias el número y "suena" (la **señalización**: los dos extremos se ponen de acuerdo en cómo hablarse, qué códecs, qué IPs). Luego, ya conectados, fluye la voz directamente entre los dos teléfonos (los **medios**: el video y el audio, de par a par).
+
+En WebRTC pasa igual: hay un intercambio inicial de "ofertas y respuestas" (SDP) para negociar, y después los frames de video fluyen directos. La señalización la montaremos con FastAPI en el paso siguiente; aquí nos centramos en la parte que ya es nuestro terreno: recibir esos frames como una fuente más.
+
+#### texto ####
+texto:
+
+## Instala aiortc
+
+`aiortc` trae su propia decodificación de video sobre PyAV (`av`):
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+pip install aiortc av
+
+#### texto ####
+texto:
+
+## Una fuente WebRTC, nativa de asyncio
+
+Aquí está la joya. En todas las fuentes anteriores tuvimos que usar `asyncio.to_thread` para no bloquear el loop con `cap.read()`. Con WebRTC **no hace falta**: `track.recv()` ya es una corutina de verdad, escrita para asyncio. Recibir un frame es, por fin, un `await` limpio y natural. Añade a `sources.py`:
+
+#### codigo ####
+etiqueta: sources.py
+----
+lenguaje: python
+----
+codigo:
+
+from aiortc.mediastreams import MediaStreamError
+
+class WebRtcSource:
+    """Fuente alimentada por un track de video WebRTC entrante.
+    Nativa de asyncio: recv() ya es una corutina, sin to_thread."""
+
+    def __init__(self, track, cam_id="webrtc"):
+        self.track = track
+        self.cam_id = cam_id
+
+    async def frames(self):
+        while True:
+            try:
+                frame = await self.track.recv()      # corutina nativa, no bloquea
+            except MediaStreamError:
+                break                                # el peer cerró la conexión
+            # av.VideoFrame -> numpy BGR, el formato que usa OpenCV/YOLO
+            yield frame.to_ndarray(format="bgr24")
+
+#### advertencia ####
+texto:
+
+Fíjate en el detalle que resume todo el taller: `WebRtcSource` no tiene ni un solo `to_thread`. Es la única fuente enteramente asíncrona, porque `aiortc` está diseñada sobre el mismo event loop que tú ya dominas. El frame llega como un `av.VideoFrame`, y `to_ndarray(format="bgr24")` lo convierte al array de NumPy en BGR que el resto de tu pipeline (OpenCV, YOLO) ya espera. La interfaz `frames()` es idéntica: se enchufa sin cambiar nada aguas abajo.
+
+#### texto ####
+texto:
+
+## De dónde sale ese `track`
+
+Un track no aparece solo: llega cuando un navegador se conecta y negocia una `RTCPeerConnection`. El patrón de aiortc es registrar un handler que se dispara al recibir el track de video. Esta función crea la conexión, responde a la oferta del navegador y te entrega la fuente lista. La usaremos desde FastAPI en el siguiente paso:
+
+#### codigo ####
+etiqueta: webrtc.py
+----
+lenguaje: python
+----
+codigo:
+
+from aiortc import RTCPeerConnection, RTCSessionDescription
+from sources import WebRtcSource
+
+async def responder_oferta(sdp, tipo, al_recibir_fuente):
+    """Negocia con el navegador y llama a `al_recibir_fuente(source)`
+    cuando llega el track de video. Devuelve la respuesta SDP."""
+    pc = RTCPeerConnection()
+
+    @pc.on("track")
+    def on_track(track):
+        if track.kind == "video":
+            al_recibir_fuente(WebRtcSource(track, cam_id="navegador"))
+
+    @pc.on("connectionstatechange")
+    async def on_state():
+        if pc.connectionState in ("failed", "closed"):
+            await pc.close()
+
+    await pc.setRemoteDescription(RTCSessionDescription(sdp=sdp, type=tipo))
+    answer = await pc.createAnswer()
+    await pc.setLocalDescription(answer)
+    return pc.localDescription      # la respuesta que devolvemos al navegador
+
+#### advertencia ####
+texto:
+
+`aiortc` corre en tu event loop: los handlers `@pc.on(...)` son corutinas o funciones normales que el loop invoca. No hay hilos escondidos ni bloqueo. Toda la maquinaria de WebRTC (ICE, DTLS, RTP) convive con tus etapas de ingesta e inferencia en el mismo loop, exactamente el modelo que llevas todo el taller construyendo.
+
+#### checkpoint ####
+texto:
+
+Tienes `WebRtcSource`, que expone la misma interfaz `frames()` que las demás fuentes, y `responder_oferta`, que crea la conexión y te entrega la fuente cuando un navegador se conecta. Todavía no puedes probarlo de punta a punta porque falta quien reciba la oferta del navegador por HTTP. Eso, y mucho más, lo monta el último bonus: exponer todo el pipeline con FastAPI.
