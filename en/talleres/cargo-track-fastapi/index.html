@@ -1,0 +1,466 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../static/profile.png">
+    <title>Cargo Track: Diseña una API de rastreo logístico con FastAPI — Talleres — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../static/site.css">
+    <link rel="stylesheet" href="../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../">
+            <img src="../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Home</a></li>
+                <li><a href="../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Workshops</a></li>
+                <li><a href="../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../talleres/cargo-track-fastapi/">
+            <i class="fa fa-globe"></i> Español
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Hire me</a>
+    </div>
+</header>
+
+    
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="./" class="text-white hover:text-white hover:underline">Cargo Track: Diseña una API de rastreo logístico con FastAPI</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Portada · <strong class="text-white">19</strong> pasos</span>
+    </div>
+</div>
+
+<section class="pt-16 pb-12 bg-gradient-to-b from-white to-[#f8f9fa] border-b border-[#e9ecef]">
+    <div class="max-w-[960px] mx-auto px-8 grid grid-cols-[1fr_320px] gap-12 items-start max-[900px]:grid-cols-1">
+        <div>
+            
+            <p class="font-mono text-xs uppercase tracking-[0.14em] text-azure mb-3">Taller</p>
+            <h1 class="text-[44px] font-black text-slate-900 leading-[1.05] tracking-[-0.02em] mb-4 max-[900px]:text-[32px]">Cargo Track: Diseña una API de rastreo logístico con FastAPI</h1>
+            <div class="text-[17px] text-slate-600 leading-[1.55] mb-6"><p>Cargo Track es una empresa de logística ficticia que necesita un sistema para gestionar sus envíos, clientes y conductores. En este taller vas a construir la API REST que hace funcionar ese sistema, desde los modelos de base de datos hasta los endpoints autenticados, y luego vas a conectar todo con un frontend en Streamlit.</p>
+</div>
+        </div>
+        <aside class="bg-white border border-[#e9ecef] rounded-2xl p-[22px_24px]">
+            <h4 class="font-mono text-[10px] uppercase tracking-[0.14em] text-slate-400 mb-3.5 font-bold">Datos del taller</h4>
+            <dl class="m-0">
+                <dt class="text-xs uppercase tracking-[0.06em] text-slate-400 font-mono mt-3.5 first:mt-0">Duración</dt><dd class="mt-1 text-slate-900 font-medium flex items-center gap-2 m-0"><i class="fa fa-clock-o text-azure w-4"></i> 15 a 18 horas</dd>
+                <dt class="text-xs uppercase tracking-[0.06em] text-slate-400 font-mono mt-3.5">Pasos</dt><dd class="mt-1 text-slate-900 font-medium flex items-center gap-2 m-0"><i class="fa fa-list-ol text-azure w-4"></i> 19</dd>
+                <dt class="text-xs uppercase tracking-[0.06em] text-slate-400 font-mono mt-3.5">Prerrequisitos</dt><dd class="mt-1 text-slate-900 font-medium flex items-center gap-2 m-0"><i class="fa fa-check text-azure w-4"></i> Python 3.12, pip y un editor de código instalados. Conocimiento básico de Python: funciones, clases y tipos.</dd>
+            </dl>
+            
+            
+            <div class="mt-[22px]">
+                <a class="w-full inline-flex justify-center items-center gap-2 px-6 py-3 rounded-full bg-azure text-white text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="01-prerrequisitos/"><i class="fa fa-play"></i> Empezar el taller</a>
+            </div>
+            
+        </aside>
+    </div>
+</section>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="02-entornos-virtuales/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Entornos virtuales</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="03-el-sistema-cargo-track/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El sistema Cargo Track</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="04-modelos-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Modelos de datos con SQLModel</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="05-relaciones-entre-modelos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Relaciones entre modelos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="06-la-base-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La base de datos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="07-primeros-endpoints/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Primeros endpoints</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="08-validacion-con-pydantic/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Validación con Pydantic</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="09-crear-y-actualizar-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Crear y actualizar envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="10-eliminar-y-cambiar-estados/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Eliminar y cambiar estados</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="11-manejo-de-errores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Manejo de errores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="12-autenticacion/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Autenticación con JWT</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="13-swagger/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Swagger: tu API documentada</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="14-streamlit-estructura/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: estructura y conexión</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="15-streamlit-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="16-streamlit-clientes-conductores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Clientes y Conductores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="17-streamlit-rastreo/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: rastreo de un envío</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="18-streamlit-ux/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: pulir la experiencia de usuario</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="19-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Cierre</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        
+        <h2 class="font-display text-[22px] uppercase font-medium text-slate-900 tracking-[0.02em] mt-0 mb-[18px] pb-2 border-b-2 border-coral">Qué vas a construir</h2>
+        <p>Una API REST funcional para Cargo Track con autenticación, documentación automática en Swagger y un frontend en Streamlit con sidebar y tabs para gestionar envíos, clientes y conductores.</p>
+
+        
+
+        
+        <h2 class="font-display text-[22px] uppercase font-medium text-slate-900 tracking-[0.02em] mt-11 mb-[18px] pb-2 border-b-2 border-azure">Objetivos de aprendizaje</h2>
+        <p>Al terminar este taller vas a poder:</p>
+<ul>
+<li>Crear y organizar una API REST con FastAPI, definiendo rutas, métodos HTTP y respuestas correctas para cada operación</li>
+<li>Modelar datos con SQLModel y diseñar relaciones entre tablas (uno-a-muchos y muchos-a-muchos)</li>
+<li>Validar datos de entrada con Pydantic y devolver errores claros cuando la validación falla</li>
+<li>Proteger endpoints con autenticación basada en API keys y entender cómo extenderlo con JWT</li>
+<li>Manejar errores de forma consistente usando los códigos HTTP adecuados para cada situación</li>
+<li>Explorar y probar la API desde la documentación automática que genera FastAPI con Swagger</li>
+<li>Gestionar entornos virtuales de Python para aislar dependencias por proyecto</li>
+<li>Conectar un frontend a los endpoints del API usando Streamlit, separando módulos con sidebar y tabs</li>
+</ul>
+
+        
+
+        
+        <h2 class="font-display text-[22px] uppercase font-medium text-slate-900 tracking-[0.02em] mt-11 mb-[18px] pb-2 border-b-2 border-azure">Prerrequisitos / Stack</h2>
+        <ul>
+<li>Python 3.12</li>
+<li>FastAPI 0.115</li>
+<li>SQLModel 0.0.21</li>
+<li>SQLite (incluido con Python) o PostgreSQL 16 (opcional)</li>
+<li>Uvicorn 0.30</li>
+<li>Streamlit 1.40</li>
+<li>httpx 0.27</li>
+<li>python-jose 3.3 (para JWT opcional)</li>
+</ul>
+
+        
+
+        <h2 class="font-display text-[22px] uppercase font-medium text-slate-900 tracking-[0.02em] mt-11 mb-[18px] pb-2 border-b-2 border-azure">Contenido del taller</h2>
+        <ol class="list-none p-0 m-0">
+            
+            <li>
+                <a href="01-prerrequisitos/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">01</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Prerrequisitos</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="02-entornos-virtuales/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">02</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Entornos virtuales</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="03-el-sistema-cargo-track/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">03</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">El sistema Cargo Track</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="04-modelos-de-datos/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">04</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Modelos de datos con SQLModel</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="05-relaciones-entre-modelos/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">05</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Relaciones entre modelos</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="06-la-base-de-datos/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">06</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">La base de datos</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="07-primeros-endpoints/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">07</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Primeros endpoints</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="08-validacion-con-pydantic/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">08</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Validación con Pydantic</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="09-crear-y-actualizar-envios/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">09</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Crear y actualizar envíos</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="10-eliminar-y-cambiar-estados/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">10</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Eliminar y cambiar estados</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="11-manejo-de-errores/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">11</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Manejo de errores</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="12-autenticacion/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">12</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Autenticación con JWT</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="13-swagger/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">13</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Swagger: tu API documentada</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="14-streamlit-estructura/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">14</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Streamlit: estructura y conexión</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="15-streamlit-envios/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">15</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Streamlit: módulo de Envíos</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="16-streamlit-clientes-conductores/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">16</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Streamlit: módulo de Clientes y Conductores</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="17-streamlit-rastreo/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">17</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Streamlit: rastreo de un envío</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="18-streamlit-ux/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">18</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Streamlit: pulir la experiencia de usuario</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="19-cierre/" class="grid grid-cols-[44px_1fr_auto] gap-[18px] items-center py-[18px] border-b border-[#e9ecef] no-underline text-slate-900 transition-[padding] hover:pl-2 hover:no-underline last:border-b-0">
+                    <span class="font-mono text-sm text-azure font-bold">19</span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[17px] font-bold text-slate-900">Cierre</span>
+                    </div>
+                    <span class="font-mono text-xs text-slate-400"><i class="fa fa-arrow-right"></i></span>
+                </a>
+            </li>
+            
+        </ol>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Available for remote projects.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Follow</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Made with <i class="fa fa-heart text-coral"></i> in Colombia · built with <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    
+    <script src="../../../static/site.js"></script>
+</body>
+</html>

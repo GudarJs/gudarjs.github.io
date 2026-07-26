@@ -1,0 +1,390 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../../static/profile.png">
+    <title>Apagado limpio · De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../../static/site.css">
+    <link rel="stylesheet" href="../../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Home</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Workshops</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../../talleres/video-asyncio-tiempo-real/17-apagado-limpio/">
+            <i class="fa fa-globe"></i> Español
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Hire me</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">17</strong> de <strong class="text-white">23</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-mapa-del-proyecto/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El mapa del proyecto</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../03-los-servicios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El mundo exterior: cámaras y modelo</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-el-problema/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El problema y el panorama</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-la-referencia/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La referencia: el número a batir</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../06-asyncio-101/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>asyncio 101: corrutinas, await y el event loop</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../07-primer-gather/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Tu primer gather, y el error que todos cometemos una vez</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../08-la-trampa-de-la-cpu/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La trampa de la CPU</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-el-executor-y-su-precio/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El executor, y el precio que trae</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-modelo-detras-de-un-socket/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El modelo detrás de un socket</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-ingesta-asincrona/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Ingesta asíncrona: transmitir, no leer</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../12-colas-y-backpressure/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Colas acotadas y backpressure</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-bloquear-o-descartar/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bloquear o descartar: elegir tu política</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-el-montaje/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El montaje: el pipeline completo</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-escala/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Escala: sesenta y cuatro cámaras</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../16-resiliencia/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Resiliencia: cuando una cámara se cae</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>Apagado limpio</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../18-observabilidad/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Observabilidad: qué te dice una cola</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-bonus-webcam/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: tu webcam, la excepción honesta</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../20-bonus-camaras-ip/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: cámaras IP por RTSP</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../21-bonus-webrtc/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: video del navegador con WebRTC</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../22-bonus-gstreamer/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: cientos de streams con GStreamer, y el supervisor</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../23-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Lo que lograste, y por dónde seguir</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 17 de 23</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">Apagado limpio</h1>
+
+        <p>Todo el taller hemos parado los programas con Ctrl-C sin pensarlo. Ahora vamos a mirar qué pasa realmente cuando haces eso, porque en un pipeline con colas llenas la respuesta es fea.</p>
+
+
+<h2>Ctrl-C es una señal, no una excepción</h2>
+<p>Cuando pulsas Ctrl-C, el sistema operativo manda una señal <code>SIGINT</code> a tu proceso, y Python la convierte en un <code>KeyboardInterrupt</code> <strong>en el punto exacto donde estuviera ejecutando</strong>. Puede ser en mitad de un <code>put</code>, mientras un trabajador tiene un frame en la mano, o entre dos líneas de tu limpieza.</p>
+<p>En un script pequeño da igual. En un pipeline significa perder lo que estuviera en vuelo y dejar sockets a medio cerrar.</p>
+<p>La solución es atrapar la señal tú, y convertirla en una petición educada:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> main.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">stop = asyncio.Event()
+loop = asyncio.get_running_loop()
+for sig in (signal.SIGINT, signal.SIGTERM):
+    loop.add_signal_handler(sig, stop.set)
+</code></pre>
+</div>
+
+<p><code>asyncio.Event</code> es una banderita que las corrutinas pueden esperar. Cuando llega la señal, en vez de reventar por donde sea, simplemente se levanta la bandera y tu programa decide qué hacer y en qué orden.</p>
+<p>Sin esto, Ctrl-C te corta por donde sea. Con esto, tú eliges por dónde.</p>
+
+
+<h2>Parar en orden: primero la entrada, al final la salida</h2>
+<p>Con la bandera levantada, el apagado sigue el sentido del flujo:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> main.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">for task in ingest:
+    task.cancel()
+await asyncio.gather(*ingest, return_exceptions=True)
+
+async with asyncio.timeout(DRAIN_DEADLINE):
+    await drain(infer_q, publish_q, infer_workers, publish_workers)
+</code></pre>
+</div>
+
+<p>Primero se corta la entrada: se cancelan las tareas de ingesta, así que dejan de entrar frames nuevos. Después se deja que lo que ya está dentro termine su recorrido.</p>
+<p>El orden importa y es el del flujo: cámaras, inferencia y, de última, publicación. Si apagaras primero la publicación, todo lo que quedaba en la segunda cola se perdería.</p>
+<p>Y ese <code>asyncio.timeout(DRAIN_DEADLINE)</code> es la dosis de realismo: le das un plazo al vaciado y, si no termina a tiempo, dejas de ser educado y cortas. Un apagado sin plazo es un programa que no se apaga.</p>
+
+
+<h2>El centinela, etapa por etapa</h2>
+<p>¿Y cómo le dices a un trabajador que ya no vengan más frames? No cancelándolo: mandándole un mensaje especial por la misma cola. Eso es el centinela, y ya lo viste en <code>pipeline.py</code> sin que le prestáramos atención:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> pipeline.py y main.py, lado a lado</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python"># lo que el worker ya esperaba, desde el paso 12
+SENTINEL = None
+
+while True:
+    msg = await in_q.get()
+    if msg is SENTINEL:
+        break
+    ...
+
+# lo que el apagado manda
+for _ in infer_workers:
+    await infer_q.put(SENTINEL)
+await asyncio.gather(*infer_workers)
+
+for _ in publish_workers:
+    await publish_q.put(SENTINEL)
+await asyncio.gather(*publish_workers)
+</code></pre>
+</div>
+
+<p>Dos detalles que valen oro:</p>
+<p><strong>Uno por trabajador.</strong> Cada worker saca un centinela y se va. Si mandaras uno solo con ocho trabajadores, siete se quedarían dormidos para siempre en el <code>get</code>.</p>
+<p><strong>¿Y por qué no cancelarlos, como hiciste con la ingesta?</strong> Porque cancelar bota el frame que el trabajador tenga en la mano, y ese frame quizá ya costó una petición al modelo. La ingesta se cancela porque lo que produce es reemplazable: vienen más frames. Los trabajadores se despiden con centinela porque lo suyo ya está pagado.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-[#e9ecef] bg-[#fff5f0] text-[15px] leading-relaxed border-l-[#b03a14] border-l-dashed">
+    <span class="size-7 rounded-full shrink-0 text-white flex items-center justify-center text-[13px] mt-px bg-[#b03a14]"><i class="fa fa-bug"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#d4471a] mb-1">Algo va a fallar... · Prueba a apagarlo</p>
+        <p>Arranca el pipeline y déjalo procesar unos segundos:</p>
+<p><code>python main.py</code></p>
+<p>Ahora pulsa Ctrl-C <strong>una sola vez</strong> y observa la salida sin tocar nada más. Cuenta cuánto tarda en volver la línea de comandos y mira los números finales de <code>stats</code>.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#1f8a5b] border border-[#e9ecef] bg-[#f1faf5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#1f8a5b] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-wrench"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#1f8a5b] mb-1">Cómo resolverlo · Ese par de segundos son el vaciado</p>
+        <p>Lo que viste no es lentitud: es el apagado haciendo su trabajo. Entre que pulsaste Ctrl-C y el programa terminó, el pipeline canceló la ingesta, mandó los centinelas, esperó a que los ocho trabajadores terminaran lo que tenían en vuelo y cerró la sesión HTTP.</p>
+<p>Fíjate en el <code>stats</code> final: los números de <code>inferred</code> y <code>published</code> cuadran. Nada quedó a medias.</p>
+<p>Si lo comparas con matar el proceso a lo bruto, la diferencia es que ahí perderías todo lo que estuviera en las dos colas, y el servicio del otro lado se quedaría con conexiones abiertas hasta que expiren.</p>
+
+    </div>
+</div>
+
+<h2>Dos descuidos que se pagan caro</h2>
+<p><strong>Uno.</strong> Cancelar una tarea hace que lance <code>CancelledError</code>. Si el <code>gather</code> no lleva <code>return_exceptions=True</code>, ese error sube de inmediato y aborta el resto del apagado: nunca se vacían las colas, y las otras tareas siguen corriendo sin nadie que las espere.</p>
+<p><strong>Dos.</strong> Si capturas <code>CancelledError</code> y no lo relanzas, la tarea se niega a morir y el apagado espera por ella hasta que venza el plazo. Es el mismo error del paso 14, y aparece aquí porque es donde duele.</p>
+<p>Cierra los recursos en <code>finally</code>: es lo único que corre igual si la tarea termina bien o si la cancelan.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint</p>
+        <p>Tu pipeline ya se apaga sin perder trabajo en vuelo y sin dejar conexiones colgando. Con eso deja de ser un experimento y empieza a parecerse a algo que puedes dejar corriendo.</p>
+
+    </div>
+</div>
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../16-resiliencia/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">Resiliencia: cuando una cámara se cae</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../18-observabilidad/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Siguiente paso →</span>
+                    <span class="text-[15px] font-bold text-slate-900">Observabilidad: qué te dice una cola</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Available for remote projects.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Follow</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Made with <i class="fa fa-heart text-coral"></i> in Colombia · built with <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../../static/workshop.js"></script>
+    <script src="../../../../static/site.js"></script>
+</body>
+</html>

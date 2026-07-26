@@ -1,0 +1,400 @@
+
+
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../static/profile.png">
+    <title>Streamlit: pulir la experiencia de usuario · Cargo Track: Diseña una API de rastreo logístico con FastAPI — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../static/site.css">
+    <link rel="stylesheet" href="../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Inicio</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Talleres</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../en/talleres/cargo-track-fastapi/18-streamlit-ux/">
+            <i class="fa fa-globe"></i> English
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Contratar</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">Cargo Track: Diseña una API de rastreo logístico con FastAPI</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">18</strong> de <strong class="text-white">19</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-entornos-virtuales/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Entornos virtuales</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../03-el-sistema-cargo-track/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El sistema Cargo Track</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-modelos-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Modelos de datos con SQLModel</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-relaciones-entre-modelos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Relaciones entre modelos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../06-la-base-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La base de datos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../07-primeros-endpoints/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Primeros endpoints</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../08-validacion-con-pydantic/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Validación con Pydantic</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-crear-y-actualizar-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Crear y actualizar envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-eliminar-y-cambiar-estados/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Eliminar y cambiar estados</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-manejo-de-errores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Manejo de errores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../12-autenticacion/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Autenticación con JWT</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-swagger/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Swagger: tu API documentada</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-streamlit-estructura/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: estructura y conexión</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-streamlit-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../16-streamlit-clientes-conductores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Clientes y Conductores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../17-streamlit-rastreo/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: rastreo de un envío</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>Streamlit: pulir la experiencia de usuario</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Cierre</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 18 de 19</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">Streamlit: pulir la experiencia de usuario</h1>
+
+        <p>Un buen frontend no solo muestra datos: le habla claro al usuario cuando algo sale mal, indica cuándo está cargando y confirma que las acciones tuvieron éxito. En este paso vas a agregar los últimos toques que hacen la diferencia entre una app funcional y una app que se siente profesional.</p>
+<h2>Estado de sesión para evitar recarga completa</h2>
+<p>Streamlit vuelve a ejecutar el script completo cada vez que el usuario interactúa. Puedes usar <code>st.session_state</code> para recordar qué envío se está viendo sin perder el contexto:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track_ui/pages/rastreo.py (actualizar mostrar)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">def mostrar():
+    st.title(&#34;Rastreo de Envíos&#34;)
+
+    if &#34;ultimo_rastreo&#34; not in st.session_state:
+        st.session_state.ultimo_rastreo = None
+
+    col_input, col_btn = st.columns([3, 1])
+    envio_id = col_input.number_input(
+        &#34;Número de envío&#34;, min_value=1, step=1, label_visibility=&#34;collapsed&#34;
+    )
+    buscar = col_btn.button(&#34;Rastrear&#34;, use_container_width=True)
+
+    if buscar:
+        st.session_state.ultimo_rastreo = int(envio_id)
+
+    if st.session_state.ultimo_rastreo:
+        _mostrar_rastreo(st.session_state.ultimo_rastreo)</code></pre>
+</div>
+
+<h2>Confirmación antes de eliminar</h2>
+<p>Agrega un paso de confirmación antes de eliminar un envío. Actualiza el módulo de envíos con una opción de eliminación en la tab de lista:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track_ui/pages/envios.py (agregar al final de _tab_lista)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from api_client import get, post, patch, delete, APIError
+
+# al final de _tab_lista, después del dataframe:
+    st.divider()
+    with st.expander(&#34;Eliminar un envío&#34;):
+        envio_id_del = st.number_input(
+            &#34;ID del envío a eliminar&#34;, min_value=1, step=1, key=&#34;del_id&#34;
+        )
+        confirmar = st.checkbox(&#34;Confirmo que quiero eliminar este envío&#34;)
+        if st.button(&#34;Eliminar&#34;, disabled=not confirmar, type=&#34;primary&#34;):
+            try:
+                delete(f&#34;/envios/{int(envio_id_del)}&#34;)
+                st.success(f&#34;Envío #{int(envio_id_del)} eliminado.&#34;)
+                st.rerun()
+            except APIError as e:
+                st.error(f&#34;Error {e.status_code}: {e.mensaje}&#34;)</code></pre>
+</div>
+
+<h2>Feedback visual con colores de estado</h2>
+<p>Agrega una función que muestra el estado con un color apropiado. Úsala en la tab de lista para resaltar los envíos según su estado:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track_ui/pages/envios.py (agregar función auxiliar)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">COLORES_ESTADO = {
+    &#34;PENDIENTE&#34;: &#34;🟡&#34;,
+    &#34;EN_TRANSITO&#34;: &#34;🔵&#34;,
+    &#34;ENTREGADO&#34;: &#34;🟢&#34;,
+    &#34;CANCELADO&#34;: &#34;🔴&#34;,
+}
+
+
+def _badge_estado(estado: str) -&gt; str:
+    return f&#34;{COLORES_ESTADO.get(estado, &#39;⚪&#39;)} {estado}&#34;</code></pre>
+</div>
+
+<h2>Recargar datos automáticamente</h2>
+<p>Agrega un botón de recarga en la tab de lista para actualizar los datos sin cambiar de tab:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track_ui/pages/envios.py (agregar al inicio de _tab_lista)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">def _tab_lista():
+    col_titulo, col_reload = st.columns([4, 1])
+    col_titulo.subheader(&#34;Envíos registrados&#34;)
+    if col_reload.button(&#34;Actualizar&#34;, use_container_width=True):
+        st.rerun()
+
+    # ... resto del código existente</code></pre>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-[#e9ecef] bg-[#fff5f0] text-[15px] leading-relaxed border-l-[#b03a14] border-l-dashed">
+    <span class="size-7 rounded-full shrink-0 text-white flex items-center justify-center text-[13px] mt-px bg-[#b03a14]"><i class="fa fa-bug"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#d4471a] mb-1">Algo va a fallar... · Intentar un estado inválido desde el frontend</p>
+        <p>En la tab "Cambiar estado", selecciona un envío que ya está en <code>ENTREGADO</code> e intenta cambiarlo a <code>EN_TRANSITO</code>.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#1f8a5b] border border-[#e9ecef] bg-[#f1faf5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#1f8a5b] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-wrench"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#1f8a5b] mb-1">Cómo resolverlo</p>
+        <p>El API responde con un <code>422</code> y el mensaje "No se puede cambiar de ENTREGADO a EN_TRANSITO". Gracias al <code>APIError</code> que definiste en <code>api_client.py</code>, el frontend muestra:</p>
+<pre><code>Error 422: No se puede cambiar de ENTREGADO a EN_TRANSITO
+</code></pre>
+<p>Eso es exactamente lo que quieres: el mensaje del API llegando claro al usuario, sin un traceback ni un error técnico incomprensible. El <code>APIError</code> captura el código y el mensaje, y <code>st.error()</code> lo muestra con el formato correcto.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint</p>
+        <p>Verifica los últimos detalles de UX:</p>
+<ol>
+<li>El botón "Actualizar" en la tab de lista recarga los datos sin recargar toda la página</li>
+<li>Eliminar un envío requiere marcar el checkbox de confirmación antes de activar el botón</li>
+<li>Un cambio de estado inválido muestra el mensaje de error del API, no un traceback de Python</li>
+<li>El módulo de Rastreo recuerda el último envío consultado si cambias de tab y vuelves</li>
+</ol>
+<p>Si los cuatro puntos funcionan, el frontend está pulido y listo.</p>
+
+    </div>
+</div>
+
+<h2>Guarda tu progreso</h2>
+<p>Haz un commit con los cambios de este paso:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">git add cargo_track_ui/api_client.py cargo_track_ui/pages/envios.py cargo_track_ui/pages/rastreo.py
+git commit -m &#34;feat: pulir UX del frontend con manejo de errores, confirmación y session_state&#34;</code></pre>
+</div>
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../17-streamlit-rastreo/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">Streamlit: rastreo de un envío</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../19-cierre/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Siguiente paso →</span>
+                    <span class="text-[15px] font-bold text-slate-900">Cierre</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Disponible para proyectos remotos.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Síguenos</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Hecho con <i class="fa fa-heart text-coral"></i> en Colombia · construido con <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../static/workshop.js"></script>
+    <script src="../../../static/site.js"></script>
+</body>
+</html>

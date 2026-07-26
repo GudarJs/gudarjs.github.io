@@ -1,0 +1,503 @@
+
+
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../static/profile.png">
+    <title>Streamlit: módulo de Clientes y Conductores · Cargo Track: Diseña una API de rastreo logístico con FastAPI — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../static/site.css">
+    <link rel="stylesheet" href="../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Inicio</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Talleres</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../en/talleres/cargo-track-fastapi/16-streamlit-clientes-conductores/">
+            <i class="fa fa-globe"></i> English
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Contratar</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">Cargo Track: Diseña una API de rastreo logístico con FastAPI</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">16</strong> de <strong class="text-white">19</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-entornos-virtuales/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Entornos virtuales</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../03-el-sistema-cargo-track/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El sistema Cargo Track</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-modelos-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Modelos de datos con SQLModel</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-relaciones-entre-modelos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Relaciones entre modelos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../06-la-base-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La base de datos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../07-primeros-endpoints/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Primeros endpoints</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../08-validacion-con-pydantic/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Validación con Pydantic</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-crear-y-actualizar-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Crear y actualizar envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-eliminar-y-cambiar-estados/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Eliminar y cambiar estados</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-manejo-de-errores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Manejo de errores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../12-autenticacion/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Autenticación con JWT</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-swagger/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Swagger: tu API documentada</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-streamlit-estructura/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: estructura y conexión</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-streamlit-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>Streamlit: módulo de Clientes y Conductores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../17-streamlit-rastreo/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: rastreo de un envío</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../18-streamlit-ux/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: pulir la experiencia de usuario</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Cierre</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 16 de 19</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">Streamlit: módulo de Clientes y Conductores</h1>
+
+        <p>En este paso construyes los módulos de Clientes y Conductores. Siguen el mismo patrón del módulo de Envíos: tabs para listar y crear, con formularios y mensajes de error claros.</p>
+<h2>Módulo de Clientes</h2>
+<p>Crea <code>cargo_track_ui/pages/clientes.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track_ui/pages/clientes.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">import streamlit as st
+from api_client import get, post, APIError
+
+
+def mostrar():
+    st.title(&#34;Gestión de Clientes&#34;)
+
+    tab_lista, tab_crear = st.tabs([&#34;Ver clientes&#34;, &#34;Nuevo cliente&#34;])
+
+    with tab_lista:
+        _tab_lista()
+    with tab_crear:
+        _tab_crear()
+
+
+def _tab_lista():
+    st.subheader(&#34;Clientes registrados&#34;)
+
+    with st.spinner(&#34;Cargando clientes...&#34;):
+        try:
+            clientes = get(&#34;/clientes/&#34;)
+        except APIError as e:
+            st.error(f&#34;Error {e.status_code}: {e.mensaje}&#34;)
+            return
+        except Exception:
+            st.error(&#34;No se pudo conectar con el API.&#34;)
+            return
+
+    if not clientes:
+        st.info(&#34;No hay clientes registrados.&#34;)
+        return
+
+    st.dataframe(
+        clientes,
+        column_config={
+            &#34;id&#34;: &#34;ID&#34;,
+            &#34;nombre&#34;: &#34;Nombre&#34;,
+            &#34;email&#34;: &#34;Correo&#34;,
+            &#34;telefono&#34;: &#34;Teléfono&#34;,
+        },
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+def _tab_crear():
+    st.subheader(&#34;Registrar nuevo cliente&#34;)
+
+    with st.form(&#34;form_crear_cliente&#34;):
+        nombre = st.text_input(&#34;Nombre completo&#34;)
+        email = st.text_input(&#34;Correo electrónico&#34;)
+        telefono = st.text_input(&#34;Teléfono (opcional)&#34;)
+        enviado = st.form_submit_button(&#34;Registrar cliente&#34;, use_container_width=True)
+
+    if enviado:
+        if not nombre or not email:
+            st.warning(&#34;El nombre y el correo son obligatorios.&#34;)
+            return
+        try:
+            nuevo = post(&#34;/clientes/&#34;, {
+                &#34;nombre&#34;: nombre,
+                &#34;email&#34;: email,
+                &#34;telefono&#34;: telefono or None,
+            })
+            st.success(f&#34;Cliente &#39;{nuevo[&#39;nombre&#39;]}&#39; registrado con ID #{nuevo[&#39;id&#39;]}.&#34;)
+        except APIError as e:
+            st.error(f&#34;Error {e.status_code}: {e.mensaje}&#34;)
+        except Exception:
+            st.error(&#34;No se pudo conectar con el API.&#34;)</code></pre>
+</div>
+
+<h2>El router de conductores en el API</h2>
+<p>Antes de crear el módulo en Streamlit, necesitas el router en el API. Crea <code>cargo_track/routers/conductores.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/routers/conductores.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+from ..database import get_session
+from ..models import Conductor
+from ..schemas import ConductorCreate, ConductorRead
+from ..auth import verificar_api_key
+
+router = APIRouter(prefix=&#34;/conductores&#34;, tags=[&#34;Conductores&#34;])
+
+
+@router.get(&#34;/&#34;, response_model=list[ConductorRead])
+def listar_conductores(session: Session = Depends(get_session)):
+    return session.exec(select(Conductor)).all()
+
+
+@router.get(&#34;/{conductor_id}&#34;, response_model=ConductorRead)
+def obtener_conductor(conductor_id: int, session: Session = Depends(get_session)):
+    conductor = session.get(Conductor, conductor_id)
+    if not conductor:
+        raise HTTPException(status_code=404, detail=&#34;Conductor no encontrado&#34;)
+    return conductor
+
+
+@router.post(&#34;/&#34;, response_model=ConductorRead, status_code=201)
+def crear_conductor(
+    conductor: ConductorCreate,
+    session: Session = Depends(get_session),
+    _: str = Depends(verificar_api_key),
+):
+    db_conductor = Conductor.model_validate(conductor)
+    session.add(db_conductor)
+    session.commit()
+    session.refresh(db_conductor)
+    return db_conductor</code></pre>
+</div>
+
+<p>Registra el nuevo router en <code>main.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/main.py (agregar import y router)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from .routers import envios, clientes, conductores
+
+# dentro de la app, después de los otros routers:
+app.include_router(conductores.router)</code></pre>
+</div>
+
+<h2>Módulo de Conductores en Streamlit</h2>
+<p>Crea <code>cargo_track_ui/pages/conductores.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track_ui/pages/conductores.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">import streamlit as st
+from api_client import get, post, APIError
+
+
+def mostrar():
+    st.title(&#34;Gestión de Conductores&#34;)
+
+    tab_lista, tab_crear = st.tabs([&#34;Ver conductores&#34;, &#34;Nuevo conductor&#34;])
+
+    with tab_lista:
+        _tab_lista()
+    with tab_crear:
+        _tab_crear()
+
+
+def _tab_lista():
+    st.subheader(&#34;Conductores registrados&#34;)
+
+    with st.spinner(&#34;Cargando conductores...&#34;):
+        try:
+            conductores = get(&#34;/conductores/&#34;)
+        except APIError as e:
+            st.error(f&#34;Error {e.status_code}: {e.mensaje}&#34;)
+            return
+        except Exception:
+            st.error(&#34;No se pudo conectar con el API.&#34;)
+            return
+
+    if not conductores:
+        st.info(&#34;No hay conductores registrados.&#34;)
+        return
+
+    st.dataframe(
+        conductores,
+        column_config={
+            &#34;id&#34;: &#34;ID&#34;,
+            &#34;nombre&#34;: &#34;Nombre&#34;,
+            &#34;licencia&#34;: &#34;Licencia&#34;,
+            &#34;email&#34;: &#34;Correo&#34;,
+        },
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
+def _tab_crear():
+    st.subheader(&#34;Registrar nuevo conductor&#34;)
+
+    with st.form(&#34;form_crear_conductor&#34;):
+        nombre = st.text_input(&#34;Nombre completo&#34;)
+        licencia = st.text_input(&#34;Número de licencia&#34;)
+        email = st.text_input(&#34;Correo electrónico&#34;)
+        enviado = st.form_submit_button(&#34;Registrar conductor&#34;, use_container_width=True)
+
+    if enviado:
+        if not nombre or not licencia or not email:
+            st.warning(&#34;Todos los campos son obligatorios.&#34;)
+            return
+        try:
+            nuevo = post(&#34;/conductores/&#34;, {
+                &#34;nombre&#34;: nombre,
+                &#34;licencia&#34;: licencia,
+                &#34;email&#34;: email,
+            })
+            st.success(f&#34;Conductor &#39;{nuevo[&#39;nombre&#39;]}&#39; registrado con ID #{nuevo[&#39;id&#39;]}.&#34;)
+        except APIError as e:
+            st.error(f&#34;Error {e.status_code}: {e.mensaje}&#34;)
+        except Exception:
+            st.error(&#34;No se pudo conectar con el API.&#34;)</code></pre>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint</p>
+        <p>Prueba los dos módulos nuevos con el API corriendo:</p>
+<ol>
+<li>En "Clientes": registra un cliente y verifica que aparece en la tabla de la tab "Ver clientes"</li>
+<li>En "Conductores": registra un conductor y verifica que aparece en la tabla</li>
+<li>Intenta registrar un cliente con el mismo email dos veces y observa el mensaje de error que muestra Streamlit</li>
+</ol>
+<p>Si los tres puntos funcionan, los módulos están completos.</p>
+
+    </div>
+</div>
+
+<h2>Guarda tu progreso</h2>
+<p>Haz un commit con los cambios de este paso:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">git add cargo_track_ui/pages/clientes.py cargo_track_ui/pages/conductores.py cargo_track/routers/conductores.py cargo_track/main.py
+git commit -m &#34;feat: agregar módulos de clientes y conductores en frontend y API&#34;</code></pre>
+</div>
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../15-streamlit-envios/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">Streamlit: módulo de Envíos</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../17-streamlit-rastreo/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Siguiente paso →</span>
+                    <span class="text-[15px] font-bold text-slate-900">Streamlit: rastreo de un envío</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Disponible para proyectos remotos.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Síguenos</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Hecho con <i class="fa fa-heart text-coral"></i> en Colombia · construido con <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../static/workshop.js"></script>
+    <script src="../../../static/site.js"></script>
+</body>
+</html>

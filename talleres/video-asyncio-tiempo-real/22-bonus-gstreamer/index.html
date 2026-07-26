@@ -1,0 +1,414 @@
+
+
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../static/profile.png">
+    <title>Bonus: cientos de streams con GStreamer, y el supervisor · De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../static/site.css">
+    <link rel="stylesheet" href="../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Inicio</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Talleres</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../en/talleres/video-asyncio-tiempo-real/22-bonus-gstreamer/">
+            <i class="fa fa-globe"></i> English
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Contratar</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">22</strong> de <strong class="text-white">23</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-mapa-del-proyecto/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El mapa del proyecto</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../03-los-servicios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El mundo exterior: cámaras y modelo</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-el-problema/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El problema y el panorama</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-la-referencia/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La referencia: el número a batir</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../06-asyncio-101/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>asyncio 101: corrutinas, await y el event loop</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../07-primer-gather/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Tu primer gather, y el error que todos cometemos una vez</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../08-la-trampa-de-la-cpu/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La trampa de la CPU</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-el-executor-y-su-precio/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El executor, y el precio que trae</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-modelo-detras-de-un-socket/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El modelo detrás de un socket</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-ingesta-asincrona/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Ingesta asíncrona: transmitir, no leer</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../12-colas-y-backpressure/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Colas acotadas y backpressure</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-bloquear-o-descartar/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bloquear o descartar: elegir tu política</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-el-montaje/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El montaje: el pipeline completo</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-escala/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Escala: sesenta y cuatro cámaras</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../16-resiliencia/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Resiliencia: cuando una cámara se cae</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../17-apagado-limpio/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Apagado limpio</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../18-observabilidad/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Observabilidad: qué te dice una cola</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-bonus-webcam/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: tu webcam, la excepción honesta</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../20-bonus-camaras-ip/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: cámaras IP por RTSP</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../21-bonus-webrtc/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: video del navegador con WebRTC</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>Bonus: cientos de streams con GStreamer, y el supervisor</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../23-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Lo que lograste, y por dónde seguir</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 22 de 23</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">Bonus: cientos de streams con GStreamer, y el supervisor</h1>
+
+        <p>Terminaste el bonus de RTSP con un techo: cada cámara IP consume un hilo decodificando H.264 sin parar, y con cuarenta cámaras tu máquina se queda sin CPU. Este capítulo es sobre qué se hace cuando llegas ahí.</p>
+<p>La respuesta incomoda un poco, y por eso vale la pena decirla: <strong>a esa escala, el video sale de Python.</strong></p>
+
+
+<h2>GStreamer ya resolvió lo que acabas de escribir</h2>
+<p>GStreamer es un framework de medios con veinte años encima. Está pensado exactamente para lo que tú acabas de construir a mano, y en la ruta del video lo hace mejor: decodificación por hardware, buffers sin copias, sincronización por timestamps, y las rarezas de RTSP de cada fabricante ya resueltas.</p>
+<p>Lo incómodo es lo parecido que resulta a tu pipeline:</p>
+<table>
+<thead><tr>
+<th>lo que escribiste</th>
+<th>GStreamer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>asyncio.Queue(maxsize=32)</code></td>
+<td><code>queue max-size-buffers=32</code></td>
+</tr>
+<tr>
+<td>backpressure al llenarse</td>
+<td>pads bloqueantes, por defecto</td>
+</tr>
+<tr>
+<td><code>put_or_drop</code></td>
+<td><code>queue leaky=downstream</code></td>
+</tr>
+<tr>
+<td>ocho trabajadores de inferencia</td>
+<td>la frontera de un <code>queue</code> es frontera de hilo</td>
+</tr>
+<tr>
+<td>el monitor de longitud de colas</td>
+<td>pad probes, <code>gst-shark</code></td>
+</tr>
+<tr>
+<td>las cuatro cámaras entrando a una cola</td>
+<td><code>funnel</code>, <code>nvstreammux</code></td>
+</tr>
+</tbody>
+</table>
+<p>Cada idea del taller, disponible como configuración.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#d4a017] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#d4a017] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-exclamation"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#b88914] mb-1">Ojo</p>
+        <p>Entonces, ¿perdiste el tiempo construyéndolo a mano? No, y la razón es la columna de la izquierda: <strong>ahora entiendes qué significa cada opción de la derecha</strong>. Poner <code>leaky=downstream</code> sin haber visto crecer una cola sin límite es copiar una línea de un foro. Después del paso 10 y del paso 11, es una decisión de política que sabes justificar.</p>
+<p>Lo que se pierde al usar GStreamer es ver tu propia concurrencia, que es justo para lo que lo escribimos hoy.</p>
+
+    </div>
+</div>
+
+<h2>Cómo se ve a esa escala</h2>
+<p>Un pipeline de producción para cientos de cámaras se parece a esto:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> el pipeline de medios</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">text</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-text">uridecodebin x25 ─┐
+                  ├─&gt; nvstreammux ─&gt; nvinfer ─&gt; nvtracker ─&gt; metadata
+uridecodebin x25 ─┘   batch-size=25   batch-size=25
+</code></pre>
+</div>
+
+<p>Tres cosas que aprender de ese dibujo:</p>
+<p><strong>El techo es la decodificación, no la inferencia.</strong> Al revés de lo que asumiría cualquiera. Por eso la primera optimización real suele ser <code>drop-frame-interval=5</code>: analizar uno de cada cinco frames. Para detectar personas o carros, cinco veces por segundo suele bastar, y es el 5x más barato que vas a conseguir.</p>
+<p><strong>Los frames viajan en lotes.</strong> <code>nvstreammux</code> junta 25 cámaras en un solo lote y el modelo lo procesa de una vez. Es la misma idea que tus ocho trabajadores concurrentes, llevada al hardware.</p>
+<p><strong>Veinticinco streams por proceso, no trescientos.</strong> Y esa decisión no es técnica, es de fallos: un stream corrupto que tumbe el proceso se lleva por delante a veinticuatro compañeros, no a doscientos noventa y nueve.</p>
+
+
+<h2>Y ahí es donde vuelve tu Python</h2>
+<p>Si el video se procesa en veinte procesos de GStreamer, alguien tiene que repartir las cámaras entre ellos, vigilarlos, reiniciar el que se muera y sacarlos de servicio ordenadamente cuando despliegues.</p>
+<p>Ese alguien es un supervisor. Y es exactamente el mismo asyncio que llevas todo el taller escribiendo:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> supervisor.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">async def supervise(shard_id, cameras):
+    backoff = 1.0
+    while not stopping.is_set():
+        proc = await asyncio.create_subprocess_exec(
+            &#34;python&#34;, &#34;shard.py&#34;, &#34;--id&#34;, str(shard_id), *cameras)
+        code = await proc.wait()
+        if stopping.is_set():
+            return
+        print(f&#34;shard {shard_id} exited {code}, restarting in {backoff:.0f}s&#34;)
+        await asyncio.sleep(backoff)
+        backoff = min(backoff * 2, 30)
+
+
+async def main():
+    shards = chunk(await discover_cameras(), SHARD_SIZE)
+    async with asyncio.TaskGroup() as tg:
+        for i, cams in enumerate(shards):
+            tg.create_task(supervise(i, cams))
+</code></pre>
+</div>
+
+<p>Reconoce las piezas, porque son todas tuyas:</p>
+<ul>
+<li><strong><code>await proc.wait()</code></strong> espera a que un proceso termine, cediendo el control igual que un socket. Un supervisor de veinte procesos no gasta veinte hilos.</li>
+<li><strong>El backoff exponencial</strong> es el mismo del paso 14, aplicado a procesos en vez de a conexiones.</li>
+<li><strong><code>stopping.is_set()</code></strong> es el <code>asyncio.Event</code> del paso 15, ahora decidiendo si un proceso que murió debe revivir o si estamos apagando a propósito.</li>
+<li><strong><code>asyncio.TaskGroup</code></strong> agrupa a los supervisores y garantiza que ninguno queda huérfano.</li>
+</ul>
+
+
+<div class="my-6 rounded-2xl overflow-hidden border border-[#e9ecef] bg-white">
+    <img src="shards.gif" alt="Cuatro shards de 25 streams bajo un supervisor asyncio. Cuando uno muere, los demás siguen entregando, y el supervisor lo reinicia con backoff creciente hasta que vuelve." class="block w-full h-auto">
+    
+    <div class="px-4 py-3 text-[13px] text-slate-400 italic border-t border-[#e9ecef] bg-[#fafbfc]">Cuatro shards de 25 streams bajo un supervisor asyncio. Cuando uno muere, los demás siguen entregando, y el supervisor lo reinicia con backoff creciente hasta que vuelve.</div>
+    
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#7d3cb5] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#7d3cb5] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-quote-left"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#7d3cb5] mb-1">Analogía · El jefe de sala</p>
+        <p>En la cocina industrial ya nadie corta las verduras a mano: hay máquinas que lo hacen mil veces más rápido. Pero sigue haciendo falta alguien que reparta el trabajo entre las máquinas, que se dé cuenta cuando una se para, que la reinicie y que decida qué hacer mientras tanto.</p>
+<p>Ese jefe de sala no toca un cuchillo en todo el día, y sin él la cocina se detiene igual.</p>
+
+    </div>
+</div>
+
+<h2>Los píxeles salen de Python. El control, no.</h2>
+<p>Esa es la frase que resume este capítulo, y quizá el taller entero.</p>
+<p>Repartir cámaras entre shards, reiniciar lo que se murió, aplicar backoff, exponer endpoints de salud, vaciar ordenadamente al desplegar: todo eso sigue siendo tuyo, y todo se escribe con las mismas cinco herramientas que ya conoces. TaskGroup, cancelación, timeouts, backoff y colas acotadas, una capa más arriba.</p>
+<p>De hecho ya lo has visto funcionando: el <code>services.py</code> que llevas todo el taller dejando abierto en la terminal 1 es una versión pequeña de exactamente eso, un proceso Python que levanta y vigila otros dos.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint</p>
+        <p>No hay nada que ejecutar en este capítulo, y es a propósito: montar DeepStream o una GPU no cabe en un taller. Lo que sí te llevas es el mapa.</p>
+<p>Si algún día tu proyecto pasa de diez cámaras a trescientas, ya sabes dónde está la frontera: el video se va a un framework de medios, y tu asyncio se queda con el plano de control.</p>
+
+    </div>
+</div>
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../21-bonus-webrtc/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">Bonus: video del navegador con WebRTC</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../23-cierre/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Siguiente paso →</span>
+                    <span class="text-[15px] font-bold text-slate-900">Lo que lograste, y por dónde seguir</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Disponible para proyectos remotos.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Síguenos</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Hecho con <i class="fa fa-heart text-coral"></i> en Colombia · construido con <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../static/workshop.js"></script>
+    <script src="../../../static/site.js"></script>
+</body>
+</html>

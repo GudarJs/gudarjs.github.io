@@ -1,0 +1,446 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../../static/profile.png">
+    <title>Primeros endpoints · Cargo Track: Diseña una API de rastreo logístico con FastAPI — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../../static/site.css">
+    <link rel="stylesheet" href="../../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Home</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Workshops</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../../talleres/cargo-track-fastapi/07-primeros-endpoints/">
+            <i class="fa fa-globe"></i> Español
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Hire me</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">Cargo Track: Diseña una API de rastreo logístico con FastAPI</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">07</strong> de <strong class="text-white">19</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-entornos-virtuales/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Entornos virtuales</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../03-el-sistema-cargo-track/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El sistema Cargo Track</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-modelos-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Modelos de datos con SQLModel</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-relaciones-entre-modelos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Relaciones entre modelos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../06-la-base-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La base de datos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>Primeros endpoints</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../08-validacion-con-pydantic/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Validación con Pydantic</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-crear-y-actualizar-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Crear y actualizar envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-eliminar-y-cambiar-estados/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Eliminar y cambiar estados</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-manejo-de-errores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Manejo de errores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../12-autenticacion/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Autenticación con JWT</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-swagger/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Swagger: tu API documentada</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-streamlit-estructura/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: estructura y conexión</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-streamlit-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../16-streamlit-clientes-conductores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Clientes y Conductores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../17-streamlit-rastreo/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: rastreo de un envío</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../18-streamlit-ux/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: pulir la experiencia de usuario</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Cierre</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 7 de 19</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">Primeros endpoints</h1>
+
+        <p>Ya tienes la base de datos lista y el servidor corriendo. Ahora vas a construir los primeros endpoints: las funciones que responden cuando alguien hace una petición HTTP a tu API.</p>
+<p>Antes de escribir el código, hay dos conceptos que necesitas entender: los <strong>decoradores</strong> y la <strong>inyección de dependencias</strong>.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#7d3cb5] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#7d3cb5] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-quote-left"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#7d3cb5] mb-1">Analogía · Un endpoint es como una ventanilla de servicio</p>
+        <p>Imagina una empresa con varias ventanillas: una para consultar saldo, otra para hacer depósitos, otra para retirar. Cada ventanilla atiende un tipo de solicitud en una dirección específica. Los endpoints son esas ventanillas: cada uno tiene una URL y un método HTTP que define qué tipo de acción maneja.</p>
+
+    </div>
+</div>
+
+<h2>Los decoradores en Python</h2>
+<p>Un <strong>decorador</strong> es una función que envuelve a otra función para agregarle comportamiento. Se reconoce por el símbolo <code>@</code> antes del nombre:</p>
+<pre><code class="lang-python">@router.get(&quot;/&quot;)
+def listar_envios():
+    ...
+</code></pre>
+<p>El decorador <code>@router.get("/")</code> le dice a FastAPI: "cuando llegue una petición GET a <code>/envios/</code>, ejecuta esta función". Sin el decorador, la función existe en Python pero nadie la llama desde afuera: no es un endpoint, es solo código muerto.</p>
+<h2>Los métodos HTTP</h2>
+<p>Antes de escribir el router, conviene tener claro qué hace cada método:</p>
+<table>
+<thead><tr>
+<th>Método</th>
+<th>Uso en Cargo Track</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td>Consultar envíos, clientes, conductores</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td>Crear un envío, registrar un cliente</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td>Actualizar el estado de un envío</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td>Eliminar un envío cancelado</td>
+</tr>
+</tbody>
+</table>
+<h2>El router de envíos</h2>
+<p>Los endpoints se organizan en <strong>routers</strong>: módulos separados que agrupan los endpoints de un mismo recurso. Crea <code>cargo_track/routers/envios.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/routers/envios.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+from ..database import get_session
+from ..models import Envio
+
+router = APIRouter(prefix=&#34;/envios&#34;, tags=[&#34;Envíos&#34;])
+
+
+@router.get(&#34;/&#34;, response_model=list[Envio])
+def listar_envios(session: Session = Depends(get_session)):
+    return session.exec(select(Envio)).all()
+
+
+@router.get(&#34;/{envio_id}&#34;, response_model=Envio)
+def obtener_envio(envio_id: int, session: Session = Depends(get_session)):
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail=&#34;Envío no encontrado&#34;)
+    return envio
+</code></pre>
+</div>
+
+<p>Vamos a desglosar las partes que pueden resultar nuevas:</p>
+<p><strong><code>APIRouter(prefix="/envios")</code></strong></p>
+<p>Agrupa todos los endpoints de este archivo bajo la URL <code>/envios</code>. Así, <code>@router.get("/")</code> responde en <code>/envios/</code> y <code>@router.get("/{envio_id}")</code> responde en <code>/envios/1</code>, <code>/envios/42</code>, etc. Sin el prefijo tendrías que escribir <code>/envios</code> en cada decorador por separado.</p>
+<p><strong><code>Depends(get_session)</code></strong></p>
+<p>Esto es <strong>inyección de dependencias</strong>: FastAPI llama a <code>get_session()</code> antes de ejecutar tu función y te entrega la sesión lista para usar. Tú no abres ni cierras nada.</p>
+<pre><code class="lang-python">def listar_envios(session: Session = Depends(get_session)):
+#                  ↑ FastAPI inyecta esto automáticamente antes de llamar tu función
+</code></pre>
+<p><strong><code>/{envio_id}</code> como parámetro de path</strong></p>
+<p>Las llaves <code>{envio_id}</code> en la URL definen un parámetro de path: el valor que el cliente pone en la URL (<code>/envios/5</code>) se extrae y se pasa a la función como argumento del mismo nombre. FastAPI también valida el tipo: si el cliente accede a <code>/envios/abc</code> (no es un entero), FastAPI retorna un 422 automáticamente antes de que tu función se ejecute.</p>
+<p><strong><code>session.exec(select(Envio)).all()</code></strong></p>
+<p>Es la forma SQLModel de hacer un <code>SELECT * FROM envio</code>. <code>select(Envio)</code> construye la consulta, <code>session.exec()</code> la ejecuta y <code>.all()</code> obtiene todos los resultados como lista.</p>
+<p><strong><code>session.get(Envio, envio_id)</code></strong></p>
+<p>Busca un registro por clave primaria. Si no existe, retorna <code>None</code>. Entonces verificamos y lanzamos el 404.</p>
+<h2>Registrar el router en main.py</h2>
+<p>Un router no hace nada hasta que lo registras en la aplicación principal. Actualiza <code>cargo_track/main.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/main.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from .database import create_db_and_tables
+from .routers import envios
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
+
+
+app = FastAPI(
+    title=&#34;Cargo Track API&#34;,
+    description=&#34;API para gestión de envíos logísticos&#34;,
+    version=&#34;1.0.0&#34;,
+    lifespan=lifespan,
+)
+
+app.include_router(envios.router)
+
+
+@app.get(&#34;/&#34;)
+def root():
+    return {&#34;mensaje&#34;: &#34;Bienvenido a la API de Cargo Track&#34;}
+</code></pre>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-[#e9ecef] bg-[#fff5f0] text-[15px] leading-relaxed border-l-[#b03a14] border-l-dashed">
+    <span class="size-7 rounded-full shrink-0 text-white flex items-center justify-center text-[13px] mt-px bg-[#b03a14]"><i class="fa fa-bug"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#d4471a] mb-1">Algo va a fallar... · Olvidar registrar el router</p>
+        <p>Comenta temporalmente la línea <code>app.include_router(envios.router)</code> en <code>main.py</code> poniendo un <code>#</code> al frente, y guarda el archivo. Con <code>--reload</code> activo el servidor se reinicia solo. Ahora visita <code>http://127.0.0.1:8000/envios/</code> en el navegador.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#1f8a5b] border border-[#e9ecef] bg-[#f1faf5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#1f8a5b] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-wrench"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#1f8a5b] mb-1">Cómo resolverlo</p>
+        <p>La respuesta es un 404:</p>
+<pre><code class="lang-json">{&quot;codigo&quot;: 404, &quot;mensaje&quot;: &quot;El recurso solicitado no existe&quot;}
+</code></pre>
+<p>El router existe en <code>routers/envios.py</code>, pero <code>main.py</code> no sabe nada de él. <code>app.include_router(envios.router)</code> es el paso que conecta los dos. Sin esa línea, todos los endpoints del router son invisibles para FastAPI. Vuelve a descomentar esa línea.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-[#e9ecef] bg-[#fff5f0] text-[15px] leading-relaxed border-l-[#d4471a]">
+    <span class="size-7 rounded-full shrink-0 text-white flex items-center justify-center text-[13px] mt-px bg-[#d4471a]"><i class="fa fa-bug"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#d4471a] mb-1">Vamos a equivocarnos a propósito · Buscar un envío que no existe</p>
+        <p>Con el router registrado, visita <code>http://127.0.0.1:8000/envios/999</code> en el navegador. No hay ningún envío con ese ID en la base de datos.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#1f8a5b] border border-[#e9ecef] bg-[#f1faf5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#1f8a5b] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-wrench"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#1f8a5b] mb-1">Cómo resolverlo</p>
+        <p>La API responde con un <code>404 Not Found</code>:</p>
+<pre><code class="lang-json">{&quot;detail&quot;: &quot;Envío no encontrado&quot;}
+</code></pre>
+<p>El <code>raise HTTPException(status_code=404, detail="Envío no encontrado")</code> que escribiste es exactamente lo que produce este resultado. En el paso de manejo de errores le vas a dar a todos los errores un formato consistente con <code>codigo</code>, <code>mensaje</code> y <code>detalle</code>.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint</p>
+        <p>Verifica que los dos endpoints responden correctamente con el servidor corriendo:</p>
+<ol>
+<li>Abre <code>http://127.0.0.1:8000/envios/</code> en el navegador. Debe responder <code>[]</code> (la base de datos está vacía, eso es correcto).</li>
+<li>Abre <code>http://127.0.0.1:8000/envios/999</code>. Debe responder con el error 404 y el mensaje <code>"Envío no encontrado"</code>.</li>
+<li>Visita <code>http://127.0.0.1:8000/docs</code>. Debe aparecer Swagger UI con la sección "Envíos" y los dos endpoints listados.</li>
+</ol>
+<p>Si los tres puntos funcionan, los primeros endpoints están activos.</p>
+
+    </div>
+</div>
+
+<h2>Guarda tu progreso</h2>
+<p>Haz un commit con los cambios de este paso:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">git add cargo_track/routers/envios.py cargo_track/main.py
+git commit -m &#34;feat: agregar endpoints GET /envios y GET /envios/{id}&#34;</code></pre>
+</div>
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../06-la-base-de-datos/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">La base de datos</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../08-validacion-con-pydantic/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Siguiente paso →</span>
+                    <span class="text-[15px] font-bold text-slate-900">Validación con Pydantic</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Available for remote projects.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Follow</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Made with <i class="fa fa-heart text-coral"></i> in Colombia · built with <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../../static/workshop.js"></script>
+    <script src="../../../../static/site.js"></script>
+</body>
+</html>

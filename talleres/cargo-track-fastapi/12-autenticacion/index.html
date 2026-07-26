@@ -1,0 +1,576 @@
+
+
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../static/profile.png">
+    <title>Autenticación con JWT · Cargo Track: Diseña una API de rastreo logístico con FastAPI — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../static/site.css">
+    <link rel="stylesheet" href="../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Inicio</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Talleres</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../en/talleres/cargo-track-fastapi/12-autenticacion/">
+            <i class="fa fa-globe"></i> English
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Contratar</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">Cargo Track: Diseña una API de rastreo logístico con FastAPI</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">12</strong> de <strong class="text-white">19</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-entornos-virtuales/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Entornos virtuales</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../03-el-sistema-cargo-track/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El sistema Cargo Track</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-modelos-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Modelos de datos con SQLModel</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-relaciones-entre-modelos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Relaciones entre modelos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../06-la-base-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La base de datos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../07-primeros-endpoints/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Primeros endpoints</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../08-validacion-con-pydantic/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Validación con Pydantic</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-crear-y-actualizar-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Crear y actualizar envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-eliminar-y-cambiar-estados/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Eliminar y cambiar estados</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-manejo-de-errores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Manejo de errores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>Autenticación con JWT</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-swagger/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Swagger: tu API documentada</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-streamlit-estructura/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: estructura y conexión</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-streamlit-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../16-streamlit-clientes-conductores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Clientes y Conductores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../17-streamlit-rastreo/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: rastreo de un envío</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../18-streamlit-ux/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: pulir la experiencia de usuario</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Cierre</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 12 de 19</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">Autenticación con JWT</h1>
+
+        <p>Hasta ahora cualquier persona puede llamar a tu API sin identificarse y crear o eliminar datos libremente. Vamos a proteger los endpoints de escritura con <strong>OAuth2 Password + JWT</strong>: el cliente envía usuario y contraseña una vez, recibe un token con tiempo de expiración, y lo usa en cada petición posterior.</p>
+<p>Los endpoints de lectura (<code>GET</code>) siguen siendo públicos: cualquier visitante puede consultar envíos. Los de escritura (<code>POST</code>, <code>PATCH</code>, <code>DELETE</code>) requieren el token.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#7d3cb5] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#7d3cb5] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-quote-left"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#7d3cb5] mb-1">Analogía · La pulsera de entrada</p>
+        <p>Imagina que Cargo Track organiza un evento de logística. En la entrada, presentas tu identificación (usuario y contraseña). A cambio recibes una pulsera con la fecha de hoy impresa: es tu token. Con la pulsera puesta, puedes entrar y salir del salón sin volver a identificarte. Cuando el evento termina (el token expira), la pulsera ya no sirve y necesitas sacar una nueva.</p>
+
+    </div>
+</div>
+
+<h2>Cómo funciona OAuth2 Password Flow</h2>
+<p>El flujo tiene tres pasos:</p>
+<ol>
+<li>El cliente hace <code>POST /auth/token</code> enviando <code>username</code> y <code>password</code> como datos de formulario.</li>
+<li>El servidor valida las credenciales y devuelve un <strong>JWT</strong> (JSON Web Token) con tiempo de expiración.</li>
+<li>El cliente incluye ese token en todas las peticiones protegidas: <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+</ol>
+<p>Un JWT es una cadena de texto en tres partes separadas por puntos (<code>header.payload.signature</code>). La parte del medio (payload) contiene los datos que guardaste, como el nombre de usuario y la fecha de expiración. La firma garantiza que nadie modificó el contenido.</p>
+<h2>Instalar las dependencias</h2>
+<p>Necesitas dos librerías nuevas:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">pip install &#34;python-jose[cryptography]&#34; &#34;passlib[bcrypt]&#34;
+</code></pre>
+</div>
+
+<p><code>python-jose</code> crea y verifica los JWT. <code>passlib</code> hashea las contraseñas con bcrypt para que nunca las guardes en texto plano.</p>
+<h2>Crear auth.py</h2>
+<p>Crea <code>cargo_track/auth.py</code>. Lo vas a construir en dos partes.</p>
+<p><strong>Parte 1: configuración y utilidades</strong></p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/auth.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from datetime import datetime, timedelta, timezone
+from typing import Optional
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+
+SECRET_KEY = &#34;cargo-track-dev-secret-cambia-en-produccion&#34;
+ALGORITHM = &#34;HS256&#34;
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+pwd_context = CryptContext(schemes=[&#34;bcrypt&#34;], deprecated=&#34;auto&#34;)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=&#34;/auth/token&#34;)
+
+USUARIOS = {
+    &#34;admin&#34;: {
+        &#34;username&#34;: &#34;admin&#34;,
+        &#34;hashed_password&#34;: pwd_context.hash(&#34;secret123&#34;),
+    }
+}
+
+
+def verificar_password(plain: str, hashed: str) -&gt; bool:
+    return pwd_context.verify(plain, hashed)
+</code></pre>
+</div>
+
+<p>Algunos detalles:</p>
+<p><strong><code>CryptContext(schemes=["bcrypt"])</code></strong>: configura el hasheador de contraseñas. Bcrypt es lento a propósito: hace que atacar contraseñas por fuerza bruta sea impráctico. <code>pwd_context.hash("secret123")</code> convierte la contraseña en texto plano a algo como <code>$2b$12$...</code>, que es lo que guardas.</p>
+<p><strong><code>OAuth2PasswordBearer(tokenUrl="/auth/token")</code></strong>: le dice a FastAPI que las peticiones protegidas deben enviar el token en el header <code>Authorization: Bearer &lt;token&gt;</code>. El <code>tokenUrl</code> apunta al endpoint donde el cliente obtiene ese token: Swagger lo usa para saber dónde hacer el login.</p>
+<p><strong><code>USUARIOS</code></strong>: un diccionario en memoria para este taller. En producción, los usuarios vendrían de la base de datos.</p>
+<p><strong>Parte 2: crear y verificar tokens</strong></p>
+<p>Agrega esto al final de <code>auth.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/auth.py (continúa)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">def crear_token(data: dict, expires_delta: Optional[timedelta] = None) -&gt; str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (
+        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    to_encode[&#34;exp&#34;] = expire
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def get_current_user(token: str = Depends(oauth2_scheme)) -&gt; dict:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=&#34;Token inválido o expirado&#34;,
+        headers={&#34;WWW-Authenticate&#34;: &#34;Bearer&#34;},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get(&#34;sub&#34;)
+        if username is None:
+            raise credentials_exception
+        return {&#34;username&#34;: username}
+    except JWTError:
+        raise credentials_exception
+</code></pre>
+</div>
+
+<p><strong><code>crear_token(data)</code></strong>: toma un diccionario (por ejemplo <code>{"sub": "admin"}</code>), le agrega el campo <code>"exp"</code> con la fecha de expiración, y lo convierte en un JWT firmado con <code>SECRET_KEY</code>. El campo <code>"sub"</code> (subject) es la convención estándar de JWT para identificar al usuario.</p>
+<p><strong><code>get_current_user</code></strong>: esta es la dependencia que protege tus endpoints. Recibe el token del header <code>Authorization</code>, lo verifica con la misma <code>SECRET_KEY</code> y algoritmo, extrae el <code>"sub"</code> (username) del payload, y devuelve el diccionario del usuario. Si el token falta, expiró o fue modificado, <code>jwt.decode</code> lanza un <code>JWTError</code> y la función devuelve un <code>401</code> con el header <code>WWW-Authenticate: Bearer</code> (requerido por el estándar OAuth2).</p>
+<h2>Crear el endpoint de login</h2>
+<p>Crea <code>cargo_track/routers/auth.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/routers/auth.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from ..auth import USUARIOS, verificar_password, crear_token
+
+router = APIRouter(prefix=&#34;/auth&#34;, tags=[&#34;Autenticación&#34;])
+
+
+@router.post(&#34;/token&#34;)
+def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    usuario = USUARIOS.get(form_data.username)
+    if not usuario or not verificar_password(form_data.password, usuario[&#34;hashed_password&#34;]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=&#34;Usuario o contraseña incorrectos&#34;,
+            headers={&#34;WWW-Authenticate&#34;: &#34;Bearer&#34;},
+        )
+    token = crear_token(data={&#34;sub&#34;: form_data.username})
+    return {&#34;access_token&#34;: token, &#34;token_type&#34;: &#34;bearer&#34;}
+</code></pre>
+</div>
+
+<p><strong><code>OAuth2PasswordRequestForm</code></strong>: un formulario estándar de OAuth2. Espera los campos <code>username</code> y <code>password</code> como datos de formulario (<code>application/x-www-form-urlencoded</code>), no como JSON. FastAPI lo provee directamente, no necesitas definir un schema.</p>
+<p>Si las credenciales son correctas, se crea un token con <code>{"sub": "admin"}</code> en el payload y se devuelve en el formato estándar: <code>{"access_token": "...", "token_type": "bearer"}</code>.</p>
+<h2>Registrar el router en main.py</h2>
+<p>Agrega el router de autenticación en <code>cargo_track/main.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/main.py (modificación)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from .routers import envios, clientes, conductores, auth
+
+# ... (el resto del archivo no cambia)
+
+app.include_router(auth.router)   # agregar antes de los demás routers
+app.include_router(clientes.router)
+app.include_router(envios.router)
+app.include_router(conductores.router)
+</code></pre>
+</div>
+
+<h2>Proteger los endpoints de escritura</h2>
+<p>La dependencia se agrega con <code>_: dict = Depends(get_current_user)</code>. El guion bajo indica que no vas a usar el valor de retorno en el endpoint: solo importa el efecto, que es el <code>401</code> si el token es inválido.</p>
+<p>Actualiza <code>cargo_track/routers/envios.py</code> (solo se muestran los endpoints que cambian):</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/routers/envios.py (cambios)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from ..auth import get_current_user
+
+# ...
+
+@router.post(&#34;/&#34;, response_model=EnvioRead, status_code=201)
+def crear_envio(
+    envio: EnvioCreate,
+    session: Session = Depends(get_session),
+    _: dict = Depends(get_current_user),
+):
+    ...
+
+
+@router.patch(&#34;/{envio_id}&#34;, response_model=EnvioRead)
+def actualizar_envio(
+    envio_id: int,
+    datos: EnvioUpdate,
+    session: Session = Depends(get_session),
+    _: dict = Depends(get_current_user),
+):
+    ...
+
+
+@router.delete(&#34;/{envio_id}&#34;, status_code=204)
+def eliminar_envio(
+    envio_id: int,
+    session: Session = Depends(get_session),
+    _: dict = Depends(get_current_user),
+):
+    ...
+
+
+@router.patch(&#34;/{envio_id}/estado&#34;, response_model=EnvioRead)
+def cambiar_estado(
+    envio_id: int,
+    cambio: CambioEstado,
+    session: Session = Depends(get_session),
+    _: dict = Depends(get_current_user),
+):
+    ...
+</code></pre>
+</div>
+
+<p>Aplica el mismo patrón en <code>clientes.py</code> (agrega la dependencia en <code>crear_cliente</code>) y en <code>conductores.py</code> (en <code>crear_conductor</code>).</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-[#e9ecef] bg-[#fff5f0] text-[15px] leading-relaxed border-l-[#d4471a]">
+    <span class="size-7 rounded-full shrink-0 text-white flex items-center justify-center text-[13px] mt-px bg-[#d4471a]"><i class="fa fa-bug"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#d4471a] mb-1">Vamos a equivocarnos a propósito · Llamar a un endpoint protegido sin token</p>
+        <p>Reinicia Uvicorn. Abre <code>http://127.0.0.1:8000/docs</code>. Expande <code>POST /envios</code>, haz clic en "Try it out" y envía la petición sin autenticarte.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#1f8a5b] border border-[#e9ecef] bg-[#f1faf5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#1f8a5b] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-wrench"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#1f8a5b] mb-1">Cómo resolverlo</p>
+        <p>La API responde con <code>401 Unauthorized</code>:</p>
+<pre><code class="lang-json">{&quot;detail&quot;: &quot;Not authenticated&quot;}
+</code></pre>
+<p>Swagger no incluyó el header <code>Authorization</code> porque no has hecho login. Para autenticarte:</p>
+<ol>
+<li>Haz clic en el botón <strong>"Authorize"</strong> (candado en la parte superior derecha)</li>
+<li>En la sección <code>OAuth2PasswordBearer</code> escribe:<ul>
+<li>Username: <code>admin</code></li>
+<li>Password: <code>secret123</code></li>
+</ul>
+</li>
+<li>Haz clic en "Authorize" y luego en "Close"</li>
+</ol>
+<p>Swagger hace <code>POST /auth/token</code> en segundo plano, obtiene el JWT y lo incluye automáticamente en todas las peticiones posteriores. Ahora <code>POST /envios</code> devuelve <code>201</code>.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-[#e9ecef] bg-[#fff5f0] text-[15px] leading-relaxed border-l-[#d4471a]">
+    <span class="size-7 rounded-full shrink-0 text-white flex items-center justify-center text-[13px] mt-px bg-[#d4471a]"><i class="fa fa-bug"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#d4471a] mb-1">Vamos a equivocarnos a propósito · Qué contiene un JWT</p>
+        <p>Copia el token que devuelve <code>POST /auth/token</code> (el valor del campo <code>access_token</code>) y pégalo en <code>https://jwt.io</code>. Observa el payload.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#1f8a5b] border border-[#e9ecef] bg-[#f1faf5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#1f8a5b] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-wrench"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#1f8a5b] mb-1">Cómo resolverlo</p>
+        <p>Vas a ver algo como:</p>
+<pre><code class="lang-json">{
+  &quot;sub&quot;: &quot;admin&quot;,
+  &quot;exp&quot;: 1234567890
+}
+</code></pre>
+<p>El <code>sub</code> es el username. El <code>exp</code> es la fecha de expiración en formato Unix timestamp. El sitio también te muestra que la firma es inválida (porque no tiene tu <code>SECRET_KEY</code>): eso confirma que solo tu servidor puede verificar los tokens que emitió.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#d4a017] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#d4a017] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-exclamation"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#b88914] mb-1">Ojo</p>
+        <p>Nunca guardes el <code>SECRET_KEY</code> en el código que subes a un repositorio. En producción, cárgalo desde una variable de entorno con <code>python-dotenv</code>. Commitear secretos es un error de seguridad grave.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint</p>
+        <p>Reinicia Uvicorn, abre Swagger y verifica:</p>
+<ol>
+<li><code>POST /auth/token</code> con <code>username=admin</code> y <code>password=secret123</code> devuelve un objeto con <code>access_token</code></li>
+<li><code>POST /envios</code> sin autenticación devuelve <code>401</code></li>
+<li>Después de hacer login en Swagger (botón "Authorize"), <code>POST /envios</code> devuelve <code>201</code></li>
+<li><code>GET /envios</code> sigue funcionando sin autenticación</li>
+</ol>
+<p>Si los cuatro puntos funcionan, los endpoints de escritura están protegidos y los de lectura siguen siendo públicos.</p>
+
+    </div>
+</div>
+
+<h2>Guarda tu progreso</h2>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">git add cargo_track/auth.py cargo_track/routers/auth.py cargo_track/routers/envios.py cargo_track/routers/clientes.py cargo_track/routers/conductores.py cargo_track/main.py
+git commit -m &#34;feat: reemplazar API key con OAuth2 Password y JWT&#34;</code></pre>
+</div>
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../11-manejo-de-errores/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">Manejo de errores</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../13-swagger/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Siguiente paso →</span>
+                    <span class="text-[15px] font-bold text-slate-900">Swagger: tu API documentada</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Disponible para proyectos remotos.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Síguenos</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Hecho con <i class="fa fa-heart text-coral"></i> en Colombia · construido con <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../static/workshop.js"></script>
+    <script src="../../../static/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,522 @@
+
+
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../static/profile.png">
+    <title>La base de datos · Cargo Track: Diseña una API de rastreo logístico con FastAPI — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../static/site.css">
+    <link rel="stylesheet" href="../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Inicio</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Talleres</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../en/talleres/cargo-track-fastapi/06-la-base-de-datos/">
+            <i class="fa fa-globe"></i> English
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Contratar</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">Cargo Track: Diseña una API de rastreo logístico con FastAPI</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">06</strong> de <strong class="text-white">19</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-entornos-virtuales/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Entornos virtuales</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../03-el-sistema-cargo-track/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El sistema Cargo Track</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-modelos-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Modelos de datos con SQLModel</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-relaciones-entre-modelos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Relaciones entre modelos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>La base de datos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../07-primeros-endpoints/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Primeros endpoints</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../08-validacion-con-pydantic/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Validación con Pydantic</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-crear-y-actualizar-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Crear y actualizar envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-eliminar-y-cambiar-estados/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Eliminar y cambiar estados</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-manejo-de-errores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Manejo de errores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../12-autenticacion/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Autenticación con JWT</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-swagger/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Swagger: tu API documentada</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-streamlit-estructura/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: estructura y conexión</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-streamlit-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../16-streamlit-clientes-conductores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Clientes y Conductores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../17-streamlit-rastreo/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: rastreo de un envío</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../18-streamlit-ux/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: pulir la experiencia de usuario</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Cierre</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 6 de 19</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">La base de datos</h1>
+
+        <p>Tienes los modelos definidos, pero Python todavía no sabe cómo comunicarse con la base de datos. Para eso necesitas dos cosas: el <strong>motor de conexión</strong> (engine), que sabe dónde está la base de datos y cómo hablarle, y la <strong>sesión</strong> (session), que maneja cada conversación individual.</p>
+<p>En este paso vas a crear <code>database.py</code> con esas dos piezas, y luego <code>main.py</code> para arrancar la aplicación.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#7d3cb5] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#7d3cb5] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-quote-left"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#7d3cb5] mb-1">Analogía · El motor es la recepción, la sesión es el escritorio</p>
+        <p>Imagina una empresa grande. La <strong>recepción</strong> sabe dónde está todo, tiene el directorio de extensiones y hay una sola en el edificio. Los <strong>escritorios</strong> son individuales: cada empleado abre uno para atender a un cliente, hace su trabajo, y cuando termina lo cierra para el siguiente.</p>
+<p>En la base de datos, el <code>engine</code> es la recepción: existe uno solo en toda la aplicación y sabe cómo conectarse a SQLite. La <code>session</code> es el escritorio: cada petición HTTP abre una, lee o escribe datos, y la cierra al terminar. Así se evita que una petición interfiera con otra.</p>
+
+    </div>
+</div>
+
+<h2>El archivo database.py</h2>
+<p>Vas a construirlo en tres partes para entender qué hace cada una antes de ver el conjunto.</p>
+<p><strong>Parte 1: la conexión</strong></p>
+<p>Crea <code>cargo_track/database.py</code> con esto:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/database.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from sqlmodel import SQLModel, create_engine, Session
+
+DATABASE_URL = &#34;sqlite:///cargo_track.db&#34;
+
+engine = create_engine(DATABASE_URL, echo=True)
+</code></pre>
+</div>
+
+<p>La URL <code>"sqlite:///cargo_track.db"</code> le dice a SQLModel tres cosas:</p>
+<ul>
+<li>El motor de base de datos es <strong>SQLite</strong></li>
+<li>El archivo se llama <code>cargo_track.db</code></li>
+<li>Los tres <code>///</code> indican ruta relativa: el archivo se crea en la carpeta desde donde ejecutas el servidor</li>
+</ul>
+<p>El parámetro <code>echo=True</code> hace que SQLModel imprima en la terminal cada instrucción SQL que ejecuta. Cuando arrancas la aplicación por primera vez, verás algo como esto en la terminal:</p>
+<pre><code>CREATE TABLE cliente (
+    id INTEGER NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    ...
+)
+</code></pre>
+<p>Eso confirma que SQLModel tradujo tus clases Python a tablas SQL. Con el tiempo vas a aprender a leer ese output para entender qué hace el ORM por debajo y para depurar errores.</p>
+<p><strong>Parte 2: crear las tablas</strong></p>
+<p>Agrega esta función al final de <code>database.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/database.py (agregar al final)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+</code></pre>
+</div>
+
+<p><code>SQLModel.metadata</code> lleva un registro de todos los modelos que tienen <code>table=True</code>. Cuando llamas <code>create_all(engine)</code>, SQLModel genera el SQL para crear cada tabla en la base de datos. Si una tabla ya existe, la deja como está, así que es seguro llamar esta función cada vez que arranca la aplicación.</p>
+<p><strong>Parte 3: la sesión</strong></p>
+<p>Agrega esta función al final de <code>database.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/database.py (agregar al final)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">def get_session():
+    with Session(engine) as session:
+        yield session
+</code></pre>
+</div>
+
+<p>Esta función tiene algo especial: usa <code>yield</code> en lugar de <code>return</code>. Eso la convierte en un <strong>generador</strong>, y su flujo es diferente al de una función normal:</p>
+<ol>
+<li><code>with Session(engine) as session:</code> abre una conexión con la base de datos</li>
+<li><code>yield session</code> pausa la función y entrega la sesión al endpoint que la pidió</li>
+<li>El endpoint hace su trabajo (leer, escribir, lo que necesite)</li>
+<li>Cuando el endpoint termina, Python vuelve aquí y ejecuta el cierre del <code>with</code>, cerrando la sesión limpiamente</li>
+</ol>
+<p>FastAPI usa este patrón con <code>Depends()</code>, que vas a ver en el siguiente paso. La ventaja es que la sesión siempre se cierra, incluso si el endpoint lanza una excepción en el medio.</p>
+<p>El archivo completo queda así:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/database.py (completo)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from sqlmodel import SQLModel, create_engine, Session
+
+DATABASE_URL = &#34;sqlite:///cargo_track.db&#34;
+
+engine = create_engine(DATABASE_URL, echo=True)
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+</code></pre>
+</div>
+
+<h2>El punto de entrada: main.py</h2>
+<p>Crea <code>cargo_track/main.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/main.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from .database import create_db_and_tables
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
+
+
+app = FastAPI(
+    title=&#34;Cargo Track API&#34;,
+    description=&#34;API para gestión de envíos logísticos&#34;,
+    version=&#34;1.0.0&#34;,
+    lifespan=lifespan,
+)
+
+
+@app.get(&#34;/&#34;)
+def root():
+    return {&#34;mensaje&#34;: &#34;Bienvenido a la API de Cargo Track&#34;}
+</code></pre>
+</div>
+
+<p>El decorador <code>@asynccontextmanager</code> convierte la función <code>lifespan</code> en el manejador del ciclo de vida de la aplicación. La parte <strong>antes</strong> del <code>yield</code> se ejecuta cuando la aplicación arranca. La parte <strong>después</strong> del <code>yield</code> se ejecutaría cuando la aplicación se apaga (útil para cerrar conexiones de red). Al pasar <code>lifespan=lifespan</code> a <code>FastAPI(...)</code>, le dices a FastAPI que use esa función para manejar el inicio y el cierre.</p>
+<p>El punto <code>@app.get("/")</code> es el endpoint raíz: cuando alguien visita <code>http://127.0.0.1:8000</code>, responde con ese JSON de bienvenida.</p>
+<p>Crea también los archivos <code>__init__.py</code> vacíos para que Python trate las carpetas como paquetes:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">touch cargo_track/__init__.py cargo_track/routers/__init__.py
+</code></pre>
+</div>
+
+<h2>Arrancar el servidor</h2>
+<p>Asegurate de estar en la carpeta raíz del proyecto (<code>cargo-track-fastapi/</code>) con el entorno virtual activado. Luego ejecuta:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">uvicorn cargo_track.main:app --reload
+</code></pre>
+</div>
+
+<p>El comando tiene tres partes:</p>
+<ul>
+<li><code>cargo_track.main</code> es el módulo Python (el archivo <code>cargo_track/main.py</code>)</li>
+<li><code>:app</code> es el nombre del objeto FastAPI dentro de ese módulo</li>
+<li><code>--reload</code> hace que el servidor se reinicie automáticamente cada vez que guardas un archivo, sin que tengas que detenerlo y volver a ejecutarlo</li>
+</ul>
+<p>La primera vez que arranques verás el output de <code>echo=True</code> con los <code>CREATE TABLE</code> de cada modelo. Al final aparece:</p>
+<pre><code>INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+</code></pre>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-[#e9ecef] bg-[#fff5f0] text-[15px] leading-relaxed border-l-[#b03a14] border-l-dashed">
+    <span class="size-7 rounded-full shrink-0 text-white flex items-center justify-center text-[13px] mt-px bg-[#b03a14]"><i class="fa fa-bug"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#d4471a] mb-1">Algo va a fallar... · Ejecutar uvicorn desde la carpeta equivocada</p>
+        <p>Detén el servidor con <code>Ctrl+C</code>. Ahora entra a la subcarpeta <code>cargo_track/</code> y trata de arrancar uvicorn desde allí:</p>
+<pre><code class="lang-bash">cd cargo_track
+uvicorn cargo_track.main:app --reload
+</code></pre>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#1f8a5b] border border-[#e9ecef] bg-[#f1faf5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#1f8a5b] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-wrench"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#1f8a5b] mb-1">Cómo resolverlo</p>
+        <p>Verás un error como este:</p>
+<pre><code>ModuleNotFoundError: No module named 'cargo_track'
+</code></pre>
+<p>Python busca los módulos desde la carpeta donde ejecutas el comando. Si estás dentro de <code>cargo_track/</code>, el paquete <code>cargo_track</code> ya no es visible porque estás dentro de él. Siempre ejecuta <code>uvicorn</code> desde la carpeta raíz del proyecto, donde está el directorio <code>cargo_track/</code> como subcarpeta. Vuelve con <code>cd ..</code> y vuelve a ejecutar el comando.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint</p>
+        <p>Con el servidor corriendo, abre <code>http://127.0.0.1:8000</code> en el navegador. Debes ver:</p>
+<pre><code class="lang-json">{&quot;mensaje&quot;: &quot;Bienvenido a la API de Cargo Track&quot;}
+</code></pre>
+<p>Además, en la carpeta <code>cargo-track-fastapi/</code> debe haber aparecido un archivo <code>cargo_track.db</code>. Puedes verificarlo sin detener el servidor abriendo otra terminal:</p>
+<pre><code class="lang-bash">ls -la cargo_track.db
+</code></pre>
+<p>Si el archivo existe y el navegador muestra el JSON, la base de datos está creada y el servidor está listo para recibir peticiones.</p>
+
+    </div>
+</div>
+
+<h2>Sección opcional: PostgreSQL</h2>
+<p>Si prefieres usar PostgreSQL (por ejemplo, para prepararte para un despliegue en producción), el cambio es mínimo. Primero instala el driver:</p>
+<pre><code class="lang-bash">pip install psycopg2-binary
+</code></pre>
+<p>Luego cambia la URL de conexión en <code>database.py</code>:</p>
+<pre><code class="lang-python">DATABASE_URL = &quot;postgresql://usuario:contraseña@localhost:5432/cargo_track&quot;
+</code></pre>
+<p>Todo lo demás, los modelos, las sesiones y los endpoints, funciona igual. SQLModel abstrae las diferencias entre motores de base de datos.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#d4a017] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#d4a017] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-exclamation"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#b88914] mb-1">Ojo</p>
+        <p>Con PostgreSQL necesitas tener el servicio corriendo y la base de datos <code>cargo_track</code> creada antes de arrancar la aplicación. Con SQLite no hay nada que configurar: el archivo se crea solo la primera vez que arrancas el servidor.</p>
+
+    </div>
+</div>
+
+<h2>Guarda tu progreso</h2>
+<p>Haz un commit con los cambios de este paso:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">git add cargo_track/database.py cargo_track/main.py cargo_track/__init__.py cargo_track/routers/__init__.py
+git commit -m &#34;feat: conectar base de datos y crear punto de entrada con FastAPI&#34;</code></pre>
+</div>
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../05-relaciones-entre-modelos/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">Relaciones entre modelos</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../07-primeros-endpoints/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Siguiente paso →</span>
+                    <span class="text-[15px] font-bold text-slate-900">Primeros endpoints</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Disponible para proyectos remotos.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Síguenos</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Hecho con <i class="fa fa-heart text-coral"></i> en Colombia · construido con <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../static/workshop.js"></script>
+    <script src="../../../static/site.js"></script>
+</body>
+</html>

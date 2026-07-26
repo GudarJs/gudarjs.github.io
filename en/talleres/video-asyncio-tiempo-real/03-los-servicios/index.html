@@ -1,0 +1,740 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../../static/profile.png">
+    <title>El mundo exterior: cámaras y modelo · De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../../static/site.css">
+    <link rel="stylesheet" href="../../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Home</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Workshops</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../../talleres/video-asyncio-tiempo-real/03-los-servicios/">
+            <i class="fa fa-globe"></i> Español
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Hire me</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">03</strong> de <strong class="text-white">23</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-mapa-del-proyecto/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El mapa del proyecto</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>El mundo exterior: cámaras y modelo</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-el-problema/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El problema y el panorama</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-la-referencia/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La referencia: el número a batir</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../06-asyncio-101/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>asyncio 101: corrutinas, await y el event loop</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../07-primer-gather/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Tu primer gather, y el error que todos cometemos una vez</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../08-la-trampa-de-la-cpu/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La trampa de la CPU</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-el-executor-y-su-precio/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El executor, y el precio que trae</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-modelo-detras-de-un-socket/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El modelo detrás de un socket</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-ingesta-asincrona/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Ingesta asíncrona: transmitir, no leer</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../12-colas-y-backpressure/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Colas acotadas y backpressure</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-bloquear-o-descartar/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bloquear o descartar: elegir tu política</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-el-montaje/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El montaje: el pipeline completo</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-escala/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Escala: sesenta y cuatro cámaras</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../16-resiliencia/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Resiliencia: cuando una cámara se cae</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../17-apagado-limpio/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Apagado limpio</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../18-observabilidad/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Observabilidad: qué te dice una cola</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-bonus-webcam/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: tu webcam, la excepción honesta</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../20-bonus-camaras-ip/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: cámaras IP por RTSP</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../21-bonus-webrtc/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: video del navegador con WebRTC</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../22-bonus-gstreamer/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: cientos de streams con GStreamer, y el supervisor</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../23-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Lo que lograste, y por dónde seguir</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 3 de 23</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">El mundo exterior: cámaras y modelo</h1>
+
+        <p>Antes de construir tu pipeline necesitas algo a lo que conectarlo: cámaras que transmitan video y un modelo que detecte objetos.</p>
+<p>En un proyecto real esas dos cosas existen sin que tú las escribas: las cámaras cuelgan de una pared y el modelo corre en un servidor. Aquí las vamos a simular en tu máquina, y por eso este paso es el único del taller donde vas a copiar código sin analizarlo línea por línea.</p>
+<p><strong>Copia estos cuatro archivos tal cual y sigue adelante.</strong> No son la lección: son el escenario donde ocurre la lección.</p>
+
+
+<h2>Los videos que harán de cámaras</h2>
+<p>Primero necesitas material que transmitir. Crea <code>make_samples.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> make_samples.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">import cv2
+import numpy as np
+from pathlib import Path
+
+Path(&#34;videos&#34;).mkdir(exist_ok=True)
+
+def make_video(path, color, n_frames=150, size=(640, 480), fps=25):
+    w, h = size
+    writer = cv2.VideoWriter(path, cv2.VideoWriter_fourcc(*&#34;mp4v&#34;), fps, size)
+    for i in range(n_frames):
+        frame = np.full((h, w, 3), 30, dtype=np.uint8)
+        x = int((i / n_frames) * (w - 80))
+        cv2.rectangle(frame, (x, h // 2 - 40), (x + 80, h // 2 + 40), color, -1)
+        cv2.putText(frame, f&#34;{Path(path).stem}  frame {i}&#34;, (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+        writer.write(frame)
+    writer.release()
+    print(&#34;wrote&#34;, path)
+
+for idx, color in enumerate([(0, 0, 200), (0, 200, 0), (200, 0, 0), (0, 200, 200)]):
+    make_video(f&#34;videos/cam{idx}.mp4&#34;, color)
+</code></pre>
+</div>
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">python make_samples.py
+</code></pre>
+</div>
+
+<p>Eso crea cuatro clips de seis segundos con un rectángulo de color moviéndose. Si prefieres usar videos propios, cópialos a la carpeta <code>videos/</code> en vez de ejecutar esto: cualquier <code>.mp4</code> corto sirve, y si sale gente o carros el detector real tendrá algo que encontrar.</p>
+
+
+<h2>El servicio de cámaras</h2>
+<p>Este es el que convierte esos archivos en cámaras. Sirve cada clip como un stream MJPEG infinito por HTTP, recibe los eventos que tu pipeline publique, y aloja el dashboard.</p>
+<p>Crea <code>svc_cameras.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> svc_cameras.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">import asyncio
+import os
+from collections import deque
+from pathlib import Path
+
+import cv2
+from fastapi import FastAPI, Request
+from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
+
+N_CAMERAS = int(os.environ.get(&#34;N_CAMERAS&#34;, &#34;8&#34;))
+FPS = float(os.environ.get(&#34;CAMERA_FPS&#34;, &#34;25&#34;))
+BOUNDARY = &#34;frame&#34;
+
+app = FastAPI()
+app.state.clips = []
+app.state.events = deque(maxlen=200)
+app.state.subscribers = set()
+
+
+def load_clips():
+    frames_per_clip = []
+    for path in sorted(Path(&#34;videos&#34;).glob(&#34;*.mp4&#34;)):
+        cap = cv2.VideoCapture(str(path))
+        jpegs = []
+        while True:
+            ok, frame = cap.read()
+            if not ok:
+                break
+            ok, buf = cv2.imencode(&#34;.jpg&#34;, frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
+            if ok:
+                jpegs.append(buf.tobytes())
+        cap.release()
+        if jpegs:
+            frames_per_clip.append(jpegs)
+            print(f&#34;loaded {path.name}: {len(jpegs)} frames&#34;)
+    return frames_per_clip
+
+
+@app.on_event(&#34;startup&#34;)
+async def startup():
+    app.state.clips = load_clips()
+    if not app.state.clips:
+        raise SystemExit(&#34;no videos found in videos/ (run: python make_samples.py)&#34;)
+    print(f&#34;serving {N_CAMERAS} camera streams at {FPS} fps&#34;)
+
+
+@app.get(&#34;/cameras&#34;)
+async def cameras():
+    return {&#34;cameras&#34;: [f&#34;cam{i}&#34; for i in range(N_CAMERAS)], &#34;fps&#34;: FPS}
+
+
+async def mjpeg_stream(clip, offset):
+    delay = 1.0 / FPS
+    i = offset
+    while True:
+        jpeg = clip[i % len(clip)]
+        yield (b&#34;--&#34; + BOUNDARY.encode() + b&#34;\r\n&#34;
+               b&#34;Content-Type: image/jpeg\r\n&#34;
+               b&#34;Content-Length: &#34; + str(len(jpeg)).encode() + b&#34;\r\n\r\n&#34;
+               + jpeg + b&#34;\r\n&#34;)
+        i += 1
+        await asyncio.sleep(delay)
+
+
+@app.get(&#34;/stream/{cam_id}&#34;)
+async def stream(cam_id: str):
+    index = int(cam_id.removeprefix(&#34;cam&#34;))
+    clip = app.state.clips[index % len(app.state.clips)]
+    offset = (index * 37) % len(clip)
+    return StreamingResponse(
+        mjpeg_stream(clip, offset),
+        media_type=f&#34;multipart/x-mixed-replace; boundary={BOUNDARY}&#34;)
+
+
+@app.post(&#34;/events&#34;)
+async def publish(request: Request):
+    event = await request.json()
+    app.state.events.append(event)
+    dead = set()
+    for queue in app.state.subscribers:
+        try:
+            queue.put_nowait(event)
+        except asyncio.QueueFull:
+            dead.add(queue)
+    app.state.subscribers -= dead
+    return {&#34;ok&#34;: True}
+
+
+@app.get(&#34;/events/stream&#34;)
+async def event_stream():
+    queue = asyncio.Queue(maxsize=100)
+    app.state.subscribers.add(queue)
+
+    async def gen():
+        try:
+            while True:
+                event = await queue.get()
+                yield f&#34;data: {event}\n\n&#34;.replace(&#34;&#39;&#34;, &#39;&#34;&#39;)
+        finally:
+            app.state.subscribers.discard(queue)
+
+    return StreamingResponse(gen(), media_type=&#34;text/event-stream&#34;)
+
+
+app.mount(&#34;/&#34;, StaticFiles(directory=&#34;static&#34;, html=True), name=&#34;static&#34;)
+</code></pre>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#d4a017] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#d4a017] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-exclamation"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#b88914] mb-1">Ojo</p>
+        <p>Fíjate en una línea que te va a servir más adelante: <code>offset = (index * 37) % len(clip)</code>. Cada cámara arranca su clip en un punto distinto, así que aunque tengas un solo video puedes servir sesenta y cuatro cámaras y todas entregan frames diferentes. Eso es lo que hará posible el paso de escala sin que tengas que grabar nada.</p>
+
+    </div>
+</div>
+
+<h2>El servicio del modelo</h2>
+<p>Recibe una imagen por HTTP y devuelve las detecciones en JSON. Trae dos implementaciones: la real con YOLO y una simulada que duerme 30 milisegundos, para que el taller funcione sin PyTorch.</p>
+<p>Crea <code>svc_model.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> svc_model.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">import asyncio
+import os
+import random
+from concurrent.futures import ThreadPoolExecutor
+
+from fastapi import FastAPI, Request
+
+FAKE = os.environ.get(&#34;FAKE_MODEL&#34;) == &#34;1&#34;
+LATENCY = float(os.environ.get(&#34;FAKE_LATENCY&#34;, &#34;0.03&#34;))
+POOL_SIZE = int(os.environ.get(&#34;MODEL_THREADS&#34;, &#34;4&#34;))
+
+app = FastAPI()
+
+
+class RealModel:
+    def __init__(self):
+        import cv2
+        import numpy as np
+        from ultralytics import YOLO
+        self.cv2 = cv2
+        self.np = np
+        self.model = YOLO(&#34;yolo11n.pt&#34;)
+
+    def infer(self, jpeg: bytes):
+        arr = self.np.frombuffer(jpeg, dtype=self.np.uint8)
+        frame = self.cv2.imdecode(arr, self.cv2.IMREAD_COLOR)
+        if frame is None:
+            return []
+        results = self.model(frame, conf=0.35, verbose=False)[0]
+        h, w = frame.shape[:2]
+        out = []
+        for box in results.boxes:
+            x1, y1, x2, y2 = box.xyxy[0].tolist()
+            out.append({
+                &#34;label&#34;: results.names[int(box.cls)],
+                &#34;conf&#34;: round(float(box.conf), 3),
+                &#34;box&#34;: [x1 / w, y1 / h, x2 / w, y2 / h],
+            })
+        return out
+
+
+class FakeModel:
+    def infer(self, jpeg: bytes):
+        import time
+        time.sleep(LATENCY)
+        return [{&#34;label&#34;: &#34;person&#34;, &#34;conf&#34;: 0.9, &#34;box&#34;: [0.3, 0.3, 0.6, 0.9]}
+                for _ in range(random.randint(0, 3))]
+
+
+@app.on_event(&#34;startup&#34;)
+async def startup():
+    app.state.model = FakeModel() if FAKE else RealModel()
+    app.state.pool = ThreadPoolExecutor(max_workers=POOL_SIZE)
+    app.state.served = 0
+    print(f&#34;model service ready (fake={FAKE}, threads={POOL_SIZE})&#34;)
+
+
+@app.post(&#34;/detect&#34;)
+async def detect(request: Request):
+    jpeg = await request.body()
+    loop = asyncio.get_running_loop()
+    detections = await loop.run_in_executor(
+        app.state.pool, app.state.model.infer, jpeg)
+    app.state.served += 1
+    return {&#34;detections&#34;: detections, &#34;count&#34;: len(detections)}
+
+
+@app.get(&#34;/health&#34;)
+async def health():
+    return {&#34;ok&#34;: True, &#34;fake&#34;: FAKE, &#34;served&#34;: app.state.served}
+</code></pre>
+</div>
+
+<p>Ese servicio hace algo que vas a entender del todo en el paso 9, y que conviene que notes ya: <strong>mete el cálculo en un <code>ThreadPoolExecutor</code></strong>. El modelo es cómputo puro, así que el servicio lo aparta a un pool de hilos para no bloquear su propio event loop.</p>
+<p>Es la misma trampa que vas a sufrir en carne propia dentro de unos pasos, resuelta aquí porque este servicio no es la lección.</p>
+
+
+<h2>El lanzador</h2>
+<p>En vez de abrir dos terminales para los dos servicios, un pequeño lanzador los levanta juntos y los apaga juntos. Crea <code>services.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> services.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">import os
+import signal
+import subprocess
+import sys
+import time
+
+PROCS = [
+    (&#34;cameras&#34;, [&#34;uvicorn&#34;, &#34;svc_cameras:app&#34;, &#34;--port&#34;, &#34;8001&#34;, &#34;--log-level&#34;, &#34;warning&#34;]),
+    (&#34;model&#34;, [&#34;uvicorn&#34;, &#34;svc_model:app&#34;, &#34;--port&#34;, &#34;8002&#34;, &#34;--log-level&#34;, &#34;warning&#34;]),
+]
+
+
+def main():
+    env = os.environ.copy()
+    if &#34;--fake&#34; in sys.argv:
+        env[&#34;FAKE_MODEL&#34;] = &#34;1&#34;
+    if &#34;--cameras&#34; in sys.argv:
+        env[&#34;N_CAMERAS&#34;] = sys.argv[sys.argv.index(&#34;--cameras&#34;) + 1]
+
+    running = []
+    for name, cmd in PROCS:
+        print(f&#34;starting {name}: {&#39; &#39;.join(cmd)}&#34;)
+        running.append((name, subprocess.Popen(cmd, env=env)))
+
+    def shutdown(*_):
+        for name, proc in running:
+            proc.send_signal(signal.SIGINT)
+        for name, proc in running:
+            proc.wait()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, shutdown)
+    signal.signal(signal.SIGTERM, shutdown)
+
+    print(&#34;\ncameras   http://127.0.0.1:8001&#34;)
+    print(&#34;model     http://127.0.0.1:8002/health&#34;)
+    print(&#34;dashboard http://127.0.0.1:8001\n&#34;)
+
+    while True:
+        for name, proc in running:
+            if proc.poll() is not None:
+                print(f&#34;{name} exited with {proc.returncode}&#34;)
+                shutdown()
+        time.sleep(0.5)
+
+
+if __name__ == &#34;__main__&#34;:
+    main()
+</code></pre>
+</div>
+
+<h2>El dashboard</h2>
+<p>Falta la cara visible. Crea la carpeta <code>static/</code> y dentro el archivo <code>index.html</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> static/index.html</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">html</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+&lt;meta charset=&#34;utf-8&#34;&gt;
+&lt;title&gt;pipeline dashboard&lt;/title&gt;
+&lt;style&gt;
+  body { background:#0d1117; color:#c9d1d9; font:14px ui-monospace,monospace; margin:0; padding:16px; }
+  h1 { font-size:15px; font-weight:600; margin:0 0 14px; color:#79c0ff; }
+  #grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
+  .cam { position:relative; background:#000; border:1px solid #21262d; border-radius:4px; overflow:hidden; }
+  .cam img { width:100%; display:block; }
+  .cam canvas { position:absolute; inset:0; width:100%; height:100%; }
+  .cam span { position:absolute; top:4px; left:6px; font-size:11px; background:#000a; padding:1px 5px; border-radius:2px; }
+  #feed { margin-top:16px; border-top:1px solid #21262d; padding-top:10px; max-height:200px; overflow-y:auto; font-size:12px; color:#8b949e; }
+  #feed div { padding:1px 0; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;detections&lt;/h1&gt;
+&lt;div id=&#34;grid&#34;&gt;&lt;/div&gt;
+&lt;div id=&#34;feed&#34;&gt;&lt;/div&gt;
+&lt;script&gt;
+const grid = document.getElementById(&#34;grid&#34;);
+const feed = document.getElementById(&#34;feed&#34;);
+const canvases = {};
+
+fetch(&#34;/cameras&#34;).then(r =&gt; r.json()).then(({cameras}) =&gt; {
+  for (const cam of cameras) {
+    const box = document.createElement(&#34;div&#34;);
+    box.className = &#34;cam&#34;;
+    box.innerHTML = `&lt;img src=&#34;/stream/${cam}&#34;&gt;&lt;canvas&gt;&lt;/canvas&gt;&lt;span&gt;${cam}&lt;/span&gt;`;
+    grid.appendChild(box);
+    canvases[cam] = box.querySelector(&#34;canvas&#34;);
+  }
+});
+
+function draw(cam, detections) {
+  const c = canvases[cam];
+  if (!c) return;
+  c.width = c.clientWidth; c.height = c.clientHeight;
+  const ctx = c.getContext(&#34;2d&#34;);
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.strokeStyle = &#34;#3fb950&#34;; ctx.lineWidth = 2;
+  ctx.fillStyle = &#34;#3fb950&#34;; ctx.font = &#34;11px monospace&#34;;
+  for (const d of detections || []) {
+    const [x1, y1, x2, y2] = d.box;
+    const x = x1 * c.width, y = y1 * c.height;
+    ctx.strokeRect(x, y, (x2 - x1) * c.width, (y2 - y1) * c.height);
+    ctx.fillText(`${d.label} ${d.conf}`, x, Math.max(10, y - 3));
+  }
+}
+
+new EventSource(&#34;/events/stream&#34;).onmessage = (e) =&gt; {
+  const ev = JSON.parse(e.data);
+  draw(ev.cam_id, ev.detections);
+  const line = document.createElement(&#34;div&#34;);
+  line.textContent = `${ev.cam_id}  seq=${ev.seq}  count=${ev.count}`;
+  feed.prepend(line);
+  while (feed.childNodes.length &gt; 60) feed.lastChild.remove();
+};
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+</div>
+
+<p>Vale la pena entender qué hace esa página, porque explica algo del diseño: <strong>el video no pasa por tu pipeline</strong>. El <code>&lt;img src="/stream/cam0"&gt;</code> va directo del servicio de cámaras al navegador, y un MJPEG dentro de un <code>img</code> es simplemente una imagen que nunca termina de cargar.</p>
+<p>Lo único que aporta tu pipeline son las cajas, que llegan por <code>EventSource</code> y se dibujan encima en un canvas. Dos caminos independientes que se juntan en la pantalla.</p>
+
+
+<h2>Arráncalo</h2>
+<p>Con los cuatro archivos creados y los videos generados:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal 1</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">python services.py --fake --cameras 4
+</code></pre>
+</div>
+
+<p>Deja esa terminal abierta el resto del taller. Vas a trabajar siempre con dos: esta con los servicios, y otra donde escribirás y ejecutarás tu pipeline.</p>
+<p>Ahora abre <a href="http://127.0.0.1:8001">http://127.0.0.1:8001</a> en el navegador.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint · Cuatro cámaras transmitiendo</p>
+        <p>Deberías ver cuatro recuadros de video reproduciéndose a la vez, etiquetados <code>cam0</code> a <code>cam3</code>, y debajo un panel de eventos <strong>vacío</strong>.</p>
+<p>Está vacío a propósito: las cámaras transmiten y el modelo espera, pero <strong>todavía no hay nada que los conecte</strong>. Ese puente es lo que vas a construir en el resto del taller.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-[#e9ecef] bg-[#fff5f0] text-[15px] leading-relaxed border-l-[#b03a14] border-l-dashed">
+    <span class="size-7 rounded-full shrink-0 text-white flex items-center justify-center text-[13px] mt-px bg-[#b03a14]"><i class="fa fa-bug"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#d4471a] mb-1">Algo va a fallar... · Comprueba el modelo</p>
+        <p>Antes de seguir, asegúrate de que el segundo servicio también responde. En una terminal nueva:</p>
+<p><code>curl http://127.0.0.1:8002/health</code></p>
+<p>Si ves algo como <code>{"ok":true,"fake":true,"served":0}</code>, todo está en orden. Si en cambio la terminal se queda colgada o dice que no se pudo conectar, mira la terminal 1.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#1f8a5b] border border-[#e9ecef] bg-[#f1faf5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#1f8a5b] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-wrench"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#1f8a5b] mb-1">Cómo resolverlo · Los dos errores típicos aquí</p>
+        <p><strong><code>no videos found in videos/</code></strong>: el servicio de cámaras arrancó antes de que existieran los clips. Ejecuta <code>python make_samples.py</code> y vuelve a levantar los servicios.</p>
+<p><strong><code>ModuleNotFoundError: No module named 'uvicorn'</code></strong> o similar: el entorno virtual no está activo en esa terminal, o faltó el <code>pip install</code>. Fíjate si tienes el <code>(venv)</code> delante y repite la instalación del paso 1.</p>
+<p>Y si <code>curl</code> no existe en tu Windows, abre <code>http://127.0.0.1:8002/health</code> en el navegador: es lo mismo.</p>
+
+    </div>
+</div>
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../02-mapa-del-proyecto/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">El mapa del proyecto</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../04-el-problema/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Siguiente paso →</span>
+                    <span class="text-[15px] font-bold text-slate-900">El problema y el panorama</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Available for remote projects.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Follow</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Made with <i class="fa fa-heart text-coral"></i> in Colombia · built with <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../../static/workshop.js"></script>
+    <script src="../../../../static/site.js"></script>
+</body>
+</html>

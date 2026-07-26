@@ -1,0 +1,535 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../../static/profile.png">
+    <title>Validación con Pydantic · Cargo Track: Diseña una API de rastreo logístico con FastAPI — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../../static/site.css">
+    <link rel="stylesheet" href="../../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Home</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Workshops</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../../talleres/cargo-track-fastapi/08-validacion-con-pydantic/">
+            <i class="fa fa-globe"></i> Español
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Hire me</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">Cargo Track: Diseña una API de rastreo logístico con FastAPI</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">08</strong> de <strong class="text-white">19</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-entornos-virtuales/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Entornos virtuales</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../03-el-sistema-cargo-track/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El sistema Cargo Track</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-modelos-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Modelos de datos con SQLModel</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-relaciones-entre-modelos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Relaciones entre modelos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../06-la-base-de-datos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La base de datos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../07-primeros-endpoints/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Primeros endpoints</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>Validación con Pydantic</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-crear-y-actualizar-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Crear y actualizar envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-eliminar-y-cambiar-estados/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Eliminar y cambiar estados</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-manejo-de-errores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Manejo de errores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../12-autenticacion/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Autenticación con JWT</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-swagger/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Swagger: tu API documentada</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-streamlit-estructura/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: estructura y conexión</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-streamlit-envios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Envíos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../16-streamlit-clientes-conductores/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: módulo de Clientes y Conductores</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../17-streamlit-rastreo/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: rastreo de un envío</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../18-streamlit-ux/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Streamlit: pulir la experiencia de usuario</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Cierre</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 8 de 19</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">Validación con Pydantic</h1>
+
+        <p>En el paso anterior, los endpoints usan el modelo SQLModel (<code>Envio</code>) directamente como <code>response_model</code>. Eso funciona para leer datos, pero tiene un problema: el mismo modelo que define la tabla de la base de datos también controla qué información recibe el cliente y qué información devuelve la API. Eso mezcla dos responsabilidades.</p>
+<p>Por ejemplo, si el cliente pudiera enviar un <code>id</code> al crear un envío, estaría intentando asignarse su propio ID. Si pudiera enviar un <code>estado</code>, podría crear un envío directamente como <code>ENTREGADO</code>. La respuesta tampoco debería exponer campos internos innecesarios.</p>
+<p>La solución es tener <strong>schemas de Pydantic separados</strong> para cada operación: uno para recibir datos (<code>Create</code>), otro para devolver datos (<code>Read</code>), y otro para actualizaciones parciales (<code>Update</code>).</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#7d3cb5] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#7d3cb5] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-quote-left"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#7d3cb5] mb-1">Analogía · Los schemas son como formularios oficiales</p>
+        <p>Cuando solicitas un pasaporte, el funcionario te da un formulario de ingreso con solo los campos que puedes llenar tú: nombre, fecha de nacimiento, dirección. Cuando te entregan el pasaporte, el documento tiene campos diferentes: el número de pasaporte (lo asignó la entidad), la fecha de expedición, campos que tú no controlas.</p>
+<p>Un mismo "objeto" (la persona) tiene formularios distintos según la dirección del flujo de información. Los schemas de Pydantic funcionan igual: <code>Create</code> define qué puede enviar el cliente, <code>Read</code> define qué le devuelve la API.</p>
+
+    </div>
+</div>
+
+<h2>Por qué Create es diferente de Read</h2>
+<p>Mira la diferencia para el caso de <code>Envio</code>:</p>
+<table>
+<thead><tr>
+<th>Campo</th>
+<th>EnvioCreate (entrada)</th>
+<th>EnvioRead (salida)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>NO (lo asigna la base de datos)</td>
+<td>SI</td>
+</tr>
+<tr>
+<td><code>cliente_id</code></td>
+<td>SI</td>
+<td>SI</td>
+</tr>
+<tr>
+<td><code>origen</code></td>
+<td>SI</td>
+<td>SI</td>
+</tr>
+<tr>
+<td><code>destino</code></td>
+<td>SI</td>
+<td>SI</td>
+</tr>
+<tr>
+<td><code>peso</code></td>
+<td>SI</td>
+<td>SI</td>
+</tr>
+<tr>
+<td><code>descripcion</code></td>
+<td>SI</td>
+<td>SI</td>
+</tr>
+<tr>
+<td><code>estado</code></td>
+<td>NO (siempre empieza como PENDIENTE)</td>
+<td>SI</td>
+</tr>
+</tbody>
+</table>
+<p>Si usaras el mismo modelo para entrada y salida, el cliente podría intentar enviar un <code>id</code> o un <code>estado</code> arbitrario al crear un envío.</p>
+<h2>Los schemas de Cargo Track</h2>
+<p>Crea el archivo <code>cargo_track/schemas.py</code>. Vas a agregar los schemas en grupos para entender cada uno.</p>
+<p><strong>Schemas de Cliente:</strong></p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/schemas.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from typing import Optional
+from pydantic import BaseModel, EmailStr, field_validator
+from .models import EstadoEnvio
+
+
+class ClienteCreate(BaseModel):
+    nombre: str
+    email: EmailStr
+    telefono: Optional[str] = None
+
+
+class ClienteRead(BaseModel):
+    id: int
+    nombre: str
+    email: str
+    telefono: Optional[str]
+
+    model_config = {&#34;from_attributes&#34;: True}
+</code></pre>
+</div>
+
+<p><code>ClienteCreate</code> no tiene <code>id</code>: el cliente no puede asignarse su propio ID. El campo <code>email: EmailStr</code> usa un tipo especial de Pydantic que valida que el valor sea un email con formato válido. Si alguien envía <code>"esto-no-es-email"</code>, Pydantic lo rechaza antes de que el código del endpoint se ejecute.</p>
+<p><code>ClienteRead</code> sí incluye <code>id</code> porque la respuesta muestra el ID que la base de datos asignó. El <code>model_config = {"from_attributes": True}</code> le dice a Pydantic que puede construir este schema a partir de un objeto SQLModel. Sin esa configuración, Pydantic esperaría un diccionario y no sabría cómo leer los atributos de un objeto ORM.</p>
+<p><strong>Schemas de Envio:</strong></p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/schemas.py (agregar al final)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">class EnvioCreate(BaseModel):
+    cliente_id: int
+    origen: str
+    destino: str
+    peso: float
+    descripcion: Optional[str] = None
+
+    model_config = {
+        &#34;json_schema_extra&#34;: {
+            &#34;example&#34;: {
+                &#34;cliente_id&#34;: 1,
+                &#34;origen&#34;: &#34;Bogotá&#34;,
+                &#34;destino&#34;: &#34;Medellín&#34;,
+                &#34;peso&#34;: 5.5,
+                &#34;descripcion&#34;: &#34;Documentos urgentes&#34;,
+            }
+        }
+    }
+
+    @field_validator(&#34;peso&#34;)
+    @classmethod
+    def peso_positivo(cls, v):
+        if v &lt;= 0:
+            raise ValueError(&#34;El peso debe ser mayor que cero&#34;)
+        return v
+
+
+class EnvioRead(BaseModel):
+    id: int
+    cliente_id: int
+    origen: str
+    destino: str
+    peso: float
+    descripcion: Optional[str]
+    estado: EstadoEnvio
+
+    model_config = {&#34;from_attributes&#34;: True}
+
+
+class EnvioUpdate(BaseModel):
+    origen: Optional[str] = None
+    destino: Optional[str] = None
+    peso: Optional[float] = None
+    descripcion: Optional[str] = None
+</code></pre>
+</div>
+
+<p>Dos cosas nuevas aquí:</p>
+<p><strong><code>json_schema_extra</code></strong>: define los valores de ejemplo que aparecen automáticamente en el formulario de Swagger. Cuando abras <code>/docs</code> y expandes el endpoint <code>POST /envios</code>, el campo "Example Value" ya tiene datos de prueba listos. Documentas el API al mismo tiempo que desarrollas.</p>
+<p><strong><code>@field_validator("peso")</code></strong>: es un validador personalizado. Pydantic lo llama cada vez que alguien crea un <code>EnvioCreate</code>. Si el peso es cero o negativo, lanza un <code>ValueError</code>. FastAPI convierte ese error en un <code>422 Unprocessable Entity</code> automáticamente. El decorador <code>@classmethod</code> es requerido por Pydantic v2 para los validadores de campo.</p>
+<p><strong><code>EnvioUpdate</code></strong> tiene todos los campos como <code>Optional</code> con valor por defecto <code>None</code>. Eso permite enviar un PATCH con solo los campos que quieres cambiar. Origen puede faltar, destino puede faltar, etc. Cuando el endpoint reciba el body, usará <code>exclude_unset=True</code> para saber cuáles campos realmente envió el cliente.</p>
+<p><strong>Schemas de Conductor y estado:</strong></p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/schemas.py (agregar al final)</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">class CambioEstado(BaseModel):
+    estado: EstadoEnvio
+
+
+class ConductorCreate(BaseModel):
+    nombre: str
+    licencia: str
+    email: EmailStr
+
+
+class ConductorRead(BaseModel):
+    id: int
+    nombre: str
+    licencia: str
+    email: str
+
+    model_config = {&#34;from_attributes&#34;: True}
+</code></pre>
+</div>
+
+<p><code>CambioEstado</code> tiene un solo campo: el nuevo estado. Al usar <code>EstadoEnvio</code> (el enum que definiste en <code>models.py</code>), Pydantic valida que el valor sea uno de los estados válidos. Si el cliente envía <code>"VOLANDO"</code>, el error 422 llega automáticamente sin que escribas ningún <code>if</code>.</p>
+<h2>Actualizar el router para usar schemas</h2>
+<p>Actualiza <code>cargo_track/routers/envios.py</code> para usar <code>EnvioRead</code> en lugar del modelo SQLModel directamente:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> cargo_track/routers/envios.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+from ..database import get_session
+from ..models import Envio
+from ..schemas import EnvioRead
+
+router = APIRouter(prefix=&#34;/envios&#34;, tags=[&#34;Envíos&#34;])
+
+
+@router.get(&#34;/&#34;, response_model=list[EnvioRead])
+def listar_envios(session: Session = Depends(get_session)):
+    return session.exec(select(Envio)).all()
+
+
+@router.get(&#34;/{envio_id}&#34;, response_model=EnvioRead)
+def obtener_envio(envio_id: int, session: Session = Depends(get_session)):
+    envio = session.get(Envio, envio_id)
+    if not envio:
+        raise HTTPException(status_code=404, detail=&#34;Envío no encontrado&#34;)
+    return envio
+</code></pre>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-[#e9ecef] bg-[#fff5f0] text-[15px] leading-relaxed border-l-[#d4471a]">
+    <span class="size-7 rounded-full shrink-0 text-white flex items-center justify-center text-[13px] mt-px bg-[#d4471a]"><i class="fa fa-bug"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#d4471a] mb-1">Vamos a equivocarnos a propósito · Probar la validación de email inválido</p>
+        <p>Con el entorno virtual activado, abre una terminal nueva (diferente a la que corre uvicorn) y ejecuta:</p>
+<pre><code class="lang-bash">python -c &quot;
+from cargo_track.schemas import ClienteCreate
+ClienteCreate(nombre=&#39;Juan&#39;, email=&#39;esto-no-es-email&#39;)
+&quot;
+</code></pre>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#1f8a5b] border border-[#e9ecef] bg-[#f1faf5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#1f8a5b] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-wrench"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#1f8a5b] mb-1">Cómo resolverlo</p>
+        <p>Pydantic lanza una excepción de validación con el detalle del campo que falló:</p>
+<pre><code>pydantic_core._pydantic_core.ValidationError: 1 validation error for ClienteCreate
+email
+  value is not a valid email address [...]
+</code></pre>
+<p>Cuando esto ocurre dentro de un endpoint de FastAPI, la respuesta automática al cliente es un <code>422 Unprocessable Entity</code>:</p>
+<pre><code class="lang-json">{
+  &quot;detail&quot;: [
+    {
+      &quot;loc&quot;: [&quot;body&quot;, &quot;email&quot;],
+      &quot;msg&quot;: &quot;value is not a valid email address&quot;,
+      &quot;type&quot;: &quot;value_error.email&quot;
+    }
+  ]
+}
+</code></pre>
+<p>FastAPI valida todos los campos antes de que el código de tu endpoint se ejecute. Si la validación falla, retorna el 422 automáticamente, sin que tengas que escribir ningún <code>if</code> adicional. Esta es una de las grandes ventajas de combinar FastAPI con Pydantic.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint</p>
+        <p>Verifica que los schemas se importan sin errores:</p>
+<pre><code class="lang-bash">python -c &quot;from cargo_track.schemas import EnvioCreate, EnvioRead, ClienteCreate, CambioEstado, ConductorCreate, ConductorRead; print(&#39;OK&#39;)&quot;
+</code></pre>
+<p>Debes ver simplemente <code>OK</code> en la terminal. Si hay algún error de sintaxis o importación, aparecerá aquí antes de arrancar el servidor.</p>
+
+    </div>
+</div>
+
+<h2>Guarda tu progreso</h2>
+<p>Haz un commit con los cambios de este paso:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> terminal</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">bash</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-bash">git add cargo_track/schemas.py cargo_track/routers/envios.py
+git commit -m &#34;feat: agregar schemas Pydantic separados para entrada y salida&#34;</code></pre>
+</div>
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../07-primeros-endpoints/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">Primeros endpoints</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../09-crear-y-actualizar-envios/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Siguiente paso →</span>
+                    <span class="text-[15px] font-bold text-slate-900">Crear y actualizar envíos</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Available for remote projects.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Follow</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Made with <i class="fa fa-heart text-coral"></i> in Colombia · built with <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../../static/workshop.js"></script>
+    <script src="../../../../static/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,405 @@
+
+
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../static/profile.png">
+    <title>Bonus: cámaras IP por RTSP · De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../static/site.css">
+    <link rel="stylesheet" href="../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Inicio</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Talleres</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../en/talleres/video-asyncio-tiempo-real/20-bonus-camaras-ip/">
+            <i class="fa fa-globe"></i> English
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Contratar</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">20</strong> de <strong class="text-white">23</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-mapa-del-proyecto/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El mapa del proyecto</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../03-los-servicios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El mundo exterior: cámaras y modelo</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-el-problema/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El problema y el panorama</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-la-referencia/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La referencia: el número a batir</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../06-asyncio-101/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>asyncio 101: corrutinas, await y el event loop</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../07-primer-gather/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Tu primer gather, y el error que todos cometemos una vez</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../08-la-trampa-de-la-cpu/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La trampa de la CPU</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-el-executor-y-su-precio/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El executor, y el precio que trae</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-modelo-detras-de-un-socket/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El modelo detrás de un socket</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-ingesta-asincrona/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Ingesta asíncrona: transmitir, no leer</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../12-colas-y-backpressure/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Colas acotadas y backpressure</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-bloquear-o-descartar/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bloquear o descartar: elegir tu política</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-el-montaje/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El montaje: el pipeline completo</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-escala/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Escala: sesenta y cuatro cámaras</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../16-resiliencia/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Resiliencia: cuando una cámara se cae</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../17-apagado-limpio/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Apagado limpio</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../18-observabilidad/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Observabilidad: qué te dice una cola</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-bonus-webcam/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: tu webcam, la excepción honesta</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>Bonus: cámaras IP por RTSP</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../21-bonus-webrtc/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: video del navegador con WebRTC</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../22-bonus-gstreamer/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: cientos de streams con GStreamer, y el supervisor</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../23-cierre/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Lo que lograste, y por dónde seguir</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 20 de 23</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">Bonus: cámaras IP por RTSP</h1>
+
+        <p>Las cámaras de vigilancia de verdad, las que cuelgan de una pared y llevan años ahí, casi siempre hablan RTSP. Si vas a llevar este pipeline a un edificio real, este es el protocolo con el que te vas a encontrar.</p>
+<p>Y trae una sorpresa desagradable que conviene conocer antes de pelearse con ella.</p>
+
+
+<h2>Por qué RTSP no es como MJPEG</h2>
+<p>Compara lo que hiciste en el paso 9 con lo que exige RTSP:</p>
+<p><strong>MJPEG sobre HTTP</strong> manda imágenes JPEG completas, una detrás de otra. Cada frame llega listo para usar y no depende de los anteriores. Por eso pudiste leerlo con <code>aiohttp</code> y un par de <code>readexactly</code>.</p>
+<p><strong>RTSP</strong> transporta video comprimido de verdad, normalmente H.264. Ahí los frames no son independientes: la mayoría solo guarda <strong>las diferencias</strong> respecto a otro frame anterior. Para obtener una imagen usable hay que decodificar el flujo, y decodificar H.264 es cómputo pesado, del que ocupa la CPU sin ningún punto donde ceder.</p>
+<p>Es decir: RTSP no es un problema de red, es un problema de la trampa del paso 6.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#7d3cb5] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#7d3cb5] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-quote-left"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#7d3cb5] mb-1">Analogía · Dos formas de mandar un álbum de fotos</p>
+        <p>MJPEG es mandar cada foto entera, una por una. Ocupa mucho, pero abres cualquiera y ya está.</p>
+<p>H.264 es mandar la primera foto entera y después solo las notas de "en esta cambió la esquina de arriba, en la siguiente el señor se movió dos pasos". Ocupa muchísimo menos, y a cambio no puedes ver la foto veinte sin haber reconstruido antes las diecinueve anteriores.</p>
+<p>Esa reconstrucción es la decodificación, y alguien tiene que pagarla.</p>
+
+    </div>
+</div>
+
+<h2>La forma correcta de conectarla</h2>
+<p>La estructura es la misma del bonus anterior: la parte bloqueante va a un hilo, en el borde, envuelta en la misma interfaz que todas tus fuentes.</p>
+<p>Crea un archivo <code>rtsp_source.py</code>:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> rtsp_source.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">import asyncio
+import cv2
+
+RECONNECT_MAX = 30.0
+
+
+class RtspSource:
+    def __init__(self, cam_id, url, jpeg_quality=80):
+        self.cam_id = cam_id
+        self.url = url
+        self.jpeg_quality = jpeg_quality
+
+    def _open(self):
+        cap = cv2.VideoCapture(self.url, cv2.CAP_FFMPEG)
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        return cap if cap.isOpened() else None
+
+    def _grab(self, cap):
+        ok, frame = cap.read()
+        if not ok:
+            return None
+        ok, buf = cv2.imencode(
+            &#34;.jpg&#34;, frame, [cv2.IMWRITE_JPEG_QUALITY, self.jpeg_quality])
+        return buf.tobytes() if ok else None
+
+    async def frames(self):
+        backoff = 1.0
+        while True:
+            cap = await asyncio.to_thread(self._open)
+            if cap is None:
+                print(f&#34;[{self.cam_id}] cannot open, retry in {backoff:.0f}s&#34;)
+                await asyncio.sleep(backoff)
+                backoff = min(backoff * 2, RECONNECT_MAX)
+                continue
+
+            backoff = 1.0
+            try:
+                while True:
+                    jpeg = await asyncio.to_thread(self._grab, cap)
+                    if jpeg is None:
+                        break
+                    yield jpeg
+            finally:
+                await asyncio.to_thread(cap.release)
+
+            print(f&#34;[{self.cam_id}] stream ended, reconnecting&#34;)
+</code></pre>
+</div>
+
+<p>Repasa las decisiones, porque cada una viene de algo que ya aprendiste:</p>
+<p><strong><code>cv2.CAP_PROP_BUFFERSIZE, 1</code></strong> le pide a OpenCV que guarde un solo frame de reserva. Sin esto, la librería acumula un buffer interno y acabas analizando imágenes de hace varios segundos: exactamente el problema del paso 10, pero escondido dentro de una librería donde tu <code>maxsize</code> no llega.</p>
+<p><strong>El bucle exterior con backoff</strong> es el patrón del paso 14. Una cámara IP se cae, se reinicia, cambia de IP. Aquí no hay excepción que atrapar: <code>cap.read()</code> simplemente empieza a devolver <code>False</code>, así que salir del bucle interior es la señal de "se acabó el stream" y toca reconectar.</p>
+<p><strong>El <code>finally</code> con <code>release</code></strong> libera el descriptor pase lo que pase, incluida una cancelación durante el apagado del paso 15.</p>
+<p><strong>La interfaz es idéntica</strong> a <code>MjpegSource</code> y a la webcam: un generador asíncrono que entrega JPEG. Por eso encaja en el pipeline sin tocar nada más.</p>
+
+
+<h2>Conectarla al pipeline</h2>
+<p>En <code>main.py</code>, donde creas las tareas de ingesta, agrega tu cámara IP junto a las demás:</p>
+
+
+<div class="my-5 rounded-2xl overflow-hidden bg-slate-900 border border-black/10">
+    
+    <div class="flex items-center justify-between px-4 py-2.5 bg-black/25 font-mono text-xs text-white/70">
+        
+        <span class="flex items-center gap-2"><i class="fa fa-file-code-o text-white/50"></i> main.py</span>
+        
+        <span class="text-[10px] uppercase tracking-[0.1em] text-white/40">python</span>
+    </div>
+    
+    <pre class="m-0 p-[18px_20px] font-mono text-[13.5px] leading-[1.7] text-[#f5f5f5] overflow-x-auto bg-transparent"><code class="language-python">RTSP_URL = &#34;rtsp://user:password@192.168.1.50:554/stream1&#34;
+
+ingest = [
+    asyncio.create_task(ingest_source(MjpegSource(cam, session), infer_q, stats))
+    for cam in cameras]
+
+ingest.append(asyncio.create_task(
+    ingest_source(RtspSource(&#34;ipcam0&#34;, RTSP_URL), infer_q, stats)))
+</code></pre>
+</div>
+
+<p>Esa es toda la integración: una tarea más apuntando a la misma cola. La cámara IP compite por los mismos trabajadores de inferencia, respeta la misma política de descarte y aparece en el mismo dashboard.</p>
+<p>La URL exacta depende del fabricante. Los patrones más habituales son <code>rtsp://usuario:clave@ip:554/stream1</code>, <code>/h264Preview_01_main</code> en Reolink, o <code>/cam/realmonitor?channel=1&amp;subtype=0</code> en Dahua. Búscala en el manual de tu modelo o en el panel web de la cámara.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-[#d4a017] border border-[#e9ecef] bg-white text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-[#d4a017] text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-exclamation"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-[#b88914] mb-1">Ojo</p>
+        <p>Casi todas las cámaras IP publican <strong>dos</strong> streams: uno principal en alta resolución y otro secundario, mucho más pequeño. Para detección, el secundario suele ser suficiente y decodificarlo cuesta una fracción. Si vas a conectar varias cámaras, empieza siempre por el stream secundario: es la optimización más barata de todo este capítulo.</p>
+
+    </div>
+</div>
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint · Si tienes una cámara a mano</p>
+        <p>Con la cámara conectada a tu red, arranca el pipeline y busca <code>ipcam0</code> en el panel de eventos del dashboard, junto a las cámaras de archivo.</p>
+<p>Y ahora haz la prueba interesante: <strong>desconecta la cámara de la corriente o del cable de red.</strong> En la terminal vas a ver el mensaje de reconexión con su backoff creciendo, mientras las demás fuentes siguen entregando frames sin inmutarse. Vuelve a conectarla y al cabo de unos segundos reaparece sola.</p>
+<p>Eso es el paso 14 funcionando sobre hardware de verdad.</p>
+
+    </div>
+</div>
+
+<h2>Cuándo esto deja de escalar</h2>
+<p>Un hilo por cámara IP funciona bien hasta unas pocas fuentes. Pero fíjate en dónde te deja: cada cámara consume un hilo decodificando H.264 de forma continua, y eso es CPU real, no espera.</p>
+<p>Con cuatro cámaras, perfecto. Con cuarenta, tu máquina se queda sin CPU decodificando y ninguna cantidad de asyncio lo va a arreglar, porque el problema ya no es la concurrencia.</p>
+<p>Ese techo es justamente el tema del último bonus.</p>
+
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../19-bonus-webcam/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">Bonus: tu webcam, la excepción honesta</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../21-bonus-webrtc/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Siguiente paso →</span>
+                    <span class="text-[15px] font-bold text-slate-900">Bonus: video del navegador con WebRTC</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Disponible para proyectos remotos.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Síguenos</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Hecho con <i class="fa fa-heart text-coral"></i> en Colombia · construido con <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../static/workshop.js"></script>
+    <script src="../../../static/site.js"></script>
+</body>
+</html>

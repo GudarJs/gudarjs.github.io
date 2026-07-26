@@ -1,0 +1,310 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sitio personal de Guzmán D. Darío — Senior Python Developer">
+    <meta name="author" content="Guzmán D. Darío">
+    <meta name="theme-color" content="#1F4F6C">
+    <link rel="icon" type="image/png" href="../../../../static/profile.png">
+    <title>Lo que lograste, y por dónde seguir · De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio — Guzmán D. Darío</title>
+    <link rel="stylesheet" href="../../../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../../static/site.css">
+    <link rel="stylesheet" href="../../../../static/workshop.css">
+</head>
+<body>
+    <header class="topbar sticky top-0 z-50 bg-white border-b border-[#e9ecef] px-8">
+    <div class="max-w-[1140px] mx-auto flex items-center gap-6 h-[72px] max-[900px]:h-auto max-[900px]:flex-wrap max-[900px]:py-3.5 max-[900px]:gap-3">
+        <a class="flex items-center gap-3 no-underline hover:no-underline text-slate-900 hover:text-slate-900" href="../../../">
+            <img src="../../../../static/profile.png" alt="" class="brand-photo">
+            <span class="flex flex-col leading-tight">
+                <span class="text-[15px] font-bold text-slate-900">Guzmán D. Darío</span>
+                <span class="text-xs text-slate-400">Senior Python Developer</span>
+            </span>
+        </a>
+        <nav class="ml-auto max-[900px]:w-full max-[900px]:ml-0">
+            <ul class="flex items-center gap-1 list-none m-0 p-0 max-[900px]:flex-wrap">
+                <li><a href="../../../" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Home</a></li>
+                <li><a href="../../../cv/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">CV</a></li>
+                <li><a href="../../" class="topnav-link is-current inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Workshops</a></li>
+                <li><a href="../../../blog/" class="topnav-link  inline-block px-3.5 py-2.5 text-slate-600 text-sm font-medium rounded hover:bg-azure/10 hover:text-azure hover:no-underline transition-all">Blog</a></li>
+            </ul>
+        </nav>
+        <a class="px-3 py-1.5 text-slate-600 text-[13px] font-medium rounded border border-[#e9ecef] inline-flex items-center gap-1.5 hover:text-azure hover:border-azure hover:no-underline transition-all" href="../../../../talleres/video-asyncio-tiempo-real/23-cierre/">
+            <i class="fa fa-globe"></i> Español
+        </a>
+        <a class="hire-cta ml-2 px-6 py-2.5 bg-azure text-white rounded-full text-sm font-medium hover:bg-deep-blue hover:text-white hover:no-underline transition-all" href="mailto:guzman.d.dario@gmail.com"><i class="fa fa-envelope"></i> Hire me</a>
+    </div>
+</header>
+
+    
+
+
+
+
+
+
+
+<div class="bg-slate-900 text-white/95 py-4">
+    <div class="max-w-[1140px] mx-auto px-8 flex items-center gap-4 flex-wrap">
+        <span class="font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 border border-white/25 px-2 py-1 rounded">Taller autoguiado</span>
+        <h1 class="text-base font-bold text-white m-0"><a href="../" class="text-white hover:text-white hover:underline">De bloqueante a tiempo real: un pipeline de video multi-cámara con asyncio</a></h1>
+        <span class="ml-auto font-mono text-xs text-white/60 tracking-[0.06em]">Paso <strong class="text-white">23</strong> de <strong class="text-white">23</strong></span>
+    </div>
+</div>
+
+<div class="max-w-[1180px] mx-auto px-8 grid grid-cols-[280px_1fr] gap-12 pt-10 pb-20 max-[900px]:grid-cols-1 max-[900px]:px-4">
+    
+<nav class="sticky top-[100px] self-start text-sm max-[900px]:static">
+    <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-slate-400 mb-3.5 px-4">Pasos del taller</p>
+    <ol class="list-none p-0 m-0">
+        <li>
+            <a href="../" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Portada<span class="block font-mono text-[9px] tracking-[0.14em] uppercase text-coral mt-0.5">Empieza aquí</span></span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../01-prerrequisitos/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Prerrequisitos</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../02-mapa-del-proyecto/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El mapa del proyecto</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../03-los-servicios/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El mundo exterior: cámaras y modelo</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../04-el-problema/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El problema y el panorama</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../05-la-referencia/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La referencia: el número a batir</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../06-asyncio-101/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>asyncio 101: corrutinas, await y el event loop</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../07-primer-gather/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Tu primer gather, y el error que todos cometemos una vez</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../08-la-trampa-de-la-cpu/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>La trampa de la CPU</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../09-el-executor-y-su-precio/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El executor, y el precio que trae</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../10-modelo-detras-de-un-socket/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El modelo detrás de un socket</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../11-ingesta-asincrona/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Ingesta asíncrona: transmitir, no leer</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../12-colas-y-backpressure/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Colas acotadas y backpressure</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../13-bloquear-o-descartar/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bloquear o descartar: elegir tu política</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../14-el-montaje/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>El montaje: el pipeline completo</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../15-escala/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Escala: sesenta y cuatro cámaras</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../16-resiliencia/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Resiliencia: cuando una cámara se cae</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../17-apagado-limpio/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Apagado limpio</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../18-observabilidad/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Observabilidad: qué te dice una cola</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../19-bonus-webcam/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: tu webcam, la excepción honesta</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../20-bonus-camaras-ip/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: cámaras IP por RTSP</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../21-bonus-webrtc/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: video del navegador con WebRTC</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="../22-bonus-gstreamer/" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline text-slate-600 hover:bg-azure/6 hover:text-azure">
+                <span>Bonus: cientos de streams con GStreamer, y el supervisor</span>
+            </a>
+        </li>
+        
+        <li>
+            <a href="./" class="flex gap-3 items-start px-4 py-2.5 rounded-2xl no-underline leading-[1.4] transition-all hover:no-underline bg-azure/10 text-azure font-semibold">
+                <span>Lo que lograste, y por dónde seguir</span>
+            </a>
+        </li>
+        
+    </ol>
+</nav>
+    <main class="max-w-[720px] min-w-0">
+        <div class="flex gap-4 font-mono text-[11px] tracking-[0.08em] uppercase text-slate-400 mb-3.5">
+            <span><i class="fa fa-bookmark mr-1"></i> Paso 23 de 23</span>
+        </div>
+        <h1 class="text-[40px] font-black text-slate-900 leading-[1.1] tracking-[-0.01em] mb-[18px] max-[900px]:text-[30px]">Lo que lograste, y por dónde seguir</h1>
+
+        <p>Empezaste con un bucle de tres líneas que procesaba 12 frames por segundo y se caía al agregar la segunda cámara. Terminaste con un pipeline que aguanta sesenta y cuatro fuentes, sobrevive a que se caigan, se apaga sin perder trabajo y te dice dónde está su cuello de botella.</p>
+<p>Y todo en un solo hilo.</p>
+
+
+<h2>Lo que construiste</h2>
+<ul>
+<li><strong>Ingesta concurrente</strong> de varias cámaras MJPEG, cada frame llegando por un <code>await</code> sobre un socket, sin un solo hilo en la ruta.</li>
+<li><strong>Inferencia fuera de tu proceso</strong>, detrás de un servicio HTTP, de modo que el cómputo pesado nunca puede congelar tu event loop.</li>
+<li><strong>Colas acotadas</strong> entre etapas, con una política elegida a conciencia en cada una: descartar lo viejo en la ingesta, bloquear en la publicación.</li>
+<li><strong>Aislamiento de fallos</strong> por fuente, con timeouts para los cuelgues silenciosos y backoff exponencial para las reconexiones.</li>
+<li><strong>Apagado ordenado</strong> con señales, centinelas por trabajador y un plazo para dejar de ser educado.</li>
+<li><strong>Diagnóstico en vivo</strong> mirando la longitud de las colas, sin abrir un profiler.</li>
+<li><strong>Cuatro tipos de fuente</strong> conectados a la misma interfaz: archivos servidos por red, webcam USB, cámaras IP por RTSP y video del navegador por WebRTC.</li>
+</ul>
+
+
+<h2>Las ideas que sirven más allá del video</h2>
+<p>Si dentro de un año olvidas todo el código de este taller, que te queden estas seis:</p>
+<p><strong>Saca el cómputo pesado de tu proceso.</strong> Entonces tu event loop se convierte en un enrutador, y enrutar es lo que hace bien.</p>
+<p><strong>Desacopla con colas. Acotadas, siempre.</strong> Una cola sin límite no es comodidad, es una fuga de memoria con pasos extra.</p>
+<p><strong>Perder datos puede ser correcto, si lo elegiste tú.</strong> Lo que nunca es correcto es perderlos sin saber cuántos.</p>
+<p><strong>Mide las colas, no el código.</strong> En un sistema de etapas, el desequilibrio entre ellas te dice más que cualquier profiler.</p>
+<p><strong>Libera en <code>finally</code>. Relanza la cancelación.</strong> Los dos descuidos que convierten un apagado limpio en uno que se queda colgado.</p>
+<p><strong>Un hilo en el borde está bien. Todo el trabajo en hilos, no.</strong> Saber distinguir esas dos situaciones vale más que cualquier truco de sintaxis.</p>
+
+
+<h2>¿Y no habría sido más fácil con hilos?</h2>
+<p>Merece una respuesta honesta ahora que ya tienes criterio para juzgarla.</p>
+<p>Con cuatro cámaras y el modelo dentro del proceso: sí, y en menos líneas. De verdad.</p>
+<p>Lo que cambió la respuesta fueron tres cosas: el cómputo salió del proceso y ya no quedaba nada donde aparcar un hilo; el número de fuentes creció hasta que esperar barato empezó a importar; y timeouts, cancelación y concurrencia estructurada no tienen equivalente limpio con hilos.</p>
+<p>Elegir bien entre las dos opciones, y saber decir por qué, es el objetivo real de este taller.</p>
+
+
+<h2>Por dónde seguir</h2>
+<p><strong>Batching en el servicio del modelo.</strong> Ahora mandas una petición por frame. Juntar varios frames en una sola petición multiplica el rendimiento del modelo, y es la optimización con mejor relación esfuerzo/beneficio que te queda.</p>
+<p><strong>Persistencia de verdad.</strong> Tus eventos viven en memoria, en los últimos 200. Mándalos a una base de datos, a un topic de Kafka o a un archivo, y aprovecha para aplicar lo aprendido: esa escritura también quiere su cola con política propia.</p>
+<p><strong>Métricas de verdad.</strong> Exporta la longitud de las colas y las tasas por etapa a Prometheus, y móntate un panel. Ya tienes los números; solo falta sacarlos por un endpoint.</p>
+<p><strong>Concurrencia estructurada a fondo.</strong> Lee sobre <code>asyncio.TaskGroup</code> y sobre por qué la gente que diseñó Trio insiste en que las tareas no deberían poder escaparse de su ámbito.</p>
+<p><strong>Y si tu proyecto crece de verdad</strong>, vuelve al bonus 20: el video se va a un framework de medios y tu Python se queda con el plano de control.</p>
+
+
+<div class="flex gap-3.5 p-[18px_22px] my-[22px] rounded-2xl border-l-4 border-l-coral border border-[#e9ecef] bg-[#fff8f5] text-[15px] leading-relaxed">
+    <span class="size-7 rounded-full shrink-0 bg-coral text-white flex items-center justify-center text-[13px] mt-px"><i class="fa fa-flag"></i></span>
+    <div class="flex-1 min-w-0">
+        <p class="font-bold text-[13px] uppercase tracking-[0.06em] text-coral mb-1">Checkpoint · Gracias por llegar hasta aquí</p>
+        <p>Si algo de este taller no quedó claro, o si lo llevaste a un proyecto real y te topaste con algo que aquí no aparece, escríbeme. Los talleres mejoran con lo que cuenta la gente que los hace.</p>
+<p>Y si te sirvió, la mejor forma de fijarlo es enseñárselo a alguien más.</p>
+
+    </div>
+</div>
+
+        <div class="grid grid-cols-2 gap-4 mt-14 pt-8 border-t border-[#e9ecef] max-[900px]:grid-cols-1">
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)]" href="../22-bonus-gstreamer/">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">← Paso anterior</span>
+                    <span class="text-[15px] font-bold text-slate-900">Bonus: cientos de streams con GStreamer, y el supervisor</span>
+                </a>
+            
+            
+                <a class="flex flex-col gap-1.5 p-[18px_22px] bg-white border border-[#e9ecef] rounded-2xl no-underline transition-all hover:border-azure hover:no-underline hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(0,0,0,0.06)] text-right" href="../../">
+                    <span class="font-mono text-[10px] tracking-[0.12em] uppercase text-slate-400">Fin del taller →</span>
+                    <span class="text-[15px] font-bold text-slate-900">Volver a talleres</span>
+                </a>
+            
+        </div>
+    </main>
+</div>
+
+
+    <footer class="site-footer bg-slate-900 text-white/65 pt-14 pb-10 text-sm mt-20">
+    <div class="max-w-[1140px] mx-auto px-8 grid grid-cols-2 gap-10 items-start max-[900px]:grid-cols-1">
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Guzmán D. Darío</h4>
+            <p class="m-0 text-white/70 max-w-[30em] leading-relaxed">Senior Python Developer · Barranquilla, Colombia. Available for remote projects.</p>
+            <p class="mt-3.5 mb-0"><a href="mailto:guzman.d.dario@gmail.com" class="text-white/85 hover:text-white">guzman.d.dario@gmail.com</a></p>
+        </div>
+        <div>
+            <h4 class="text-white text-[13px] uppercase tracking-[0.12em] mb-3.5 font-bold">Follow</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="https://github.com/GudarJs" target="_blank" rel="noreferrer" aria-label="GitHub" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-github"></i></a>
+                <a href="https://linkedin.com/in/gudarjs" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-linkedin"></i></a>
+                <a href="https://twitter.com/GudarJs" target="_blank" rel="noreferrer" aria-label="Twitter" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-twitter"></i></a>
+                <a href="mailto:guzman.d.dario@gmail.com" aria-label="Email" class="size-[38px] rounded-full inline-flex items-center justify-center bg-white/8 text-white hover:bg-azure hover:text-white hover:no-underline transition-all"><i class="fa fa-envelope"></i></a>
+            </div>
+        </div>
+        <div class="col-span-2 border-t border-white/10 pt-5 mt-2 text-xs text-white/50 text-center max-[900px]:col-span-1">
+            Made with <i class="fa fa-heart text-coral"></i> in Colombia · built with <a href="https://www.getlektor.com/" target="_blank" rel="noreferrer" class="text-white/85 hover:text-white">Lektor</a>
+        </div>
+    </div>
+</footer>
+
+    <script src="../../../../static/workshop.js"></script>
+    <script src="../../../../static/site.js"></script>
+</body>
+</html>
