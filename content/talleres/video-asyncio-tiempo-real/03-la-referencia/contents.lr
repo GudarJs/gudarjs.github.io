@@ -1,0 +1,103 @@
+_model: taller-paso
+---
+title: La referencia: el número a batir
+---
+orden: 3
+---
+body:
+
+#### texto ####
+texto:
+
+Antes de arreglar algo hay que medirlo. Si no, al final del taller no vas a saber si mejoraste de verdad o si solo te lo parece.
+
+En este paso vas a correr el pipeline bloqueante, el de verdad, contra las cuatro cámaras que ya tienes transmitiendo. Y te vas a quedar con un número.
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+git checkout step-03-baseline
+
+#### texto ####
+texto:
+
+Abre `baseline.py` y míralo con calma. Es corto y no tiene trucos:
+
+#### codigo ####
+etiqueta: baseline.py
+----
+lenguaje: python
+----
+codigo:
+
+CAMERAS = ["cam0", "cam1", "cam2", "cam3"]
+FRAMES_PER_CAMERA = 40
+
+for cam in CAMERAS:
+    for jpeg in read_frames(cam, FRAMES_PER_CAMERA):
+        result = detect(jpeg)
+        publish(result)
+
+#### texto ####
+texto:
+
+Cuatro cámaras, cuarenta frames de cada una, ciento sesenta en total. Y el detalle que importa: el `for` de arriba. La `cam1` no empieza hasta que la `cam0` terminó sus cuarenta frames. Es literalmente el cocinero atendiendo un pedido a la vez.
+
+Las funciones `read_frames`, `detect` y `publish` son bloqueantes: usan `urllib` y esperan sentadas a que la red conteste. Nada de esto es un error todavía. Es simplemente la forma directa de escribirlo.
+
+Ejecútalo:
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+python baseline.py
+
+#### texto ####
+texto:
+
+Tarda unos trece segundos. Mientras esperas, mira el dashboard en el navegador: los eventos empiezan a aparecer, pero **de a una cámara**. Primero solo `cam0`, luego solo `cam1`. Puedes ver la fila de espera con tus ojos.
+
+Al terminar imprime algo parecido a esto:
+
+#### codigo ####
+etiqueta: salida
+----
+lenguaje: text
+----
+codigo:
+
+4 cameras, 160 frames, one at a time
+elapsed: 13.2s   throughput: 12.1 frames/s
+
+#### checkpoint ####
+titulo: Tu número de referencia
+----
+texto:
+
+**Anota tu cifra de `throughput`.** En la máquina donde se escribió este taller fueron 12.1 frames por segundo; en la tuya será parecida, quizá 10 o 15 según el equipo. Da igual el valor exacto: lo que importa es que es **tu** punto de partida.
+
+Ni un frame se perdió: los ciento sesenta se procesaron. Eso también importa, porque más adelante vamos a empezar a descartar frames a propósito y querrás comparar peras con peras.
+
+#### texto ####
+texto:
+
+## Pon el número en contexto
+
+Cuatro cámaras a 25 frames por segundo producen **100 frames por segundo** entre todas. Tu pipeline procesa 12. Es decir, vas por detrás de la realidad a razón de ocho a uno, y esa brecha crece cada segundo que pasa.
+
+Y ahora la pregunta que ordena el resto del taller: **¿dónde se fue el tiempo?** No en calcular. Tu proceso se pasó esos trece segundos casi entero esperando: esperando a que la cámara mandara el siguiente frame, esperando a que el modelo contestara, esperando a que se publicara el evento.
+
+Un pipeline que se pasa el tiempo esperando es exactamente el caso donde asyncio brilla. Vamos a por él.
+
+#### advertencia ####
+texto:
+
+Guarda tu número donde puedas verlo. Lo vas a comparar en el paso 12, cuando el pipeline completo esté funcionando, y la diferencia es la mejor parte del taller.

@@ -1,0 +1,130 @@
+_model: taller-paso
+---
+title: Observabilidad: qué te dice una cola
+---
+orden: 16
+---
+body:
+
+#### texto ####
+texto:
+
+Tu pipeline funciona, escala y se apaga bien. Falta lo que separa un sistema que corre de uno que puedes operar: saber, en cualquier momento, **dónde está el cuello de botella**.
+
+Y la buena noticia es que ya construiste el instrumento sin darte cuenta. Las colas te lo dicen.
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+git checkout step-13-observability
+
+#### texto ####
+texto:
+
+## Tres estados y tres diagnósticos
+
+La longitud de una cola no es un número decorativo: es la relación entre quien produce y quien consume, medida en tiempo real. Solo hay tres casos.
+
+**Casi vacía.** El consumidor va más rápido que el productor y le sobra capacidad. La cola casi nunca acumula nada. Si esto pasa en todas tus colas, tienes margen de sobra.
+
+**Estable a media altura.** Producción y consumo van igualados. Es el estado sano de un sistema bien dimensionado: hay un colchón para absorber picos, pero no crece.
+
+**Siempre al máximo.** El consumidor no da abasto. La cola vive llena y el productor o espera o descarta. **Ahí está tu cuello de botella**, sin ambigüedad.
+
+#### imagen ####
+imagen: queue-diagnosis.gif
+----
+pie: Las tres lecturas de una cola. La primera casi vacía, la segunda estable a media altura, la tercera pegada al tope: esa última es la que señala el cuello de botella.
+
+#### analogia ####
+titulo: El fregadero
+----
+texto:
+
+Abre el grifo y mira el fregadero. Si el agua baja tan rápido como entra, no se acumula nada: el desagüe puede con todo.
+
+Si el nivel sube hasta el borde y se queda ahí, el desagüe no da abasto. Y fíjate en lo que ese nivel te dice: no necesitas medir el desagüe ni desarmar la tubería. **El nivel del agua ya te señaló el problema.**
+
+Una cola llena es exactamente eso.
+
+#### texto ####
+texto:
+
+## Verlo en vivo
+
+La rama trae un monitor que imprime el estado cada segundo. Levanta los servicios con muchas cámaras y arranca el pipeline:
+
+#### codigo ####
+etiqueta: terminal 1
+----
+lenguaje: bash
+----
+codigo:
+
+python services.py --fake --cameras 64
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+INFER_WORKERS=16 python main.py
+
+#### codigo ####
+etiqueta: salida
+----
+lenguaje: text
+----
+codigo:
+
+infer= 32  publish=  0    read=1520.0/s  inferred= 118.0/s  dropped=1402.0/s
+infer= 32  publish=  1    read=1498.0/s  inferred= 121.0/s  dropped=1377.0/s
+
+#### texto ####
+texto:
+
+Lee esa salida como un diagnóstico médico, de izquierda a derecha:
+
+**`infer= 32`**, y el `maxsize` de esa cola es justamente 32. No baja de ahí. La cola de inferencia vive llena: el cuello de botella está en el modelo.
+
+**`publish= 0` o `1`**. La cola de publicación está casi siempre vacía, así que la etapa de publicación va sobrada y no es el problema.
+
+**`dropped` sigue el ritmo de `read`.** Como la primera cola está llena, casi todo lo que entra se descarta. Coherente con lo anterior.
+
+Con dos números por segundo sabes exactamente dónde invertir: no en optimizar la publicación, no en leer más rápido las cámaras, sino en darle más capacidad al modelo. Que es lo que hiciste en el paso 13 subiendo `MODEL_THREADS`.
+
+#### checkpoint ####
+titulo: Sin abrir un profiler
+----
+texto:
+
+Deberías estar viendo la primera cola pegada a su tope y la segunda casi vacía. Ahora repite el experimento del paso 13: para los servicios y vuelve a levantarlos con `MODEL_THREADS=16`.
+
+Mira cómo cambia la primera columna. Esa es la diferencia entre adivinar y medir.
+
+#### texto ####
+texto:
+
+## Por qué esto es mejor que un profiler
+
+Un profiler te dice en qué funciones se va el tiempo dentro de tu proceso. Pero en este pipeline **tu proceso casi no hace nada**: espera sockets. Un profiler te diría que te pasas la vida en `select` o en `epoll`, que es cierto y completamente inútil.
+
+Las colas, en cambio, miden lo que de verdad importa en un sistema de etapas: **el desequilibrio entre ellas**. Y funcionan igual si el cuello de botella está en otra máquina, en un servicio ajeno o en la red.
+
+#### advertencia ####
+texto:
+
+Instrumenta tus colas desde el primer día, no cuando ya tengas un problema. Son tres líneas de código y te ahorran tardes enteras de suposiciones. Y si vas a mandar métricas a algún sitio, la longitud de cada cola es el primer número que deberías exportar.
+
+#### checkpoint ####
+texto:
+
+Con esto termina el pipeline. Tienes ingesta concurrente, inferencia fuera del proceso, colas con política explícita, aislamiento de fallos, apagado ordenado y diagnóstico en vivo.
+
+Lo que viene son cuatro capítulos bonus: conectar fuentes de video reales, y ver qué forma toma todo esto cuando pasas a cientos de streams.

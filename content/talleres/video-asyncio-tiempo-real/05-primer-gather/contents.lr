@@ -1,0 +1,160 @@
+_model: taller-paso
+---
+title: Tu primer gather, y el error que todos cometemos una vez
+---
+orden: 5
+---
+body:
+
+#### texto ####
+texto:
+
+Teoría suficiente. Vamos a verlo correr.
+
+En la rama `step-04-asyncio-101` que ya tienes hay un archivo llamado `hello_async.py`. Ábrelo entero, son doce líneas:
+
+#### codigo ####
+etiqueta: hello_async.py
+----
+lenguaje: python
+----
+codigo:
+
+import asyncio
+import time
+
+async def task(name, seconds):
+    print(f"{name}: starting")
+    await asyncio.sleep(seconds)
+    print(f"{name}: done after {seconds}s")
+
+async def main():
+    t0 = time.perf_counter()
+    await asyncio.gather(
+        task("A", 2),
+        task("B", 1),
+        task("C", 3),
+    )
+    print(f"total: {time.perf_counter() - t0:.1f}s")
+
+asyncio.run(main())
+
+#### texto ####
+texto:
+
+Tres piezas nuevas que vale la pena nombrar:
+
+- **`asyncio.sleep(seconds)`** simula una espera de red. Es el equivalente de juguete a "pedirle un frame a la cámara".
+- **`asyncio.gather(...)`** lanza varias corrutinas a la vez y espera a que todas terminen.
+- **`asyncio.run(main())`** arranca el event loop y ejecuta tu corrutina principal. Es la puerta de entrada: todo lo asíncrono vive dentro.
+
+Antes de ejecutarlo, haz una predicción en voz alta. Las tres tareas duran 2, 1 y 3 segundos. ¿Cuánto va a tardar el total?
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+python hello_async.py
+
+#### codigo ####
+etiqueta: salida
+----
+lenguaje: text
+----
+codigo:
+
+A: starting
+B: starting
+C: starting
+B: done after 1s
+A: done after 2s
+C: done after 3s
+total: 3.0s
+
+#### texto ####
+texto:
+
+Tres segundos, no seis. Ahí está la concurrencia, y esa salida te dice exactamente cómo funciona:
+
+Las tres líneas de `starting` salen **de golpe**, antes de que ninguna termine. Las tres tareas arrancaron sin esperarse entre ellas. Y luego terminan **en orden de duración**, no en el orden en que las escribiste: primero la B que dormía un segundo, después la A, al final la C.
+
+El event loop arrancó la A, se topó con su `await asyncio.sleep(2)`, la apartó y arrancó la B. Lo mismo. Arrancó la C. Y a partir de ahí se dedicó a despertar a cada una cuando le tocaba.
+
+#### checkpoint ####
+titulo: Tres segundos
+----
+texto:
+
+Si tu salida dice `total: 3.0s`, acabas de ver el modelo mental completo de asyncio funcionando. Todo el resto del taller es aplicar esta misma idea a cámaras y modelos en vez de a `sleep`.
+
+#### texto ####
+texto:
+
+## Ahora el error que todos cometemos una vez
+
+En la misma rama hay otro archivo, `never_awaited.py`. Es casi idéntico, con una diferencia:
+
+#### codigo ####
+etiqueta: never_awaited.py
+----
+lenguaje: python
+----
+codigo:
+
+import asyncio
+
+async def task(name, seconds):
+    print(f"{name}: starting")
+    await asyncio.sleep(seconds)
+    print(f"{name}: done after {seconds}s")
+
+async def main():
+    task("A", 2)      # <- no await
+    print("end")
+
+asyncio.run(main())
+
+#### error_provocado ####
+modo: guiado
+----
+titulo: Vamos a olvidar un await a propósito
+----
+texto:
+
+Fíjate en la línea marcada: llama a `task("A", 2)` pero **sin `await`**. Es el error más común de quien empieza con asyncio, y lo vamos a provocar ahora mismo para que aprendas a reconocerlo.
+
+Ejecuta `python never_awaited.py` y mira bien lo que sale:
+
+`RuntimeWarning: coroutine 'task' was never awaited`
+`  task("A", 2)      # <- no await`
+`end`
+
+#### solucion_error ####
+titulo: Construiste la receta y no la cocinaste
+----
+texto:
+
+Lo importante de esta salida es lo que **no** está: ni `A: starting` ni `A: done after 2s`. La tarea nunca corrió.
+
+¿Por qué? Porque, como viste en el paso anterior, llamar a una corrutina no la ejecuta: crea un objeto y ya. Como nadie hizo `await` de ese objeto, Python lo recogió sin haberlo ejecutado jamás y te avisó al final.
+
+Y ahora la parte que duele: **esto no es una excepción**. No hay traceback, no hay error, el programa termina con código de salida cero como si todo hubiera ido bien. Solo un aviso perdido entre la salida. En un pipeline grande, un `await` olvidado significa una etapa entera que simplemente no hace nada, en silencio.
+
+Para arreglarlo, agrega el `await`:
+
+`await task("A", 2)`
+
+Vuelve a ejecutarlo y ahora sí verás las dos líneas de la tarea.
+
+#### advertencia ####
+texto:
+
+Guarda ese mensaje en la memoria: `coroutine ... was never awaited`. Cuando en el paso 12 una etapa de tu pipeline no haga nada y no entiendas por qué, este aviso va a estar en tu terminal esperándote.
+
+#### checkpoint ####
+texto:
+
+Ya sabes lanzar varias corrutinas a la vez con `gather`, leer la salida para confirmar que corrieron concurrentemente, y reconocer el aviso de un `await` olvidado. En el siguiente paso vamos a romper el event loop a propósito.

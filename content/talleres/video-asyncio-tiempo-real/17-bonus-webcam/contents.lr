@@ -1,0 +1,131 @@
+_model: taller-paso
+---
+title: Bonus: tu webcam, la excepción honesta
+---
+orden: 17
+---
+body:
+
+#### texto ####
+texto:
+
+Llevas todo el taller oyendo que los hilos sobran. Este capítulo es donde eso deja de ser cierto, y merece contarse con la misma claridad que el resto.
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+git checkout step-14-webcam
+
+#### texto ####
+texto:
+
+## El problema con el hardware
+
+Tus cámaras hasta ahora llegaban por la red, y la red tiene API asíncrona: `aiohttp` te deja esperar bytes cediendo el control.
+
+Una webcam USB no. Se lee con OpenCV:
+
+#### codigo ####
+etiqueta: lo que hace OpenCV
+----
+lenguaje: python
+----
+codigo:
+
+cap = cv2.VideoCapture(0)
+ok, frame = cap.read()
+
+#### texto ####
+texto:
+
+Ese `cap.read()` es una llamada bloqueante que baja hasta el driver del sistema operativo. Tarda lo que tarde el hardware en entregar el cuadro, y durante ese tiempo **no hay ningún `await` posible**. No existe una versión asíncrona: no es que OpenCV no la haya implementado, es que el sistema operativo no ofrece esa interfaz para capturar video.
+
+Es exactamente la trampa del paso 6, pero esta vez no la puedes esquivar cambiando de arquitectura. Es hardware.
+
+#### texto ####
+texto:
+
+## Aquí sí, un hilo
+
+Y para esto existe la herramienta que aprendiste en el paso 7. Abre la fuente de webcam:
+
+#### codigo ####
+etiqueta: sources.py
+----
+lenguaje: python
+----
+codigo:
+
+async def frames(self):
+    cap = await asyncio.to_thread(self._open)
+    try:
+        while True:
+            jpeg = await asyncio.to_thread(self._grab, cap)
+            if jpeg is None:
+                break
+            yield jpeg
+    finally:
+        await asyncio.to_thread(cap.release)
+
+#### texto ####
+texto:
+
+`asyncio.to_thread(funcion, *args)` es la forma corta de `run_in_executor`: manda esa llamada bloqueante a un hilo y te devuelve algo que puedes esperar con `await`. El event loop queda libre mientras el driver hace lo suyo.
+
+Fíjate en tres decisiones de diseño:
+
+- **El hilo está en el borde**, en la única pieza que toca hardware, no repartido por todo el sistema.
+- **La interfaz es idéntica** a la de `MjpegSource`: un generador asíncrono que entrega JPEG. El resto del pipeline no se entera de que esta fuente es distinta.
+- **El `finally` con `cap.release()`** libera la cámara pase lo que pase, incluida una cancelación. Sin él, la webcam se queda tomada y ni tu programa ni ningún otro puede abrirla hasta que reinicies.
+
+#### analogia ####
+titulo: El intérprete
+----
+texto:
+
+Todo el pipeline habla el idioma de asyncio. La webcam solo habla el idioma bloqueante del sistema operativo, y no va a aprender otro.
+
+`to_thread` es el intérprete que pones en la frontera: un hilo dedicado a traducir. No conviertes tu empresa entera al otro idioma, ni obligas a la cámara a cambiar. Pones a una persona en la puerta.
+
+#### texto ####
+texto:
+
+## Pruébalo
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+WEBCAM=1 python main.py
+
+#### checkpoint ####
+titulo: Tú, en el dashboard
+----
+texto:
+
+Abre el dashboard y busca la fuente nueva junto a las cámaras de video: es tu cara, con las mismas cajas de detección dibujadas encima y los mismos eventos en el panel de abajo.
+
+La webcam pasó por la misma cola, los mismos trabajadores de inferencia y la misma publicación que todo lo demás. Esa uniformidad es la recompensa de haberla envuelto en la misma interfaz.
+
+#### advertencia ####
+texto:
+
+En macOS, la primera vez que ejecutes esto el sistema te va a pedir permiso para acceder a la cámara desde la terminal. Si lo rechazas sin querer, tendrás que habilitarlo a mano en Ajustes del Sistema, Privacidad y seguridad, Cámara. Y si otra aplicación está usando la webcam, `cv2.VideoCapture(0)` va a fallar o devolver cuadros negros: ciérrala antes.
+
+#### texto ####
+texto:
+
+## La regla que te llevas
+
+Esta es la lección general del capítulo, y sirve para cualquier proyecto asíncrono:
+
+**Un hilo en el borde, envuelto en la misma interfaz que todo lo demás, es una decisión de diseño correcta.** Lo que no lo es, y viste por qué en el paso 7, es que todo tu trabajo real acabe en hilos y el event loop se quede repartiendo objetos.
+
+Reconocer la diferencia entre esas dos situaciones es, probablemente, lo más útil que te llevas de este taller.

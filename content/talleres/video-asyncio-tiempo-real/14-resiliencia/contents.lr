@@ -1,0 +1,167 @@
+_model: taller-paso
+---
+title: Resiliencia: cuando una cámara se cae
+---
+orden: 14
+---
+body:
+
+#### texto ####
+texto:
+
+Hasta ahora todas tus cámaras se han portado bien, porque son archivos de video servidos desde tu propia máquina. En producción no pasa eso. Las cámaras se quedan sin red, se reinician, se cuelgan a mitad de un frame, o alguien las desenchufa.
+
+La pregunta de este paso es simple: cuando una de sesenta y cuatro falla, ¿qué le pasa a las otras sesenta y tres?
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+git checkout step-11-resilience
+
+#### texto ####
+texto:
+
+## El fallo que no da error
+
+Empecemos por el más traicionero. Una cámara puede dejar de mandar frames **sin cerrar la conexión**: el socket sigue abierto, nadie lanza una excepción, y tu `await reader.readexactly(...)` se queda esperando para siempre.
+
+No es un error, es un silencio. Y con la ingesta bloqueante del paso 3, ese silencio te colgaba el programa entero.
+
+La respuesta cabe en dos líneas:
+
+#### codigo ####
+etiqueta: sources.py
+----
+lenguaje: python
+----
+codigo:
+
+async with asyncio.timeout(self.stall_timeout):
+    yield await self._read_part(response.content)
+
+#### texto ####
+texto:
+
+`asyncio.timeout(segundos)` envuelve cualquier trozo de código asíncrono y, si tarda más de la cuenta, cancela lo que haya dentro y lanza `TimeoutError`. Sin hilos vigilantes, sin banderas, sin comprobar relojes a mano.
+
+Esta es una de las cosas que no tienen equivalente limpio con hilos: un hilo bloqueado en un socket muerto no se puede interrumpir desde fuera. Una corrutina sí.
+
+#### texto ####
+texto:
+
+## Y cuando falla, reintentar con cabeza
+
+Detectado el fallo, hay que volver a conectar. Pero no a lo bruto:
+
+#### codigo ####
+etiqueta: sources.py
+----
+lenguaje: python
+----
+codigo:
+
+except (aiohttp.ClientError, TimeoutError) as e:
+    print(f"[{self.cam_id}] {type(e).__name__}, retry in {backoff:.1f}s")
+    await asyncio.sleep(backoff)
+    backoff = min(backoff * 2, MAX_BACKOFF)
+
+#### texto ####
+texto:
+
+Eso es **backoff exponencial**: espera 1 segundo, luego 2, luego 4, luego 8, hasta un tope. Si la cámara volvió, reconectas enseguida. Si está caída de verdad, dejas de martillearla cada milisegundo.
+
+#### analogia ####
+titulo: Llamar a alguien que no contesta
+----
+texto:
+
+Si llamas a un amigo y no contesta, no vuelves a marcar inmediatamente cincuenta veces seguidas. Esperas un poco, lo intentas otra vez, y si sigue sin contestar esperas más.
+
+Un reintento sin backoff contra un servicio caído es peor que no reintentar: le impide levantarse, porque le llega una avalancha de conexiones justo cuando está arrancando.
+
+#### texto ####
+texto:
+
+## Que muera una no puede matar al resto
+
+Falta la pieza más importante: el aislamiento. Mira cómo se envuelve la ingesta de cada fuente:
+
+#### codigo ####
+etiqueta: pipeline.py
+----
+lenguaje: python
+----
+codigo:
+
+try:
+    async for jpeg in source.frames():
+        ...
+except asyncio.CancelledError:
+    raise
+except Exception as e:
+    print(f"[{source.cam_id}] gave up: {e!r} (others continue)")
+
+#### texto ####
+texto:
+
+Los dos `except` están en ese orden por una razón crítica.
+
+**`except Exception`** atrapa el fallo de esa cámara y lo deja ahí, dentro de su propia tarea. Las demás ni se enteran. Sin esto, si usas un `TaskGroup`, una excepción en un hijo cancela a todos sus hermanos: una cámara mala tumbaría las sesenta y tres buenas.
+
+**`except asyncio.CancelledError: raise`** va **antes**, y esto es lo que más gente hace mal. `CancelledError` es cómo asyncio te pide que termines, por ejemplo cuando apagas el programa. Si lo atrapas y no lo relanzas, tu tarea se niega a morir y el apagado se queda esperándola.
+
+La regla, para toda tu carrera con asyncio: **la cancelación no se traga nunca.**
+
+#### texto ####
+texto:
+
+## Pruébalo con cámaras rotas
+
+La rama trae un programa que lanza tres fuentes a la vez: una sana, una que no existe y una apuntando a un puerto donde no hay nadie.
+
+#### codigo ####
+etiqueta: test_resilience.py
+----
+lenguaje: python
+----
+codigo:
+
+good = MjpegSource("cam0", session)
+missing = MjpegSource("cam999", session, reconnect=False)
+wrong_port = MjpegSource(
+    "cam0", session, base="http://127.0.0.1:9999", reconnect=False)
+
+await asyncio.gather(
+    take(good, 10, "healthy   "),
+    take(missing, 10, "missing   "),
+    take(wrong_port, 10, "unreachable"),
+)
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+python test_resilience.py
+
+#### checkpoint ####
+titulo: Dos fallan, una entrega
+----
+texto:
+
+En la salida vas a ver las dos fuentes rotas quejándose, cada una con su tipo de error: la que no existe recibe un 404, la del puerto equivocado no logra ni conectar.
+
+Y en medio de las quejas, la cámara sana entrega sus diez frames y termina tranquila.
+
+Eso es aislamiento de fallos. En el pipeline completo significa que puedes perder una cámara, o diez, y el sistema sigue dando servicio con las que quedan.
+
+#### advertencia ####
+texto:
+
+Fíjate en un detalle de diseño: cada fuente tiene su propia tarea. Si hubieras escrito la ingesta como un bucle que recorre todas las cámaras por turnos, no habría forma de aislar el fallo de una sola. La estructura de tareas **es** la estructura de tus dominios de fallo.

@@ -1,0 +1,171 @@
+_model: taller-paso
+---
+title: Colas acotadas y backpressure
+---
+orden: 10
+---
+body:
+
+#### texto ####
+texto:
+
+Este es el paso más importante del taller. Aquí está la respuesta a la mitad de la pregunta que nos trajo: cómo procesar varias cámaras sin reventar la memoria ni perder cuadros a ciegas. La herramienta es `asyncio.Queue`, y el detalle que lo cambia todo cabe en una palabra: **acotada**.
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+git checkout step-08-queues
+
+#### texto ####
+texto:
+
+## Las etapas se hablan por colas
+
+En vez de que la ingesta llame a la inferencia y quede a su merced, la ingesta **deja frames en una cola** y sigue con lo suyo. La inferencia **los saca cuando puede**.
+
+Ninguna de las dos sabe que la otra existe. La cola las desacopla, y ese desacople es lo que permite que cada una vaya a su propio ritmo.
+
+`asyncio.Queue` está hecha para esto: `await queue.put(item)` mete un elemento y `await queue.get()` saca uno, y las dos ceden el control al event loop mientras esperan.
+
+#### analogia ####
+titulo: La ventanilla entre la cocina y el salón
+----
+texto:
+
+En un restaurante, el cocinero no le entrega el plato al mesero en la mano, esperando a que venga. Lo deja en la ventanilla y vuelve al fuego. El mesero lo recoge cuando pasa.
+
+Ninguno de los dos espera al otro, y ese mostrador es lo que permite que la cocina siga produciendo mientras el mesero atiende una mesa lejana.
+
+Pero fíjate en algo: la ventanilla **tiene un tamaño**. Si se llena de platos, el cocinero se da cuenta de que va más rápido que el salón y tiene que decidir qué hacer. Ese aviso es información valiosa, y es justo lo que una cola infinita te esconde.
+
+#### texto ####
+texto:
+
+## El peligro de la cola sin límite
+
+`asyncio.Queue()` sin argumentos es **infinita**. Suena cómodo. Es una trampa, y la vamos a ver de frente.
+
+Abre `unbounded_queue.py`: un productor que mete 100 elementos por segundo y un consumidor que saca 10.
+
+#### codigo ####
+etiqueta: unbounded_queue.py
+----
+lenguaje: python
+----
+codigo:
+
+async def producer(q):
+    seq = 0
+    while True:
+        await q.put(seq)
+        seq += 1
+        await asyncio.sleep(0.01)      # 100 per second
+
+async def consumer(q):
+    while True:
+        await q.get()
+        await asyncio.sleep(0.1)       # 10 per second
+
+async def main():
+    q = asyncio.Queue()               # <- no maxsize
+    asyncio.create_task(producer(q))
+    asyncio.create_task(consumer(q))
+    for _ in range(10):
+        await asyncio.sleep(1)
+        print("queue size:", q.qsize())
+
+#### error_provocado ####
+modo: guiado
+----
+titulo: Vamos a dejar crecer una cola sin límite
+----
+texto:
+
+Ejecuta `python unbounded_queue.py` y no toques nada durante diez segundos. Vas a ver la cola creciendo:
+
+`queue size: 81`
+`queue size: 161`
+`queue size: 242`
+`...`
+`queue size: 805`
+
+#### solucion_error ####
+titulo: Una fuga de memoria con pasos extra
+----
+texto:
+
+El número nunca baja. Y no puede bajar: entran 100 por segundo y salen 10, así que cada segundo se acumulan 90 elementos más. En diez segundos, 900. En diez minutos, 54.000.
+
+En este ejemplo cada elemento es un número y no pasa nada. En tu pipeline **cada elemento es un JPEG**. Multiplica 54.000 por el peso de una imagen y tienes el proceso muerto por falta de memoria.
+
+Y hay un segundo daño, más silencioso: aunque la memoria aguantara, estarías procesando frames de hace varios minutos. En un sistema de tiempo real, un resultado viejo no vale nada aunque sea correcto.
+
+Una cola sin límite no te protege de nada: solo convierte un problema visible de velocidad en una fuga de memoria.
+
+#### texto ####
+texto:
+
+## La cola acotada y el freno automático
+
+La solución es una palabra. Abre `bounded_queue.py`, que es el mismo programa con una diferencia:
+
+#### codigo ####
+etiqueta: bounded_queue.py
+----
+lenguaje: python
+----
+codigo:
+
+q = asyncio.Queue(maxsize=5)
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+python bounded_queue.py
+
+#### codigo ####
+etiqueta: salida
+----
+lenguaje: text
+----
+codigo:
+
+queue size: 5
+queue size: 5
+queue size: 5
+
+#### texto ####
+texto:
+
+Clavada en cinco. Lo que pasa por dentro es lo interesante: cuando la cola está llena, `await q.put(item)` **se queda esperando** a que haya espacio. El productor, sin saberlo, pasó a ir al ritmo del consumidor.
+
+Eso tiene nombre: **backpressure**. La presión del final de la cadena se propaga hacia atrás hasta la fuente, sin que nadie tenga que coordinar nada.
+
+#### imagen ####
+imagen: backpressure.gif
+----
+pie: Arriba, la cola sin límite creciendo hasta 805 elementos. Abajo, con maxsize=5 la cola se mantiene llena y el productor espera en el put, ajustándose al ritmo del consumidor.
+
+#### checkpoint ####
+titulo: Deberías tener dos salidas muy distintas
+----
+texto:
+
+Una donde el número sube sin parar hasta 805, y otra donde se queda clavado en 5. Mismo productor, mismo consumidor, un solo argumento de diferencia.
+
+Si puedes explicar por qué la segunda no crece, entendiste backpressure.
+
+#### advertencia ####
+texto:
+
+Backpressure es la respuesta correcta cuando **no puedes permitirte perder datos**: una cola de pagos, una de mensajes, un procesamiento por lotes. Pero fíjate en lo que le hace a un sistema de tiempo real: si el productor es una cámara en vivo, frenarla no es una opción. La cámara va a seguir mandando frames a 25 por segundo, le hagas caso o no.
+
+Esa tensión es el tema del siguiente paso.

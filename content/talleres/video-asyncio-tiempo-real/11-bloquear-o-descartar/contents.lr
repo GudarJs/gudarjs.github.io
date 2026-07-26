@@ -1,0 +1,103 @@
+_model: taller-paso
+---
+title: Bloquear o descartar: elegir tu política
+---
+orden: 11
+---
+body:
+
+#### texto ####
+texto:
+
+Terminaste el paso anterior con una tensión sin resolver: el backpressure frena al productor, pero una cámara en vivo no se puede frenar. Va a seguir mandando 25 frames por segundo aunque tu cola esté llena y aunque tu proceso esté ahogado.
+
+Así que cuando la cola se llena solo hay dos salidas honestas. Y la palabra clave es **elegir**.
+
+#### texto ####
+texto:
+
+## Las dos políticas
+
+**Bloquear al productor.** `await q.put(item)` espera a que haya espacio. Nada se pierde, y el sistema entero se ajusta al ritmo del eslabón más lento. Es lo correcto cuando perder un dato es inaceptable: una transacción, un mensaje, una fila de trabajos por lotes.
+
+**Descartar lo viejo.** Cuando la cola está llena, botas el elemento más antiguo y metes el nuevo. Pierdes datos a propósito, y a cambio lo que procesas siempre es reciente. Es lo correcto en tiempo real, donde un frame de hace treinta segundos no le sirve a nadie aunque lo analices perfectamente.
+
+Lo importante es que esto **se elige por etapa, no de forma global**. En el mismo pipeline puedes querer una cosa en un sitio y la contraria en otro.
+
+#### analogia ####
+titulo: La sala de urgencias
+----
+texto:
+
+En una sala de urgencias hay dos tipos de fila. La del papeleo administrativo es de bloquear: si hay diez personas por delante, esperas tu turno, porque perder tu formulario no es una opción.
+
+La de los monitores de signos vitales es de descartar: la pantalla muestra el pulso de **ahora**. Si el sistema se atrasa, a nadie le sirve ver el latido de hace dos minutos como si fuera el actual. Ahí lo viejo se tira sin dudar.
+
+Mismo hospital, políticas opuestas, y las dos correctas.
+
+#### texto ####
+texto:
+
+## Descartar, en código
+
+Bloquear ya sabes cómo se escribe, es el `await q.put(item)` de siempre. Descartar hay que escribirlo a mano, y ocupa doce líneas. Ábrelo en `pipeline.py`:
+
+#### codigo ####
+etiqueta: pipeline.py
+----
+lenguaje: python
+----
+codigo:
+
+def put_or_drop(q: asyncio.Queue, item) -> bool:
+    try:
+        q.put_nowait(item)
+        return True
+    except asyncio.QueueFull:
+        try:
+            q.get_nowait()
+        except asyncio.QueueEmpty:
+            pass
+        q.put_nowait(item)
+        return False
+
+#### texto ####
+texto:
+
+Sigue la lógica, porque cada línea está por una razón:
+
+- **`q.put_nowait(item)`** intenta meter el elemento sin esperar. Si hay sitio, listo, devuelve `True`.
+- Si no hay sitio, lanza **`asyncio.QueueFull`**, y ahí entra el plan B.
+- **`q.get_nowait()`** saca el elemento más viejo para hacer espacio. Ese es el frame que estás botando.
+- El `except asyncio.QueueEmpty: pass` cubre un caso raro pero real: entre que fallaste al meter y vas a sacar, otra tarea pudo haber vaciado la cola. En un solo hilo es improbable, pero escribir código defensivo aquí no cuesta nada.
+- Devuelve **`False`** para que quien llama **sepa que se perdió algo**.
+
+Ese valor de retorno es la diferencia entre perder frames y perderlos a ciegas. Con él puedes contar los descartes y enseñarlos, que es justo lo que harás en el paso 16.
+
+#### texto ####
+texto:
+
+## Una línea contra doce
+
+Vale la pena mirar las dos políticas juntas, porque el contraste dice algo:
+
+Bloquear es `await q.put(item)`. Una línea.
+
+Descartar son doce líneas con dos `try` anidados, porque tienes que hacer el espacio a mano y decidir qué se pierde.
+
+Esa asimetría no es casualidad: Python te da gratis la política conservadora, y te obliga a escribir explícitamente la que pierde datos. Está bien que sea así. Botar información debería costar unas líneas de pensar.
+
+#### advertencia ####
+texto:
+
+El error clásico aquí es elegir descartar porque "es más rápido". No lo es: procesas los mismos frames por segundo en los dos casos, porque el límite lo pone el consumidor. Lo que cambia es **qué** frames procesas, los recientes o los viejos, y si el productor se frena o no.
+
+#### checkpoint ####
+texto:
+
+Antes de seguir, contesta esto para el pipeline que estás construyendo:
+
+- La cola de **ingesta a inferencia**: ¿bloquear o descartar? Las cámaras no se pueden frenar y un frame viejo no sirve. Descartar.
+- La cola de **inferencia a publicación**: ¿bloquear o descartar? Ese resultado ya costó una ida y vuelta al modelo. Sería absurdo tirarlo ahora. Bloquear.
+
+Si llegaste a esas dos respuestas por tu cuenta, ya tienes el diseño del pipeline en la cabeza. En el siguiente paso lo vas a montar entero.

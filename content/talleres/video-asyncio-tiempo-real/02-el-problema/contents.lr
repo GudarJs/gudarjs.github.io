@@ -9,7 +9,47 @@ body:
 #### texto ####
 texto:
 
-Antes de escribir código, entendamos qué vamos a construir y, sobre todo, **por qué** la forma "obvia" de hacerlo falla. Casi todo el mundo empieza un proyecto de visión con un bucle como este:
+Vamos a arrancar por el final feliz: en dos comandos vas a tener cuatro cámaras transmitiendo en tu navegador. Y una vez que las veas moverse, entenderás mucho mejor por qué el código que casi todos escribimos la primera vez no aguanta.
+
+Cada paso de este taller es una rama de git. Empezamos por la primera:
+
+#### codigo ####
+etiqueta: terminal 1
+----
+lenguaje: bash
+----
+codigo:
+
+git checkout step-02-problem
+python services.py --fake --cameras 4
+
+#### texto ####
+texto:
+
+Deja esa terminal abierta el resto del taller. Acabas de levantar dos servicios:
+
+- **El servicio de cámaras**, en el puerto 8001, que lee tus videos y los transmite como MJPEG sobre HTTP. Para el resto del taller son cámaras de verdad: se conectan por red y entregan frames a 25 por segundo, les prestes atención o no.
+- **El servicio del modelo**, en el puerto 8002, que recibe una imagen por HTTP y devuelve las detecciones en JSON.
+
+La bandera `--fake` sustituye YOLO por un modelo simulado que tarda 30 milisegundos y devuelve detecciones inventadas. Si instalaste torch sin problemas puedes quitarla y usar el modelo real; el comportamiento del pipeline es el mismo, solo cambian los números.
+
+Abre ahora [http://127.0.0.1:8001](http://127.0.0.1:8001) en tu navegador.
+
+#### checkpoint ####
+titulo: Deberías estar viendo esto
+----
+texto:
+
+Cuatro recuadros de video reproduciéndose a la vez, cada uno con su etiqueta `cam0`, `cam1`, `cam2`, `cam3`. Debajo, un panel de eventos vacío.
+
+Está vacío porque **todavía no hay pipeline**. Las cámaras transmiten y el modelo espera, pero nadie los ha conectado. Eso es exactamente lo que vas a construir.
+
+#### texto ####
+texto:
+
+## La forma obvia de conectarlos
+
+Tienes cámaras que dan frames y un modelo que los analiza. Lo natural es escribir esto:
 
 #### codigo ####
 etiqueta: el pipeline ingenuo
@@ -19,54 +59,60 @@ lenguaje: python
 codigo:
 
 while True:
-    frame = camara.read()          # 1. espera a la cámara      (I/O)
-    resultado = modelo.detectar(frame)   # 2. ocupa la CPU/GPU  (cómputo)
-    disco.escribir(resultado)      # 3. espera al disco         (I/O)
+    frame = camera.read()             # waits on the camera   (I/O)
+    result = model.detect(frame)      # occupies the CPU      (compute)
+    store(result)                     # waits on the disk     (I/O)
 
 #### texto ####
 texto:
 
-Todo ocurre en serie, en un solo hilo. Fíjate en el detalle clave: mientras el modelo detecta (paso 2), **nadie lee la cámara**; mientras el disco escribe (paso 3), **el modelo está ocioso**. Cada etapa espera a que la anterior termine del todo.
+Léelo despacio y fíjate en el detalle que lo arruina todo: mientras el modelo detecta, **nadie está leyendo la cámara**. Mientras el disco escribe, **el modelo está de brazos cruzados**. Cada línea espera a que la anterior termine del todo.
 
-Con una sola cámara y poca carga, "funciona". El problema aparece al escalar.
+Con una cámara y poca carga esto funciona, y por eso sobrevive tanto tiempo en tantos proyectos. El problema aparece cuando agregas la segunda.
 
 #### analogia ####
-titulo: El pipeline bloqueante es una cocina con un solo cocinero
+titulo: Un cocinero, cuatro pedidos
 ----
 texto:
 
-Imagina un restaurante donde un único cocinero hace todo, y de uno en uno: corta la verdura de un plato, luego lo cocina, luego lo emplata, y solo entonces empieza el siguiente pedido. Mientras cocina, el cuchillo está quieto. Mientras emplata, la sartén se enfría.
+Imagina una cocina con un solo cocinero que atiende los pedidos de uno en uno. Va a la nevera por el primer pedido y espera a que alguien se quite del medio. Pone el sartén al fuego y se queda ahí mirándolo. Sirve el plato, lo lleva a la ventanilla, y solo entonces lee el segundo pedido.
 
-No es que el cocinero sea lento: es que **nunca hace dos cosas a la vez**, aunque cortar el siguiente plato mientras el actual se cocina sería gratis. Con un pedido va bien. Con la sala llena, la cola de comandas crece sin control y los clientes se van.
+No es que sea lento, y el fuego tampoco lo es. El problema es que **nunca hace dos cosas a la vez**, aunque ir por los ingredientes del segundo plato mientras el primero se cocina no le costaría nada.
+
+Con un pedido va bien. Con la sala llena, la fila de comandas crece y los clientes se van.
 
 #### texto ####
 texto:
 
-## Por qué colapsa al escalar
+## Por qué se cae al escalar
 
-Cuando metes N cámaras en ese mismo bucle:
+Mete cuatro cámaras en ese mismo bucle y esto es lo que pasa:
 
-- Cada cámara espera su turno. La latencia crece de forma **lineal** con el número de fuentes.
-- Si una etapa se atrasa (el disco se satura, la red se congestiona), **toda la cadena se detiene**.
-- Los frames que llegan mientras estás ocupado se encolan sin límite o se pierden sin control. O revientas la memoria, o pierdes cuadros sin saber cuáles.
+- Cada cámara **espera su turno**, así que la latencia crece de forma lineal con el número de fuentes.
+- Si una sola etapa se atrasa, se atasca **la cadena entera**.
+- Los frames que llegan mientras estás ocupado o se acumulan sin límite, o desaparecen sin dejar rastro. O revientas la memoria, o pierdes cuadros sin saber cuáles.
 
-El throughput queda limitado por la **suma** de las latencias de todas las etapas, no por la más lenta. Y esa suma es justo lo que no podemos permitirnos en tiempo real.
+El throughput queda limitado por la **suma** de las etapas, no por la más lenta. Y esa suma es justo lo que no te puedes permitir en tiempo real.
 
 #### imagen ####
-imagen: timeline-bloqueante.gif
+imagen: blocking-timeline.gif
 ----
-pie: Arriba, el modelo bloqueante: cada frame pasa por captura, inferencia y escritura de forma secuencial, y el tiempo total es la suma. Abajo, la meta del taller: las tres etapas trabajan a la vez sobre frames distintos, y el tiempo total colapsa al de la etapa más lenta.
+pie: Cuatro cámaras en un bucle bloqueante. Cada una empieza solo cuando la anterior terminó sus tres etapas, y las demás esperan su turno en gris. El tiempo total es la suma de todo.
 
 #### texto ####
 texto:
 
-## La meta
+## Lo que vas a construir
 
-Ese "abajo" de la animación es exactamente lo que vamos a construir: **tres etapas desacopladas que trabajan en paralelo**, conectadas por colas. La captura no espera a la inferencia; la inferencia no espera a la escritura. Cada una avanza a su ritmo y el sistema entero se mueve a la velocidad de la etapa más lenta, no de la suma.
+En vez de esa cadena, el pipeline final tendrá tres etapas trabajando **a la vez** sobre frames distintos, conectadas por colas:
 
-Para llegar ahí necesitamos una herramienta que sepa hacer muchas cosas "a la vez" sin abrir mil hilos: `asyncio`. Pero antes de teoría, vamos a ver el problema con nuestros propios ojos. En el siguiente paso construimos el pipeline bloqueante de verdad y lo medimos.
+- **Ingesta**: una tarea por cámara, leyendo frames de la red.
+- **Inferencia**: varios trabajadores que sacan frames de una cola y se los mandan al modelo.
+- **Publicación**: manda los eventos resultantes al dashboard que ya tienes abierto.
+
+Todo eso en **un solo hilo**. Y esa es la parte que hoy suena imposible.
 
 #### checkpoint ####
 texto:
 
-En este punto deberías tener claras tres ideas: (1) el pipeline ingenuo hace una cosa a la vez, (2) su tiempo total es la suma de las etapas, y (3) nuestra meta es solapar las etapas para que el total sea el de la más lenta. Si eso tiene sentido, sigamos.
+Deja el servicio corriendo en su terminal y ten el dashboard abierto en una pestaña. Vas a volver a mirarlo muchas veces. En el siguiente paso vas a escribir el pipeline bloqueante de verdad, y a ponerle un número.

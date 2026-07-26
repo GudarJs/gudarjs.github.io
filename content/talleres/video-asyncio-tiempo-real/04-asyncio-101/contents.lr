@@ -1,6 +1,6 @@
 _model: taller-paso
 ---
-title: asyncio 101: event loop, corutinas y await
+title: asyncio 101: corrutinas, await y el event loop
 ---
 orden: 4
 ---
@@ -9,122 +9,117 @@ body:
 #### texto ####
 texto:
 
-`asyncio` intimida al principio porque introduce palabras nuevas (event loop, corutina, `await`, tarea) que parecen magia. No lo son. En este paso construimos el modelo mental correcto y lo probamos con un ejemplo diminuto. Sin video todavía: solo las piezas.
+Vamos a parar de escribir pipeline un momento para entender la herramienta. Este paso es el más conceptual del taller, y también el que hace que todo lo demás tenga sentido.
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+git checkout step-04-asyncio-101
 
 #### texto ####
 texto:
 
 ## Concurrencia no es paralelismo
 
-Esta es la idea que hay que interiorizar antes que nada:
+Esta distinción confunde a mucha gente durante años, así que vale la pena decirla clarito:
 
-- **Paralelismo** es hacer varias cosas *literalmente al mismo tiempo* (varios núcleos de CPU trabajando en paralelo).
-- **Concurrencia** es *gestionar* varias tareas a la vez, avanzando un poco en cada una, aunque haya un solo trabajador.
+**Paralelismo** es varias cosas ocurriendo en el mismo instante, en varios núcleos del procesador. Dos cocineros cocinando.
 
-`asyncio` te da **concurrencia en un solo hilo**. No hay varios núcleos trabajando: hay un único hilo que salta de una tarea a otra en los momentos en que cada una se queda esperando.
+**Concurrencia** es gestionar varias tareas a la vez, avanzando un poco en cada una, aunque solo haya un trabajador. Un cocinero que mientras el arroz hierve va picando la cebolla.
+
+asyncio te da **concurrencia en un solo hilo**. No hace que tu computadora calcule más rápido: hace que deje de estar parada esperando. Y como acabas de comprobar en el paso anterior, tu pipeline se pasa casi todo el tiempo esperando.
 
 #### analogia ####
-titulo: El event loop es un mesero, no un ejército de meseros
+titulo: Un mesero, diez mesas
 ----
 texto:
 
-Un buen mesero atiende diez mesas él solo. No se queda plantado esperando a que la mesa 3 decida su pedido: toma nota, va a la cocina, de paso recoge un plato de la mesa 7, lleva la cuenta a la mesa 1. Aprovecha cada momento de espera de una mesa para avanzar con otra.
+Un buen mesero no se queda parado en la mesa tres esperando a que los clientes se decidan. Toma el pedido de la mesa uno, pasa por la cocina a dejarlo, recoge los platos sucios de la siete de camino, y deja una cuenta en la dos.
 
-El event loop es ese mesero. Cada mesa es una tarea. El momento en que una mesa "está pensando" es un `await`: el punto donde la tarea dice "voy a esperar, mientras tanto atiende a otro". Un solo mesero (un hilo) da la sensación de atender todo a la vez, siempre que nadie lo secuestre con una tarea que no le deje moverse.
+Es una sola persona, igual que antes. Pero cada momento de espera se lo gasta atendiendo a alguien más. Nunca está quieto y nunca está en dos sitios a la vez.
+
+Ese mesero es el event loop.
 
 #### texto ####
 texto:
 
-## Las tres piezas
+## Las dos palabras nuevas
 
-- Una **corutina** es una función declarada con `async def`. Llamarla no la ejecuta: devuelve un objeto corutina, como una receta que aún no has cocinado.
-- **`await`** es el punto donde una corutina cede el control al event loop mientras espera algo (I/O, un temporizador, otra corutina). Es el "voy a esperar, atiende a otro" del mesero.
-- El **event loop** es ese único hilo que corre las corutinas y, cada vez que una hace `await`, salta a otra que esté lista.
+Solo hay dos cosas que aprender de sintaxis, y una tercera que entender.
 
-#### imagen ####
-imagen: event-loop.gif
-----
-pie: Cada tarea (cámara) entra al carril del event loop, avanza hasta un `await` (esperando I/O) y se aparta a esperar, dejando el carril libre para otra. Cuando su I/O termina, vuelve a la cola. El carril, un solo hilo, nunca se queda ocioso mientras haya trabajo listo.
-
-#### texto ####
-texto:
-
-## Pruébalo tú
-
-Guarda esto como `saludo_async.py`. Lanza tres "tareas" que esperan tiempos distintos y observa que **terminan concurrentemente**, no una tras otra:
+**`async def` define una corrutina.** Y aquí viene lo raro: llamarla no ejecuta nada.
 
 #### codigo ####
-etiqueta: saludo_async.py
+etiqueta: python
 ----
 lenguaje: python
 ----
 codigo:
 
-import asyncio
-import time
+async def read(cam):
+    return await socket.read()
 
-async def tarea(nombre, segundos):
-    print(f"{nombre}: empiezo")
-    await asyncio.sleep(segundos)      # cede el control mientras "espera"
-    print(f"{nombre}: termino tras {segundos}s")
-
-async def main():
-    t0 = time.perf_counter()
-    await asyncio.gather(
-        tarea("A", 2),
-        tarea("B", 1),
-        tarea("C", 3),
-    )
-    print(f"total: {time.perf_counter() - t0:.1f}s")
-
-asyncio.run(main())
+read("cam0")
+# -> <coroutine object read at 0x104f2c9c0>
 
 #### texto ####
 texto:
 
-Córrelo. Las tres tareas empiezan casi a la vez, terminan en orden B, A, C (por sus tiempos de espera) y el total es de unos **3 segundos**, no 6. Mientras A y C esperan, el loop avanza con las demás. Eso es concurrencia en un solo hilo.
+Llamar a `read("cam0")` te devuelve un objeto, no un resultado. Es una receta que nadie ha cocinado todavía: tiene los pasos escritos, pero no se ha encendido el fuego.
 
-#### error_provocado ####
-modo: guiado
+**`await` la cocina.** Ejecuta la corrutina de verdad y, cuando esta se pone a esperar algo, le devuelve el control al event loop.
+
+#### codigo ####
+etiqueta: python
 ----
-titulo: Vamos a olvidar el await a propósito
+lenguaje: python
 ----
-texto:
+codigo:
 
-Este es el error número uno de quien empieza con asyncio, y quiero que lo veas ahora, en un ejemplo pequeño, en vez de dentro del pipeline. Cambia la línea del `gather` para llamar a las corutinas **sin** await ni gather, así:
-
-```python
-async def main():
-    tarea("A", 2)      # <- llamada sin await
-    print("fin")
-```
-
-Corre el script. En vez de ver los mensajes de la tarea, Python te suelta:
-
-`RuntimeWarning: coroutine 'tarea' was never awaited`
-
-#### solucion_error ####
-texto:
-
-Ese warning significa que creaste el objeto corutina (la receta) pero nunca lo cocinaste. Una corutina **no hace nada** hasta que la esperas con `await`, la lanzas con `asyncio.create_task(...)`, o la agrupas con `asyncio.gather(...)`.
-
-Es el fallo más silencioso de asyncio: no revienta con una excepción, solo "no pasa nada" y un warning fácil de ignorar. Cuando notes que una parte de tu pipeline async "no se ejecuta" sin razón aparente, tu primer sospechoso es un `await` olvidado. Recupera el `await asyncio.gather(...)` del script original y todo vuelve a funcionar.
+jpeg = await read("cam0")
 
 #### texto ####
 texto:
 
-## El matiz que lo cambia todo: I/O-bound vs CPU-bound
+Ese `await` es el momento clave de todo el taller. No significa "quédate aquí parado hasta que llegue el dato". Significa: **"suelta el hilo, que otro lo aproveche, y avísame cuando el dato esté"**.
 
-Aquí está la trampa que hunde a la mayoría. `asyncio` brilla cuando las tareas pasan el tiempo **esperando** (I/O-bound): leer de una cámara, escribir a disco, mandar por red. Ese `await asyncio.sleep(...)` del ejemplo simula justo esa espera.
+#### texto ####
+texto:
 
-Pero si una tarea **ocupa el núcleo** haciendo cálculo puro (CPU-bound), como la inferencia de un modelo, no hay ningún `await` en medio donde ceder el control. Esa tarea **secuestra el event loop entero**: mientras calcula, ninguna otra tarea avanza. El mesero se queda atascado cocinando un plato imposible y las diez mesas esperan.
+## El event loop
+
+La tercera pieza no la escribes tú: es quien reparte el trabajo. El **event loop** es el único hilo que ejecuta corrutinas y salta entre ellas en cada `await`.
+
+Su trabajo es simple:
+
+1. Tiene una lista de tareas listas para avanzar.
+2. Toma una, y solo una, y la ejecuta.
+3. Cuando esa tarea llega a un `await` que espera algo lento, la aparta y toma la siguiente de la lista.
+4. Cuando el dato que esperaba la primera llega, la devuelve a la lista de listas.
+
+Nadie se queda parado esperando. Y como todo ocurre en un hilo, no hay carreras de datos ni candados que gestionar.
 
 #### imagen ####
-imagen: io-vs-cpu.gif
+imagen: event-loop.gif
 ----
-pie: A la izquierda, trabajo I/O-bound: casi todo es espera, así que las tareas se intercalan y asyncio las gestiona de maravilla. A la derecha, trabajo CPU-bound: cada tarea ocupa el núcleo de principio a fin, así que meterlas en el mismo loop solo las serializa. El cómputo pesado necesita salir del event loop, a un executor. Lo veremos en el paso 7.
+pie: El event loop toma una tarea de la lista de listas y la ejecuta. Al llegar a un await, la tarea se aparta a esperar y el bucle toma la siguiente. Cuando llega el dato, la tarea vuelve a la fila.
+
+#### advertencia ####
+texto:
+
+Que todo ocurra en un hilo tiene una consecuencia enorme que veremos en el paso 6: si una de tus tareas se pone a calcular sin parar, **no hay ningún `await` donde ceder el control**, y el event loop se queda congelado hasta que termine. Guárdate esa idea.
 
 #### checkpoint ####
 texto:
 
-Deberías poder responder tres preguntas: (1) ¿qué devuelve llamar a una `async def` sin await? (un objeto corutina que no se ejecuta), (2) ¿qué hace `await`? (cede el control al loop mientras espera), y (3) ¿por qué asyncio no acelera por sí solo la inferencia de un modelo? (es CPU-bound, no hay espera donde ceder). Con eso, estamos listos para meter el video en escena.
+Antes de seguir, asegúrate de que puedes explicar con tus palabras estas tres frases:
+
+- Llamar a una corrutina no la ejecuta, devuelve un objeto.
+- `await` la ejecuta y suelta el hilo mientras espera.
+- El event loop es un solo hilo que salta entre tareas en cada `await`.
+
+En el siguiente paso lo vas a ver funcionando, con un programa de doce líneas.

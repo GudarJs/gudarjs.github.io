@@ -1,0 +1,148 @@
+_model: taller-paso
+---
+title: Escala: sesenta y cuatro cámaras
+---
+orden: 13
+---
+body:
+
+#### texto ####
+texto:
+
+Cuatro cámaras funcionan. La pregunta honesta es qué pasa con sesenta y cuatro, porque ahí es donde las arquitecturas enseñan de qué están hechas.
+
+Y de paso vas a descubrir algo incómodo y muy útil: cuál es de verdad tu cuello de botella.
+
+#### codigo ####
+etiqueta: terminal 1
+----
+lenguaje: bash
+----
+codigo:
+
+git checkout step-10-scale
+python services.py --fake --cameras 64
+
+#### texto ####
+texto:
+
+Ese `--cameras 64` le dice al servicio que sirva sesenta y cuatro streams. No necesitas sesenta y cuatro archivos de video: el servicio reutiliza los clips que tengas y arranca cada stream en un punto distinto, así que cada cámara entrega frames diferentes.
+
+Ahora, en la otra terminal, corre el pipeline con dieciséis trabajadores en vez de ocho:
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+INFER_WORKERS=16 python main.py
+
+#### codigo ####
+etiqueta: salida
+----
+lenguaje: text
+----
+codigo:
+
+64 cameras, 16 inference workers
+
+ingested:  1511.7 frames/s
+inferred:   118.2 frames/s
+dropped:   1393.5 frames/s   (92% of ingest)
+
+#### texto ####
+texto:
+
+Esa salida cuenta dos historias opuestas, y hay que leerlas por separado.
+
+**La ingesta escaló sin despeinarse.** Un solo hilo leyendo sesenta y cuatro sockets a la vez está entregando **1511 frames por segundo**. Sesenta y cuatro conexiones simultáneas y el event loop ni se inmuta, porque esperar es barato.
+
+**La inferencia no escaló.** Se quedó en 118 por segundo, prácticamente lo mismo que con cuatro cámaras. Y como consecuencia, el 92% de los frames se está descartando.
+
+#### texto ####
+texto:
+
+## Descartar no es fallar
+
+Ese 92% asusta después de haber presumido de `0 dropped` en el paso anterior. Pero mira lo que está pasando de verdad: es `put_or_drop` haciendo **exactamente** lo que le pediste en el paso 11.
+
+La cola de inferencia está llena porque el modelo no da más. Cada frame nuevo bota el más viejo. El sistema procesa lo más reciente que puede y sigue en pie.
+
+Piensa en la alternativa. Sin esa política, esos 1393 frames por segundo que sobran se acumularían en memoria, y en menos de un minuto el proceso estaría muerto. El descarte no es el problema: **es lo que evita el problema.**
+
+#### advertencia ####
+texto:
+
+Lo que sí sería un fallo es descartar **sin saberlo**. Por eso `put_or_drop` devuelve `False` y el pipeline lleva la cuenta. Un sistema que pierde datos y te lo dice es honesto; uno que los pierde en silencio es una bomba de tiempo.
+
+#### texto ####
+texto:
+
+## Y el cuello de botella no es tuyo
+
+Aquí viene lo bonito de haber sacado el modelo del proceso en el paso 8. El límite está en el servicio de detección, así que vamos a darle más recursos. Para en la terminal 1 y arráncalo así:
+
+#### codigo ####
+etiqueta: terminal 1
+----
+lenguaje: bash
+----
+codigo:
+
+MODEL_THREADS=16 python services.py --fake --cameras 64
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+INFER_WORKERS=16 python main.py
+
+#### codigo ####
+etiqueta: salida
+----
+lenguaje: text
+----
+codigo:
+
+inferred:   118.2 frames/s      ->    441.1 frames/s
+
+#### advertencia ####
+texto:
+
+Cuidado con los dos dieciséis, que son cosas distintas y es fácil confundirlos:
+
+- **`INFER_WORKERS=16`** son **tus corrutinas**: cuántas peticiones mantienes en vuelo hacia el modelo.
+- **`MODEL_THREADS=16`** son **hilos dentro del servicio del modelo**, que es quien de verdad calcula.
+
+El primero decide cuánto trabajo pides a la vez. El segundo, cuánto trabajo puede atender el otro lado.
+
+#### checkpoint ####
+titulo: Casi cuatro veces más, sin tocar tu código
+----
+texto:
+
+Pasaste de 118 a 441 frames por segundo **sin cambiar una sola línea de tu pipeline**. Solo le diste más hilos al servicio que corre detrás del socket.
+
+Eso es lo que compraste en el paso 8. Si el modelo viviera dentro de tu proceso, escalarlo significaría rediseñar tu programa. Viviendo detrás de un socket, es una variable de entorno, o mañana una máquina con GPU, o pasado un servicio replicado.
+
+#### texto ####
+texto:
+
+## Este es el argumento del taller
+
+Con todo lo que has visto, ya puedes contestar la pregunta que mucha gente hace al principio: ¿no habría sido más fácil con hilos?
+
+Con cuatro cámaras y el modelo dentro del proceso: **sí**, y en menos líneas. Sería deshonesto decirte otra cosa.
+
+Lo que cambia la respuesta es esto:
+
+- Sesenta y cuatro hilos para sostener sesenta y cuatro streams, contra sesenta y cuatro corrutinas suspendidas en un `await`. Cada hilo reserva su pila y paga cambios de contexto; una corrutina suspendida es un objeto esperando en memoria.
+- El cómputo salió del proceso, así que ya no queda nada donde valga la pena aparcar un hilo.
+- Timeouts, cancelación y concurrencia estructurada, que es lo que viene en los próximos pasos, no tienen equivalente limpio con hilos.
+
+Con cuatro cámaras los hilos van bien. Con sesenta y cuatro, y con seiscientas, no.

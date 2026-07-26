@@ -9,42 +9,93 @@ body:
 #### texto ####
 texto:
 
-Antes de empezar, asegúrate de tener listo lo siguiente. Esta página es ligera a propósito: solo enumera lo necesario y te enlaza a las guías oficiales de instalación. No vamos a instalar todo paso a paso, cada herramienta tiene su documentación y las versiones cambian.
+Antes de empezar necesitas tres cosas instaladas y una carpeta con el repositorio clonado. Nada más. Este paso es corto a propósito: en cuanto termines vas a tener cámaras transmitiendo en tu navegador.
+
+## Lo que debes tener instalado
+
+- **Python 3.12 o superior.** Compruébalo con `python --version`. Si te sale 3.10 o menos, actualiza: el taller usa `asyncio.timeout` y `asyncio.TaskGroup`, que aparecieron en 3.11 y no existen antes. Descárgalo de [python.org](https://www.python.org/downloads/).
+- **Git.** Cada paso del taller es una rama, así que lo vas a usar todo el rato. [git-scm.com](https://git-scm.com/downloads).
+- **Un editor de código.** [VS Code](https://code.visualstudio.com/) va perfecto, pero cualquiera sirve.
+
+## Lo que debes saber
+
+Que te sientas cómodo escribiendo funciones y clases en Python, y que entiendas una list comprehension cuando la veas. Nada de asyncio: eso lo construimos desde cero a partir del paso 4.
 
 #### texto ####
 texto:
 
-## Lo que necesitas instalado
+## Clona el repositorio y prepara el entorno
 
-- **Python 3.12** o superior. Verifica con `python --version`. Guía oficial: [python.org/downloads](https://www.python.org/downloads/).
-- **Un editor de código.** Recomiendo [VS Code](https://code.visualstudio.com/) con la extensión de Python, pero cualquiera sirve.
-- **Git** (opcional pero recomendado para versionar tu proyecto): [git-scm.com](https://git-scm.com/).
+Abre una terminal y ejecuta esto. Cambia `<REPO-URL>` por la dirección que te dieron:
 
-## Lo que sabemos que ya sabes
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
 
-Este taller es de nivel intermedio. Asumimos que estás cómodo con:
+git clone <REPO-URL> async-video-pipeline
+cd async-video-pipeline
+python -m venv venv
 
-- Funciones, clases y `import` en Python.
-- List comprehensions y diccionarios.
-- Ejecutar scripts desde la terminal.
+#### comando_os ####
+descripcion: Activa el entorno virtual. Este comando cambia según tu sistema:
+----
+windows:
 
-No necesitas saber `asyncio` de antemano. Ese es justo el corazón del taller y lo construimos desde cero.
+venv\Scripts\activate
+----
+mac:
+
+source venv/bin/activate
+----
+linux:
+
+source venv/bin/activate
+
+#### texto ####
+texto:
+
+Sabrás que funcionó porque el nombre `(venv)` aparece al principio de tu línea de comandos. A partir de aquí, **todos los comandos del taller asumen que el entorno está activo**. Si cierras la terminal, vuelve a activarlo.
+
+Ahora instala las dependencias:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+pip install -r requirements.txt
 
 #### advertencia ####
 texto:
 
-`asyncio` forma parte de la librería estándar de Python: no se instala con pip, ya viene incluido. Las únicas dependencias que instalaremos son las de visión (OpenCV y ultralytics). Las instalamos en el paso 2, dentro de un entorno virtual.
+Esa instalación descarga PyTorch, que pesa bastante y en algunas máquinas se resiste. Si falla, no te bloquees: el taller entero funciona con un modelo simulado que no necesita torch. Más adelante verás la bandera `--fake`, y todo lo demás es idéntico.
 
 #### texto ####
 texto:
 
-## Material del taller: videos de muestra
+## Los videos de prueba
 
-Vas a necesitar unos cuantos archivos de video cortos que harán de "cámaras". Sirve cualquier `.mp4` que tengas a mano (clips del teléfono, por ejemplo). Lo ideal es que **tengan personas, coches u objetos** para que el detector tenga algo que encontrar.
+Las "cámaras" de este taller son clips de video que un servicio reproduce en bucle y sirve por la red, como haría una cámara real. Necesitas al menos un archivo `.mp4` en la carpeta `videos/`.
 
-Si no tienes ninguno, en el paso 3 te muestro cómo generar videos de prueba con OpenCV en dos líneas, así que puedes seguir el taller aunque empieces con las manos vacías.
+Si tienes videos propios a la mano, cópialos ahí: cualquier clip corto sirve, y si sale gente o carros el detector tendrá algo que encontrar. Si no, genera unos sintéticos:
+
+#### codigo ####
+etiqueta: terminal
+----
+lenguaje: bash
+----
+codigo:
+
+python make_samples.py
 
 #### checkpoint ####
+titulo: Antes de seguir
+----
 texto:
 
-Si al escribir `python --version` en tu terminal ves `Python 3.12.x` (o superior) y tienes tu editor abierto, estás listo. Pasa al siguiente paso, donde montamos el proyecto y hacemos nuestra primera detección.
+Ejecuta `python --version` y confirma que dice 3.12 o superior. Mira dentro de `videos/` y confirma que hay al menos un archivo `.mp4`. Con eso ya puedes pasar al siguiente paso, donde vas a ver cuatro cámaras transmitiendo en tu navegador.
