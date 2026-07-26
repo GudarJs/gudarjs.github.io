@@ -1,0 +1,89 @@
+_model: taller-paso
+---
+title: El problema y el panorama
+---
+orden: 4
+---
+body:
+
+#### texto ####
+texto:
+
+Tienes cuatro cámaras transmitiendo y un modelo esperando peticiones. Antes de conectarlos conviene entender por qué la forma obvia de hacerlo, la que casi todos escribimos la primera vez, no aguanta.
+
+Este paso no lleva código que ejecutar: es el que le da sentido a todo lo demás. Ten el dashboard abierto en una pestaña mientras lo lees.
+
+#### texto ####
+texto:
+
+## La forma obvia de conectarlos
+
+Tienes cámaras que dan frames y un modelo que los analiza. Lo natural es escribir esto:
+
+#### codigo ####
+etiqueta: el pipeline ingenuo
+----
+lenguaje: python
+----
+codigo:
+
+while True:
+    frame = camera.read()             # waits on the camera   (I/O)
+    result = model.detect(frame)      # occupies the CPU      (compute)
+    store(result)                     # waits on the disk     (I/O)
+
+#### texto ####
+texto:
+
+Léelo despacio y fíjate en el detalle que lo arruina todo: mientras el modelo detecta, **nadie está leyendo la cámara**. Mientras el disco escribe, **el modelo está de brazos cruzados**. Cada línea espera a que la anterior termine del todo.
+
+Con una cámara y poca carga esto funciona, y por eso sobrevive tanto tiempo en tantos proyectos. El problema aparece cuando agregas la segunda.
+
+#### analogia ####
+titulo: Un cocinero, cuatro pedidos
+----
+texto:
+
+Imagina una cocina con un solo cocinero que atiende los pedidos de uno en uno. Va a la nevera por el primer pedido y espera a que alguien se quite del medio. Pone el sartén al fuego y se queda ahí mirándolo. Sirve el plato, lo lleva a la ventanilla, y solo entonces lee el segundo pedido.
+
+No es que sea lento, y el fuego tampoco lo es. El problema es que **nunca hace dos cosas a la vez**, aunque ir por los ingredientes del segundo plato mientras el primero se cocina no le costaría nada.
+
+Con un pedido va bien. Con la sala llena, la fila de comandas crece y los clientes se van.
+
+#### texto ####
+texto:
+
+## Por qué se cae al escalar
+
+Mete cuatro cámaras en ese mismo bucle y esto es lo que pasa:
+
+- Cada cámara **espera su turno**, así que la latencia crece de forma lineal con el número de fuentes.
+- Si una sola etapa se atrasa, se atasca **la cadena entera**.
+- Los frames que llegan mientras estás ocupado o se acumulan sin límite, o desaparecen sin dejar rastro. O revientas la memoria, o pierdes cuadros sin saber cuáles.
+
+El throughput queda limitado por la **suma** de las etapas, no por la más lenta. Y esa suma es justo lo que no te puedes permitir en tiempo real.
+
+#### imagen ####
+imagen: blocking-timeline.gif
+----
+pie: Cuatro cámaras en un bucle bloqueante. Cada una empieza solo cuando la anterior terminó sus tres etapas, y las demás esperan su turno en gris. El tiempo total es la suma de todo.
+
+#### texto ####
+texto:
+
+## Lo que vas a construir
+
+En vez de esa cadena, el pipeline final tendrá tres etapas trabajando **a la vez** sobre frames distintos, conectadas por colas:
+
+- **Ingesta**: una tarea por cámara, leyendo frames de la red.
+- **Inferencia**: varios trabajadores que sacan frames de una cola y se los mandan al modelo.
+- **Publicación**: manda los eventos resultantes al dashboard que ya tienes abierto.
+
+Todo eso en **un solo hilo**. Y esa es la parte que hoy suena imposible.
+
+#### checkpoint ####
+texto:
+
+Deja los servicios corriendo en su terminal y el dashboard abierto en una pestaña: vas a volver a mirarlo muchas veces.
+
+En el siguiente paso vas a escribir tu primer archivo del pipeline, el bloqueante, y a ponerle un número que te va a perseguir el resto del taller.

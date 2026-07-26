@@ -1,0 +1,162 @@
+_model: taller-paso
+---
+title: La referencia: el número a batir
+---
+orden: 5
+---
+body:
+
+#### texto ####
+texto:
+
+Antes de arreglar algo hay que medirlo. Si no, al final del taller no vas a saber si mejoraste de verdad o si solo te lo parece.
+
+En este paso vas a correr el pipeline bloqueante, el de verdad, contra las cuatro cámaras que ya tienes transmitiendo. Y te vas a quedar con un número.
+
+#### texto ####
+texto:
+
+Crea un archivo llamado `baseline.py`. Es tu primer archivo del pipeline y no tiene ni una sola línea de asyncio: es a propósito la versión directa, la que escribirías sin pensar mucho.
+
+Empieza por las tres funciones que hablan con el mundo exterior. Las tres usan `urllib`, que viene con Python y es **bloqueante**: cada llamada se queda esperando sentada a que la red conteste.
+
+#### codigo ####
+etiqueta: baseline.py
+----
+lenguaje: python
+----
+codigo:
+
+import time
+import urllib.request
+
+CAMERAS = ["cam0", "cam1", "cam2", "cam3"]
+FRAMES_PER_CAMERA = 40
+BOUNDARY = b"--frame"
+
+
+def read_frames(cam_id, n):
+    """Pull n JPEG frames from one camera stream. Blocking, start to finish."""
+    stream = urllib.request.urlopen(f"http://127.0.0.1:8001/stream/{cam_id}")
+    frames, buffer = [], b""
+    while len(frames) < n:
+        buffer += stream.read(8192)
+        while True:
+            start = buffer.find(BOUNDARY)
+            if start < 0:
+                break
+            head_end = buffer.find(b"\r\n\r\n", start)
+            if head_end < 0:
+                break
+            header = buffer[start:head_end].decode(errors="ignore")
+            length = None
+            for line in header.split("\r\n"):
+                if line.lower().startswith("content-length:"):
+                    length = int(line.split(":")[1])
+            if length is None or len(buffer) < head_end + 4 + length:
+                break
+            frames.append(buffer[head_end + 4:head_end + 4 + length])
+            buffer = buffer[head_end + 4 + length:]
+            if len(frames) >= n:
+                break
+    stream.close()
+    return frames
+
+
+def detect(jpeg):
+    request = urllib.request.Request(
+        "http://127.0.0.1:8002/detect", data=jpeg, method="POST")
+    return urllib.request.urlopen(request).read()
+
+
+def publish(event):
+    request = urllib.request.Request(
+        "http://127.0.0.1:8001/events",
+        data=event, method="POST",
+        headers={"Content-Type": "application/json"})
+    urllib.request.urlopen(request).read()
+
+#### texto ####
+texto:
+
+`read_frames` parece la más enredada, pero solo está desenvolviendo el formato MJPEG que viste en el paso 3: busca la marca `--frame`, lee la cabecera para saber cuántos bytes mide la imagen, corta esos bytes y repite. Es el mismo trabajo que en el paso 11 harás en cuatro líneas con aiohttp.
+
+Ahora agrega al final del archivo el bucle, que es la parte que de verdad importa:
+
+#### codigo ####
+etiqueta: baseline.py, al final
+----
+lenguaje: python
+----
+codigo:
+
+t0 = time.perf_counter()
+total = 0
+for cam in CAMERAS:
+    for i, jpeg in enumerate(read_frames(cam, FRAMES_PER_CAMERA)):
+        result = detect(jpeg)
+        publish(b'{"cam_id":"%s","seq":%d,"count":0,"detections":[]}'
+                % (cam.encode(), i))
+        total += 1
+elapsed = time.perf_counter() - t0
+
+print(f"{len(CAMERAS)} cameras, {total} frames, one at a time")
+print(f"elapsed: {elapsed:.1f}s   throughput: {total / elapsed:.1f} frames/s")
+
+#### texto ####
+texto:
+
+Cuatro cámaras, cuarenta frames de cada una, ciento sesenta en total. Y el detalle que importa: el `for` de arriba. La `cam1` no empieza hasta que la `cam0` terminó sus cuarenta frames. Es literalmente el cocinero atendiendo un pedido a la vez.
+
+Guarda el archivo y ejecútalo desde la segunda terminal, con los servicios corriendo en la primera:
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+python baseline.py
+
+#### texto ####
+texto:
+
+Tarda unos trece segundos. Mientras esperas, mira el dashboard en el navegador: los eventos empiezan a aparecer, pero **de a una cámara**. Primero solo `cam0`, luego solo `cam1`. Puedes ver la fila de espera con tus ojos.
+
+Al terminar imprime algo parecido a esto:
+
+#### codigo ####
+etiqueta: salida
+----
+lenguaje: text
+----
+codigo:
+
+4 cameras, 160 frames, one at a time
+elapsed: 13.2s   throughput: 12.1 frames/s
+
+#### checkpoint ####
+titulo: Tu número de referencia
+----
+texto:
+
+**Anota tu cifra de `throughput`.** En la máquina donde se escribió este taller fueron 12.1 frames por segundo; en la tuya será parecida, quizá 10 o 15 según el equipo. Da igual el valor exacto: lo que importa es que es **tu** punto de partida.
+
+Ni un frame se perdió: los ciento sesenta se procesaron. Eso también importa, porque más adelante vamos a empezar a descartar frames a propósito y querrás comparar peras con peras.
+
+#### texto ####
+texto:
+
+## Pon el número en contexto
+
+Cuatro cámaras a 25 frames por segundo producen **100 frames por segundo** entre todas. Tu pipeline procesa 12. Es decir, vas por detrás de la realidad a razón de ocho a uno, y esa brecha crece cada segundo que pasa.
+
+Y ahora la pregunta que ordena el resto del taller: **¿dónde se fue el tiempo?** No en calcular. Tu proceso se pasó esos trece segundos casi entero esperando: esperando a que la cámara mandara el siguiente frame, esperando a que el modelo contestara, esperando a que se publicara el evento.
+
+Un pipeline que se pasa el tiempo esperando es exactamente el caso donde asyncio brilla. Vamos a por él.
+
+#### advertencia ####
+texto:
+
+Guarda tu número donde puedas verlo. Lo vas a comparar en el paso 12, cuando el pipeline completo esté funcionando, y la diferencia es la mejor parte del taller.

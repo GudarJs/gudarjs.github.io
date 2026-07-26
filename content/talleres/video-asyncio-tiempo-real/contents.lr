@@ -8,7 +8,7 @@ duracion: 10 a 12 horas
 ---
 descripcion:
 
-¿Cómo lees varias cámaras a la vez, corres un modelo de detección sobre cada frame y publicas los resultados, todo en un solo hilo y sin perder cuadros por el camino? En este taller vas a partir del bucle bloqueante que casi todos escribimos la primera vez, medir lo mal que escala, y reconstruirlo paso a paso como un pipeline asíncrono: ingesta por sockets, inferencia detrás de un servicio, colas acotadas con política de descarte, tolerancia a fallos y apagado ordenado. Cada paso es una rama del repositorio, y cada rama corre.
+¿Cómo lees varias cámaras a la vez, corres un modelo de detección sobre cada frame y publicas los resultados, todo en un solo hilo y sin perder cuadros por el camino? En este taller vas a partir del bucle bloqueante que casi todos escribimos la primera vez, medir lo mal que escala, y reconstruirlo paso a paso como un pipeline asíncrono: ingesta por sockets, inferencia detrás de un servicio, colas acotadas con política de descarte, tolerancia a fallos y apagado ordenado. Escribes cada archivo tú, desde el primero hasta el último, y cada paso termina con algo que corre.
 ---
 producto_final:
 
@@ -40,6 +40,5 @@ stack:
 - OpenCV (opencv-python 4.10) y NumPy 2.x
 - ultralytics 8.3 (YOLO11n, corre en CPU) con un modo `--fake` por si no puedes instalar torch
 - aiortc 1.9, solo para el bonus de WebRTC
-- Git, porque cada paso del taller es una rama
 ---
-prerrequisitos_resumen: Python 3.12 o superior, Git y un editor de código. Cómodo con funciones, clases y list comprehensions. No necesitas saber asyncio de antes: empezamos desde cero.
+prerrequisitos_resumen: Python 3.12 o superior y un editor de código. Cómodo con funciones, clases y list comprehensions. No hay nada que clonar: todos los archivos se escriben durante el taller. No necesitas saber asyncio de antes.

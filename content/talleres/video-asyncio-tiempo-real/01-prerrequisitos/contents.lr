@@ -9,24 +9,25 @@ body:
 #### texto ####
 texto:
 
-Antes de empezar necesitas tres cosas instaladas y una carpeta con el repositorio clonado. Nada más. Este paso es corto a propósito: en cuanto termines vas a tener cámaras transmitiendo en tu navegador.
+Este taller se construye entero desde cero. No hay nada que clonar ni que descargar: todos los archivos que necesitas están escritos en estas páginas, y los vas a ir creando tú.
+
+Lo único que hace falta es tener Python listo.
 
 ## Lo que debes tener instalado
 
-- **Python 3.12 o superior.** Compruébalo con `python --version`. Si te sale 3.10 o menos, actualiza: el taller usa `asyncio.timeout` y `asyncio.TaskGroup`, que aparecieron en 3.11 y no existen antes. Descárgalo de [python.org](https://www.python.org/downloads/).
-- **Git.** Cada paso del taller es una rama, así que lo vas a usar todo el rato. [git-scm.com](https://git-scm.com/downloads).
+- **Python 3.12 o superior.** Compruébalo con `python --version`. Si te sale 3.10 o menos, actualiza: vamos a usar `asyncio.timeout` y `asyncio.TaskGroup`, que llegaron en la 3.11 y no existen antes. Descárgalo de [python.org](https://www.python.org/downloads/).
 - **Un editor de código.** [VS Code](https://code.visualstudio.com/) va perfecto, pero cualquiera sirve.
 
 ## Lo que debes saber
 
-Que te sientas cómodo escribiendo funciones y clases en Python, y que entiendas una list comprehension cuando la veas. Nada de asyncio: eso lo construimos desde cero a partir del paso 4.
+Que te sientas cómodo escribiendo funciones y clases en Python, y que entiendas una list comprehension cuando la veas. Nada de asyncio: eso lo construimos desde cero a partir del paso 6.
 
 #### texto ####
 texto:
 
-## Clona el repositorio y prepara el entorno
+## Crea la carpeta del proyecto
 
-Abre una terminal y ejecuta esto. Cambia `<REPO-URL>` por la dirección que te dieron:
+Abre una terminal y prepara el sitio donde vas a trabajar:
 
 #### codigo ####
 etiqueta: terminal
@@ -35,7 +36,7 @@ lenguaje: bash
 ----
 codigo:
 
-git clone <REPO-URL> async-video-pipeline
+mkdir async-video-pipeline
 cd async-video-pipeline
 python -m venv venv
 
@@ -57,32 +58,17 @@ source venv/bin/activate
 #### texto ####
 texto:
 
-Sabrás que funcionó porque el nombre `(venv)` aparece al principio de tu línea de comandos. A partir de aquí, **todos los comandos del taller asumen que el entorno está activo**. Si cierras la terminal, vuelve a activarlo.
-
-Ahora instala las dependencias:
-
-#### codigo ####
-etiqueta: terminal
-----
-lenguaje: bash
-----
-codigo:
-
-pip install -r requirements.txt
+Sabrás que funcionó porque aparece `(venv)` al principio de tu línea de comandos. A partir de aquí, **todos los comandos del taller asumen que el entorno está activo**. Si cierras la terminal, vuelve a activarlo.
 
 #### advertencia ####
 texto:
 
-Esa instalación descarga PyTorch, que pesa bastante y en algunas máquinas se resiste. Si falla, no te bloquees: el taller entero funciona con un modelo simulado que no necesita torch. Más adelante verás la bandera `--fake`, y todo lo demás es idéntico.
+Este es el olvido más común del taller, y da errores confusos: `ModuleNotFoundError` de paquetes que sí instalaste, o un `python` que no es el que crees. Si algo raro pasa, lo primero que debes mirar es si tienes el `(venv)` delante.
 
 #### texto ####
 texto:
 
-## Los videos de prueba
-
-Las "cámaras" de este taller son clips de video que un servicio reproduce en bucle y sirve por la red, como haría una cámara real. Necesitas al menos un archivo `.mp4` en la carpeta `videos/`.
-
-Si tienes videos propios a la mano, cópialos ahí: cualquier clip corto sirve, y si sale gente o carros el detector tendrá algo que encontrar. Si no, genera unos sintéticos:
+## Instala las dependencias
 
 #### codigo ####
 etiqueta: terminal
@@ -91,11 +77,49 @@ lenguaje: bash
 ----
 codigo:
 
-python make_samples.py
+pip install aiohttp fastapi uvicorn opencv-python numpy
+
+#### texto ####
+texto:
+
+Eso es todo lo que necesitas para el taller completo. Para que veas de dónde sale cada cosa:
+
+- **aiohttp** es el cliente y servidor HTTP asíncrono. Es la pieza con la que vas a leer las cámaras y hablarle al modelo.
+- **fastapi** y **uvicorn** levantan los dos servicios que simulan el mundo exterior.
+- **opencv-python** y **numpy** leen los videos y manipulan las imágenes.
+
+#### texto ####
+texto:
+
+## El modelo de detección, opcional
+
+Este taller funciona de principio a fin con un **modelo simulado** que tarda 30 milisegundos y devuelve detecciones inventadas. Para aprender la arquitectura da exactamente igual, y te ahorra una descarga de más de un gigabyte.
+
+Si quieres detección real de objetos, instala también:
+
+#### codigo ####
+etiqueta: terminal, opcional
+----
+lenguaje: bash
+----
+codigo:
+
+pip install ultralytics
+
+#### advertencia ####
+texto:
+
+`ultralytics` arrastra PyTorch, que pesa bastante y en algunas máquinas se resiste a instalarse. Si falla, no pierdas tiempo peleándote: sigue con el modelo simulado. Todo el taller, incluidas las mediciones y los capítulos bonus, funciona igual.
 
 #### checkpoint ####
 titulo: Antes de seguir
 ----
 texto:
 
-Ejecuta `python --version` y confirma que dice 3.12 o superior. Mira dentro de `videos/` y confirma que hay al menos un archivo `.mp4`. Con eso ya puedes pasar al siguiente paso, donde vas a ver cuatro cámaras transmitiendo en tu navegador.
+Ejecuta estos dos comandos y confirma que ambos responden bien:
+
+`python --version` debe decir 3.12 o superior.
+
+`python -c "import aiohttp, fastapi, cv2, numpy; print('todo listo')"` debe imprimir `todo listo` sin errores.
+
+Con eso ya puedes pasar al mapa del proyecto, que te va a decir qué archivos vas a escribir y para qué sirve cada uno.

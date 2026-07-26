@@ -1,0 +1,144 @@
+_model: taller-paso
+---
+title: El mapa del proyecto
+---
+orden: 2
+---
+body:
+
+#### texto ####
+texto:
+
+Vas a escribir todos los archivos de este proyecto con tus manos. Esta página es el mapa: vuelve a ella cada vez que un paso mencione un archivo y no recuerdes de dónde salió ni para qué servía.
+
+Lo primero que hay que entender es que vas a tener **dos programas separados**, corriendo en dos terminales distintas.
+
+#### texto ####
+texto:
+
+## Los dos lados
+
+**El mundo exterior.** Las cámaras y el modelo de detección. En un proyecto real esto existe sin que tú lo escribas: las cámaras cuelgan de una pared y el modelo corre en un servidor. Aquí lo vas a simular en tu máquina, en el paso 3, copiando cuatro archivos sin analizarlos.
+
+**Tu pipeline.** Lo que construyes de verdad, del paso 5 al 18, archivo por archivo y entendiendo cada línea.
+
+Los dos lados se comunican **solo por HTTP**. Tu pipeline nunca importa nada del código de los servicios: les pide frames y les manda imágenes, igual que se lo pediría a una cámara al otro lado de la ciudad.
+
+#### codigo ####
+etiqueta: el árbol que vas a construir
+----
+lenguaje: text
+----
+codigo:
+
+async-video-pipeline/
+│
+├── venv/                # tu entorno virtual
+├── videos/              # los clips que las cámaras reproducen en bucle
+├── static/index.html    # PASO 3: el dashboard del navegador
+│
+├── make_samples.py      # PASO 3: genera los videos de prueba
+├── svc_cameras.py       # PASO 3: cámaras MJPEG en el puerto 8001
+├── svc_model.py         # PASO 3: detección por HTTP en el puerto 8002
+├── services.py          # PASO 3: levanta los dos servicios de arriba
+│
+├── baseline.py          # PASO 5:  el pipeline bloqueante, para medirlo
+├── hello_async.py       # PASO 7:  asyncio en 18 líneas
+├── never_awaited.py     # PASO 7:  el await olvidado
+├── heavy.py             # PASO 8:  una función que quema CPU
+├── block_loop.py        # PASO 8:  el event loop congelado
+├── infer_in_executor.py # PASO 9:  la salida con un hilo
+│
+├── detector.py          # PASO 10: hablarle al modelo por HTTP
+├── sources.py           # PASO 11: leer cámaras MJPEG con aiohttp
+├── pipeline.py          # PASO 13 y 14: el mensaje, la política de cola, las 3 etapas
+├── sink.py              # PASO 14: publicar los eventos al dashboard
+└── main.py              # PASO 14: armar todo y arrancarlo
+
+#### texto ####
+texto:
+
+## Tres grupos, tres propósitos
+
+**Los cuatro del paso 3** son el escenario. Los copias una vez y no los vuelves a tocar.
+
+**Los cinco de la mitad** son ejercicios sueltos. Cada uno demuestra una idea, se ejecuta solo y no forma parte del sistema final. Al terminar el taller puedes borrarlos sin que nada se rompa.
+
+**Los cinco de abajo son el pipeline.** Esos son los que importan, y así se relacionan entre ellos:
+
+#### codigo ####
+etiqueta: quién llama a quién
+----
+lenguaje: text
+----
+codigo:
+
+  svc_cameras.py                                    svc_model.py
+  (puerto 8001)                                     (puerto 8002)
+        │                                                 ▲
+        │ MJPEG                                     HTTP  │  detecciones
+        ▼                                                 │
+  ┌───────────┐   cola    ┌──────────────┐   cola   ┌───────────┐
+  │ sources   │──────────▶│  pipeline    │─────────▶│   sink    │
+  │  .py      │           │    .py       │          │   .py     │
+  └───────────┘           └──────────────┘          └─────┬─────┘
+   lee frames             las 3 etapas y la               │ HTTP
+                          política de cola                ▼
+                                                     dashboard
+
+                        main.py lo arranca todo
+
+#### texto ####
+texto:
+
+## Qué hace cada archivo tuyo
+
+**`detector.py`** envuelve al servicio del modelo. Una clase con un método: le pasas los bytes de una imagen y te devuelve las detecciones. Todo lo que sabe hacer es un POST y esperar.
+
+**`sources.py`** envuelve a una cámara. Te entrega frames uno a uno con `async for`. Esta es la pieza clave del diseño: **todas tus fuentes van a tener esta misma forma**, sea un archivo servido por red, tu webcam, una cámara IP o el navegador. Por eso los capítulos bonus del final van a encajar agregando una sola línea.
+
+**`pipeline.py`** es el corazón: el mensaje que viaja entre etapas, la política de qué hacer cuando una cola se llena, y las tres corrutinas de ingesta, inferencia y publicación.
+
+**`sink.py`** manda los resultados al dashboard. En un proyecto real, aquí escribirías a una base de datos o a una cola de mensajes.
+
+**`main.py`** no tiene lógica propia: crea las colas, arranca las tareas y las apaga en orden. Es el plano de montaje.
+
+#### analogia ####
+titulo: Cinco archivos, cinco oficios
+----
+texto:
+
+Piensa en el pipeline como un taller con cinco puestos: uno que recibe la materia prima (`sources`), uno que la transforma (`pipeline`), uno que despacha el producto (`sink`), un teléfono para hablar con el proveedor externo (`detector`), y un capataz que organiza a todos y decide cuándo se cierra (`main`).
+
+Ninguno hace el trabajo de otro, y por eso puedes cambiar cualquiera sin tocar los demás. En el paso 20 vas a agregar una cámara IP como fuente nueva, y no vas a modificar ni `pipeline` ni `sink`: solo un puesto más que entrega materia prima en el mismo formato.
+
+#### texto ####
+texto:
+
+## Cómo trabajar
+
+Cada paso te dice qué archivo crear o modificar, y te da el código completo. La forma de avanzar es siempre la misma:
+
+1. Creas o abres el archivo que indica el paso.
+2. Escribes lo que aparece en el bloque de código.
+3. Lo ejecutas y comparas con el resultado esperado del checkpoint.
+
+Escribe el código a mano en vez de copiarlo y pegarlo, sobre todo al principio. Es más lento y por eso funciona: los errores que cometas tecleando son justo los que te enseñan a leer los mensajes de error.
+
+#### advertencia ####
+texto:
+
+Cuando un paso te pida **modificar** un archivo que ya existe, siempre te dirá qué parte cambia. Si en algún momento te pierdes o algo no cuadra, cada paso termina con un checkpoint que describe exactamente qué deberías estar viendo: úsalo para saber si puedes seguir o toca revisar.
+
+#### checkpoint ####
+titulo: Ten esto a mano
+----
+texto:
+
+No hace falta memorizar nada de esta página. Lo único que deberías llevarte es la idea general:
+
+- Dos programas, en dos terminales: los servicios que simulan el mundo, y tu pipeline.
+- Se hablan solo por HTTP.
+- Vas a escribir cinco archivos que forman el sistema, y cada uno tiene un oficio.
+
+En el siguiente paso vas a crear los servicios y ver cuatro cámaras moverse en tu navegador.

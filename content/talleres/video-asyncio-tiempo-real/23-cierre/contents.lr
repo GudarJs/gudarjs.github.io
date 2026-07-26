@@ -1,0 +1,83 @@
+_model: taller-paso
+---
+title: Lo que lograste, y por dónde seguir
+---
+orden: 23
+---
+body:
+
+#### texto ####
+texto:
+
+Empezaste con un bucle de tres líneas que procesaba 12 frames por segundo y se caía al agregar la segunda cámara. Terminaste con un pipeline que aguanta sesenta y cuatro fuentes, sobrevive a que se caigan, se apaga sin perder trabajo y te dice dónde está su cuello de botella.
+
+Y todo en un solo hilo.
+
+#### texto ####
+texto:
+
+## Lo que construiste
+
+- **Ingesta concurrente** de varias cámaras MJPEG, cada frame llegando por un `await` sobre un socket, sin un solo hilo en la ruta.
+- **Inferencia fuera de tu proceso**, detrás de un servicio HTTP, de modo que el cómputo pesado nunca puede congelar tu event loop.
+- **Colas acotadas** entre etapas, con una política elegida a conciencia en cada una: descartar lo viejo en la ingesta, bloquear en la publicación.
+- **Aislamiento de fallos** por fuente, con timeouts para los cuelgues silenciosos y backoff exponencial para las reconexiones.
+- **Apagado ordenado** con señales, centinelas por trabajador y un plazo para dejar de ser educado.
+- **Diagnóstico en vivo** mirando la longitud de las colas, sin abrir un profiler.
+- **Cuatro tipos de fuente** conectados a la misma interfaz: archivos servidos por red, webcam USB, cámaras IP por RTSP y video del navegador por WebRTC.
+
+#### texto ####
+texto:
+
+## Las ideas que sirven más allá del video
+
+Si dentro de un año olvidas todo el código de este taller, que te queden estas seis:
+
+**Saca el cómputo pesado de tu proceso.** Entonces tu event loop se convierte en un enrutador, y enrutar es lo que hace bien.
+
+**Desacopla con colas. Acotadas, siempre.** Una cola sin límite no es comodidad, es una fuga de memoria con pasos extra.
+
+**Perder datos puede ser correcto, si lo elegiste tú.** Lo que nunca es correcto es perderlos sin saber cuántos.
+
+**Mide las colas, no el código.** En un sistema de etapas, el desequilibrio entre ellas te dice más que cualquier profiler.
+
+**Libera en `finally`. Relanza la cancelación.** Los dos descuidos que convierten un apagado limpio en uno que se queda colgado.
+
+**Un hilo en el borde está bien. Todo el trabajo en hilos, no.** Saber distinguir esas dos situaciones vale más que cualquier truco de sintaxis.
+
+#### texto ####
+texto:
+
+## ¿Y no habría sido más fácil con hilos?
+
+Merece una respuesta honesta ahora que ya tienes criterio para juzgarla.
+
+Con cuatro cámaras y el modelo dentro del proceso: sí, y en menos líneas. De verdad.
+
+Lo que cambió la respuesta fueron tres cosas: el cómputo salió del proceso y ya no quedaba nada donde aparcar un hilo; el número de fuentes creció hasta que esperar barato empezó a importar; y timeouts, cancelación y concurrencia estructurada no tienen equivalente limpio con hilos.
+
+Elegir bien entre las dos opciones, y saber decir por qué, es el objetivo real de este taller.
+
+#### texto ####
+texto:
+
+## Por dónde seguir
+
+**Batching en el servicio del modelo.** Ahora mandas una petición por frame. Juntar varios frames en una sola petición multiplica el rendimiento del modelo, y es la optimización con mejor relación esfuerzo/beneficio que te queda.
+
+**Persistencia de verdad.** Tus eventos viven en memoria, en los últimos 200. Mándalos a una base de datos, a un topic de Kafka o a un archivo, y aprovecha para aplicar lo aprendido: esa escritura también quiere su cola con política propia.
+
+**Métricas de verdad.** Exporta la longitud de las colas y las tasas por etapa a Prometheus, y móntate un panel. Ya tienes los números; solo falta sacarlos por un endpoint.
+
+**Concurrencia estructurada a fondo.** Lee sobre `asyncio.TaskGroup` y sobre por qué la gente que diseñó Trio insiste en que las tareas no deberían poder escaparse de su ámbito.
+
+**Y si tu proyecto crece de verdad**, vuelve al bonus 20: el video se va a un framework de medios y tu Python se queda con el plano de control.
+
+#### checkpoint ####
+titulo: Gracias por llegar hasta aquí
+----
+texto:
+
+Si algo de este taller no quedó claro, o si lo llevaste a un proyecto real y te topaste con algo que aquí no aparece, escríbeme. Los talleres mejoran con lo que cuenta la gente que los hace.
+
+Y si te sirvió, la mejor forma de fijarlo es enseñárselo a alguien más.

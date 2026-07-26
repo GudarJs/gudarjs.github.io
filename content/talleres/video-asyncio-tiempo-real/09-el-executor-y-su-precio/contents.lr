@@ -1,0 +1,119 @@
+_model: taller-paso
+---
+title: El executor, y el precio que trae
+---
+orden: 9
+---
+body:
+
+#### texto ####
+texto:
+
+Tienes el event loop congelado y sabes por qué. La salida evidente es sacar ese cálculo a un hilo aparte, y asyncio trae una herramienta justo para eso. Vamos a usarla, a comprobar que funciona, y después a mirar con lupa lo que acabamos de construir.
+
+En la misma rama `step-05-cpu-trap` hay un segundo archivo, `infer_in_executor.py`. La diferencia con el anterior cabe en una línea:
+
+#### codigo ####
+etiqueta: infer_in_executor.py
+----
+lenguaje: python
+----
+codigo:
+
+async def main():
+    loop = asyncio.get_running_loop()
+    asyncio.create_task(heartbeat())
+    await asyncio.sleep(0.35)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        for _ in range(4):
+            await loop.run_in_executor(pool, detect_in_process, b"")
+    await asyncio.sleep(0.35)
+
+#### texto ####
+texto:
+
+`loop.run_in_executor(pool, funcion, argumento)` manda esa función a un hilo del pool y te devuelve algo que sí puedes esperar con `await`. El cálculo sigue ocurriendo, pero **fuera** del hilo del event loop, así que el bucle queda libre para atender a los demás.
+
+Ejecútalo y compara con lo que viste antes:
+
+#### codigo ####
+etiqueta: terminal 2
+----
+lenguaje: bash
+----
+codigo:
+
+python infer_in_executor.py
+
+#### codigo ####
+etiqueta: salida
+----
+lenguaje: text
+----
+codigo:
+
+tick   gap    101 ms
+tick   gap    101 ms
+tick   gap    101 ms
+tick   gap    101 ms
+tick   gap    101 ms
+
+#### checkpoint ####
+titulo: Plano
+----
+texto:
+
+Ni un hueco. El latido se mantiene en 101 milisegundos de principio a fin, mientras las cuatro detecciones ocurren igual que antes. Acabas de aprender la herramienta estándar para meter código bloqueante en un programa asíncrono.
+
+`run_in_executor` es la respuesta correcta muchas veces, y en el paso 17 la vas a usar de verdad. Pero ahora viene la parte interesante.
+
+#### texto ####
+texto:
+
+## Mira bien lo que acabamos de construir
+
+Da un paso atrás y describe la arquitectura que tienes ahora mismo:
+
+- Cada unidad de trabajo real ocurre **en un hilo**.
+- El event loop se dedica a **pasar objetos de un lado a otro** y a esperar resultados.
+
+Eso es un pool de hilos. Con ceremonia adicional.
+
+Si tu diseño entero consiste en mandar todo el trabajo a un executor, entonces no necesitas asyncio: `threading` con una `queue.Queue` hace lo mismo, en menos líneas y con menos conceptos nuevos que aprender. Sería deshonesto que este taller te vendiera lo contrario.
+
+#### advertencia ####
+texto:
+
+Esta es la pregunta que deberías hacerte en cualquier proyecto asíncrono real: ¿mis tareas se pasan el tiempo **esperando**, o **calculando**? Si es lo segundo y no puedes cambiarlo, asyncio te está complicando la vida sin darte nada a cambio.
+
+#### texto ####
+texto:
+
+## La pregunta que sí lleva a algún sitio
+
+En vez de preguntarnos cómo meter el cálculo en nuestro programa sin romperlo, demos la vuelta a la pregunta:
+
+**¿Y si el cálculo no viviera en nuestro programa?**
+
+Porque piénsalo: ¿por qué tiene que correr el modelo dentro de tu proceso de Python? Un modelo de detección es un servicio: recibe una imagen, devuelve unas cajas. Podría estar en otro proceso. En otra máquina. En una máquina con GPU mientras la tuya no la tiene.
+
+Y si el modelo está detrás de la red, entonces desde el punto de vista de tu programa la inferencia deja de ser cálculo y **se convierte en espera**. Que es justo aquello en lo que asyncio es imbatible.
+
+#### analogia ####
+titulo: La cocina no lava sus platos
+----
+texto:
+
+En el paso anterior el mesero se atascaba lavando la vajilla. La solución del executor es contratar a un lavaplatos y que el mesero le pase la loza: funciona, pero ahora tienes que coordinar a dos personas dentro del mismo local, y el mesero se pasa el día haciendo de mensajero.
+
+La otra solución es mandar la vajilla a un servicio de lavado externo. El mesero deja la caja en la puerta y sigue atendiendo mesas. No coordina a nadie: solo espera a que devuelvan la caja limpia, y esperar es exactamente lo que sabe hacer bien.
+
+#### checkpoint ####
+texto:
+
+En este punto deberías tener dos cosas claras:
+
+- `run_in_executor` arregla el síntoma y a veces es la respuesta correcta.
+- Si **todo** tu trabajo acaba en el executor, lo que construiste es un pool de hilos y asyncio te sobra.
+
+En el siguiente paso el modelo sale de tu proceso, y el pipeline se vuelve puro I/O.
